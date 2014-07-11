@@ -1,13 +1,25 @@
 #!/bin/bash
 set -o errexit
-n_process=4
 
-database=$1
-
-if [ ! -d "$database" -o -z "$database" ]
+if [ $# -lt 1 ]
 then
-  echo "'$database' isn't a directory"
-  exit
+  echo "Usage: $0 <dataset directory> [number of parallel processes]"
+  exit 1
+fi
+
+if [ ! -d "$1" ]
+then
+  echo "Invalid directory \"$1\"!"
+  exit 1
+fi
+
+database="$1"
+
+if [ $# -lt 2 ]
+then
+  n_process=`cat /proc/cpuinfo  | grep '^processor' | wc -l`
+else
+  n_process=$2
 fi
 
 min_freq=10

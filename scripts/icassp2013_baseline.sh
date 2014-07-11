@@ -1,13 +1,19 @@
 #!/bin/bash
 set -o errexit
 
-database="$1"
-
-if [ ! -d "$database" -o -z "$database" ]
+if [ $# -lt 1 ]
 then
-  echo "'$database' isn't a directory"
-  exit
+  echo "Usage: $0 <dataset directory>"
+  exit 1
 fi
+
+if [ ! -d "$1" ]
+then
+  echo "Invalid directory \"$1\"!"
+  exit 1
+fi
+
+database="$1"
 
 min_freq=10
 max_freq=5000
