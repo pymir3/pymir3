@@ -1,0 +1,60 @@
+HELP ON DATASETS
+
+======= INTRODUCTION
+The most important thing when getting results is setting up your databases
+straight. In automatic transcription of music, you will often have:
+a) Audio files containing music pieces for testing
+b) Audio files containing audio samples for training - for each instrument
+c) Label files containing ground truth information for each instrument that
+exists in a)
+
+For research purposes, you may want to organize your data, so that you will
+generate results more easily. In our example scripts, each dataset is organized
+as Pieces and Samples. Pieces may contain media (Audio, for example) and labels.
+Labels are manual annotations, synchronized with the media files (file names
+will be used for matching, so "foo.wav" corresponds to "foo.txt"). Labels are
+separated by instrument.
+
+Samples are organized by media type and instrument, and contain excerpts of
+things that are to be detected (notes). Many musical transcription systems
+ignore this part, but good results were achieved using supervised training of
+notes nowadays (2013).
+
+======= DIRECTORY STRUCTURE
+Although the structure isn't restricted, our databases are held in a directory
+whose inner structure is pre-defined.
+Directory structure:
+./database_name/
+./database_name/Pieces/ # Here are the pieces
+./database_name/Pieces/Audio # Audio files for the pieces - maybe in the future
+                             # we will use video or something else
+./database_name/Pieces/Labels # Label files corresponding to audio. The pieces
+                              # will be matched using file names!
+./database_name/Samples/ # Samples directory. Again, it is prepared to get video
+                         # or other sensor data.
+./database_name/Samples/Audio/Instrument1 # Note samples for instrument 1
+./database_name/Samples/Audio/Instrument2 # Note samples for instrument 2
+
+======= PRE-BUILT DATASETS
+PyMIR3 currently uses the following datasets:
+Small - Downloaded together with the main program. Three ten-second excerpts
+that can be used for sanity checks.
+
+The following two databases are downloaded using import_piano_db.sh.
+
+Piano - Built using Polliner and Elis' paper. All pieces were rendered using
+samples from the IOWA Musical Instrument Samples.
+
+PianoL - A crop from the Piano dataset that can be used for quick tests.
+
+MAPS - You will have to manually download the database and then run the
+import_maps.sh script to convert it to the PyMIR3 format.
+TODO: automatic download
+
+MIREX - Experimental support only, but you may download it using the
+import_mirex.sh script.
+
+======= LICENSING
+Remember that all aforementioned datasets are restricted by their licenses, and
+usually may only be used for research purposes and are copyrighted by their
+respective owners.
