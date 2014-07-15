@@ -18,18 +18,14 @@ class Wav2Spectrogram(mir3.module.Module):
         parser.add_argument('-t','--spectrum-type', default='magnitude',
                             choices=['power', 'magnitude', 'decibels',
                             'logmagnitude', 'logmagnitude2'], help="""type of
-                            spectrum generated. Possible values are 'power',
-                            'magnitude', 'decibels', 'logmagnitude',
-                            'logmagnitude2' (default: %(default)s)""")
+                            spectrum generated (default: %(default)s)""")
         parser.add_argument('-l','--window-length', type=int, default=2048,
                             help="""window length, in samples (default:
                             %(default)s)""")
         parser.add_argument('-S','--window-shape', default='Hanning',
                             choices=['Bartlett', 'Blackman', 'Hamming',
-                            'Hanning', 'Triangle'], help="""shape of the window.
-                            Possible values are 'Bartlett', 'Blackman',
-                            'Hamming', 'Hanning' or 'Triangle' (default:
-                            %(default)s)""")
+                            'Hanning', 'Triangle'], help="""shape of the window
+                            (default: %(default)s)""")
         parser.add_argument('-s','--window-step', type=int, default=1024,
                             help="""step, in samples, between windows (default:
                             %(default)s)""")
