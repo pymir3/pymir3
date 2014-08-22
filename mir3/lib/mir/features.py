@@ -20,13 +20,9 @@ def energy(A):
 
 def flux(A):
     """Spectral flux of each frame"""
-    print A.shape
     a = numpy.diff(A, axis = 1)
-    print a.shape
     s = numpy.sum(numpy.maximum(a, 0), axis=0)
-    print s.shape
     s0 = numpy.sum(A, axis=0)
-    print s0.shape
     return numpy.hstack ((numpy.array([0]), s))/s0
     
 
