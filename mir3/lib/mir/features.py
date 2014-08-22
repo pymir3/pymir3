@@ -24,7 +24,7 @@ def flux(A):
     s = numpy.sum(numpy.maximum(a, 0), axis=0)
     s0 = numpy.sum(A, axis=0)
     return numpy.hstack ((numpy.array([0]), s))/s0
-    
+
 
 def centroid(A):
     """Centroid of each frame"""
