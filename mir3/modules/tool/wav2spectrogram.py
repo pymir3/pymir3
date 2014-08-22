@@ -17,8 +17,8 @@ class Wav2Spectrogram(mir3.module.Module):
                             DFT that will be calculated (default: value of
                             'window-length')""")
         parser.add_argument('-t','--spectrum-type', default='magnitude',
-                            choices=['power', 'magnitude', 'decibels',
-                            'logmagnitude', 'logmagnitude2'], help="""type of
+                            choices=['power', 'magnitude', 'log',
+                            'sqrt'], help="""type of
                             spectrum generated (default: %(default)s)""")
         parser.add_argument('-l','--window-length', type=int, default=2048,
                             help="""window length, in samples (default:
@@ -94,13 +94,16 @@ class Wav2Spectrogram(mir3.module.Module):
                         NFFT=s.metadata.sampling_configuration.window_length,\
                         Fs=s.metadata.sampling_configuration.fs,\
                         window=pylab.window_hanning,\
-                        noverlap=s.metadata.sampling_configuration.window_step-\
-                        s.metadata.sampling_configuration.window_length,
+                        noverlap=s.metadata.sampling_configuration.window_length-\
+                        s.metadata.sampling_configuration.window_step,
                         pad_to=s.metadata.sampling_configuration.dft_length)
 
         if s.metadata.sampling_configuration.spectrum_type == 'magnitude':
             Pxx = numpy.sqrt(Pxx)
 
+        if s.metadata.sampling_configuration.spectrum_type == 'sqrt':
+            Pxx = numpy.sqrt(numpy.sqrt(Pxx))
+                        
         if s.metadata.sampling_configuration.spectrum_type == 'log':
             Pxx = numpy.log10(numpy.sqrt(Pxx) + 10**(-6))
 
