@@ -7,13 +7,18 @@ then
   exit 1
 fi
 
-./pymir3-cl.py tool wav2spectrogram $1 /tmp/$$
+echo ./pymir3-cl.py tool wav2spectrogram $1 /tmp/$$.spec
+./pymir3-cl.py tool wav2spectrogram $1 /tmp/$$.spec
+
+echo ./pymir3-cl.py info any /tmp/$$.spec
+./pymir3-cl.py info any /tmp/$$.spec -m
 
 feature_files=""
 for feature in energy mfcc centroid flatness flux rolloff
 do
 echo "Computing $feature"
-./pymir3-cl.py features $feature /tmp/$$ /tmp/$$.$feature
+echo ./pymir3-cl.py features $feature /tmp/$$.spec /tmp/$$.$feature
+./pymir3-cl.py features $feature /tmp/$$.spec /tmp/$$.$feature
 featurefiles=$featurefiles" /tmp/$$.$feature"
 done
 

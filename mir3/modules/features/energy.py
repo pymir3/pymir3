@@ -20,7 +20,7 @@ class Energy(mir3.module.Module):
     def run(self, args):
         s = spectrogram.Spectrogram()
         s.load(args.infile)
-        
+
         t = track.FeatureTrack()
         t.data = feats.energy(s.data/ \
             s.metadata.sampling_configuration.dft_length)
