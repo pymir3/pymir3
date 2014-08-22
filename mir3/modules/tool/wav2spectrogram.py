@@ -77,9 +77,14 @@ class Wav2Spectrogram(mir3.module.Module):
 
         # Calculates data
         rate, data = scipy.io.wavfile.read(wav_file.name)
+
+        data = data.astype(numpy.float)
+        
         if data.ndim > 1:
             data = numpy.mean(data, axis=1)
-        
+
+        data /= 32767.0 # Normalization to -1/+1 range
+            
         s.metadata.sampling_configuration.fs = rate
         s.metadata.sampling_configuration.ofs = \
                 s.metadata.sampling_configuration.fs / \
@@ -89,20 +94,37 @@ class Wav2Spectrogram(mir3.module.Module):
                 
         if nSamples == 0:
             raise ValueError("File '%s' has no audio" % wav_file.name)
-        
-        Pxx, freqs, bins, im = pylab.specgram(data,\
-                        NFFT=s.metadata.sampling_configuration.window_length,\
-                        Fs=s.metadata.sampling_configuration.fs,\
-                        window=pylab.window_hanning,\
-                        noverlap=s.metadata.sampling_configuration.window_length-\
-                        s.metadata.sampling_configuration.window_step,
-                        pad_to=s.metadata.sampling_configuration.dft_length)
 
-        if s.metadata.sampling_configuration.spectrum_type == 'magnitude':
-            Pxx = numpy.sqrt(Pxx)
+        #print data[0:32]
+        #print numpy.abs(numpy.fft.rfft(data[0:32]))
+        #print numpy.abs(numpy.fft.rfft(data[32:64]))
+
+        window = numpy.hanning(window_length)
+        
+        buffered_data = [ data[k:k+window_length] * window\
+                    for k in range(len(data)/window_step)]
+
+        buffered_data = numpy.array(buffered_data).T
+        
+        Pxx = numpy.abs(numpy.fft.rfft(buffered_data,\
+                            n = dft_length,\
+                            axis = 0))
+
+        #print Pxx[:,0]
+        
+        #Pxx, freqs, bins, im = pylab.specgram(data,\
+        #                NFFT=s.metadata.sampling_configuration.window_length,\
+        #                Fs=s.metadata.sampling_configuration.fs,\
+        #                window=pylab.window_hanning,\
+        #                noverlap=s.metadata.sampling_configuration.window_length-\
+        #                s.metadata.sampling_configuration.window_step,
+        #                pad_to=s.metadata.sampling_configuration.dft_length)
 
         if s.metadata.sampling_configuration.spectrum_type == 'sqrt':
-            Pxx = numpy.sqrt(numpy.sqrt(Pxx))
+            Pxx = numpy.sqrt(Pxx)
+
+        if s.metadata.sampling_configuration.spectrum_type == 'power':
+            Pxx = Pxx ** 2
                         
         if s.metadata.sampling_configuration.spectrum_type == 'log':
             Pxx = numpy.log10(numpy.sqrt(Pxx) + 10**(-6))
