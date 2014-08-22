@@ -54,3 +54,6 @@ docs/_build/
 
 # Write backup
 *~
+
+# Vim temp file
+.*swp
