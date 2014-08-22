@@ -71,7 +71,7 @@ class BaseObject(object):
 
         # Restore arrays if needed
         if restore_state:
-            __place_arrays(self, array_list)
+            BaseObject.__place_arrays(self, array_list)
 
     def load(self, handler):
         """Loads an object in the compressed format.
