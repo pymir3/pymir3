@@ -7,16 +7,18 @@ then
   exit 1
 fi
 
-echo "./pymir3-cl.py tool wav2spectrogram $1 /tmp/$$"
+./pymir3-cl.py tool wav2spectrogram $1 /tmp/$$
 
 feature_files=""
 for feature in energy mfcc centroid flatness flux rolloff
 do
 echo "Computing $feature"
-echo "./pymir3-cl.py feature $feature /tmp/$$ /tmp/$$.$feature"
+./pymir3-cl.py features $feature /tmp/$$ /tmp/$$.$feature
 featurefiles=$featurefiles" /tmp/$$.$feature"
 done
 
 echo "Joining features"
-echo "./pymir3-cl.py feature join $featurefiles /tmp/$$.features.join"
+./pymir3-cl.py features join $featurefiles /tmp/$$.features.join
 
+echo "Calculating mean and variance - output in CSV"
+./pymir3-cl.py features stats /tmp/$$.features.join -m -v -c

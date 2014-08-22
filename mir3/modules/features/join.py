@@ -3,7 +3,7 @@ import mir3.data.feature_track as track
 import mir3.module
 import numpy
 
-class Stack(troll.module.Module):
+class Join(mir3.module.Module):
     def get_help(self):
         return """Joins two or more feature tracks into one multi-dimensional feature track"""
 

@@ -109,6 +109,6 @@ class Wav2Spectrogram(mir3.module.Module):
 
         s.data = Pxx
 
-        pylab.show()
+        #pylab.show()
         
         return s
