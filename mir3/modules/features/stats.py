@@ -87,6 +87,7 @@ class Stats(mir3.module.Module):
                     sys.stdout.write(str(out[i]))
                     sys.stdout.write(",")
                 sys.stdout.write(str(out[-1]))
+                sys.stdout.write('\n')
                 
             if final_output is None:
                 final_output = out

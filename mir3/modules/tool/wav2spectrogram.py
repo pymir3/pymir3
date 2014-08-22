@@ -77,6 +77,8 @@ class Wav2Spectrogram(mir3.module.Module):
 
         # Calculates data
         rate, data = scipy.io.wavfile.read(wav_file.name)
+        if data.ndim > 1:
+            data = numpy.mean(data, axis=1)
         
         s.metadata.sampling_configuration.fs = rate
         s.metadata.sampling_configuration.ofs = \
