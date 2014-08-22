@@ -26,4 +26,4 @@ echo "Joining features"
 ./pymir3-cl.py features join $featurefiles /tmp/$$.features.join
 
 echo "Calculating mean and variance - output in CSV"
-./pymir3-cl.py features stats /tmp/$$.features.join -m -v -c
+./pymir3-cl.py features stats -m -v -c /tmp/$$.features.join /tmp/$$.features.stats
