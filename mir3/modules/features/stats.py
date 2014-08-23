@@ -62,11 +62,14 @@ class Stats(mir3.module.Module):
                              o.data.var(axis=0)))
 
             if args.slope is True:
-                out = numpy.hstack((out,
-                                numpy.array(
-                [scipy.stats.linregress(o.data[:,i], range(o.data.shape[0]))[0]
-                 for i in xrange(o.data.shape[1])]
-                        )))
+                variance =  o.data.var(axis=0)
+                lindata = numpy.zeros(variance.shape)
+                for i in xrange(o.data.shape[1]):
+                    if variance[i] > 0:
+                        lindata[i] = scipy.stats.linregress(o.data[:,i],\
+                                            range(o.data.shape[0]))[0]
+
+                out = numpy.hstack((out,lindata))
 
             if args.limits is True:
                 out = numpy.hstack((out,
@@ -123,8 +126,9 @@ class Stats(mir3.module.Module):
         p.data = final_output
 
         if args.normalize:
+            std_p = p.data.std(axis=0)
             p.data = (p.data - p.data.mean(axis=0))/\
-                numpy.maximum(10**(-6), p.data.std(axis=0))
+                    numpy.maximum(10**(-6), std_p)
 
         p.metadata.sampling_configuration = o.metadata.sampling_configuration
         p.metadata.feature = new_features

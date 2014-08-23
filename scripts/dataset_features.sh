@@ -70,7 +70,7 @@ done
 
 echo "Calculating statistics from all feature tracks"
 final_name="$database"/features.dataset
-./pymir3-cl.py features stats -m -v -l -s -n `find "$database" -name '*.features'` $final_name
+./pymir3-cl.py features stats -m -v -s -l -n `find "$database" -name '*.features'` $final_name
 #./minion.py info features $final_name
 
 
