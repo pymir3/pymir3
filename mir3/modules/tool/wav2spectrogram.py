@@ -108,7 +108,7 @@ class Wav2Spectrogram(mir3.module.Module):
         
         Pxx = numpy.abs(numpy.fft.rfft(buffered_data,\
                             n = dft_length,\
-                            axis = 0))
+                            axis = 0)) / float(window_length)
 
         #print Pxx[:,0]
         
