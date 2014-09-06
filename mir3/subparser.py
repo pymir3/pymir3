@@ -1,6 +1,6 @@
 import importlib
 import inspect
-import os.path
+import os
 
 class Subparser(object):
     """Magic class to make command line modules easy.
@@ -10,22 +10,22 @@ class Subparser(object):
     command line.
     """
 
-    def __init__(self, parser, module_file, module_name):
+    def __init__(self, parser, dirname, module_name):
         """Do all the magic for this class.
 
         Scans the directory for the module given and finds submodules available.
         For each submodule, process it so that it can be called from the command
         line.
 
-        Both module_file and module_name are provided so that a wrapper library
-        that shadows part of the modules can be used.
+        Both dirname and module_name are provided so that a wrapper library that
+        shadows part of the modules can be used.
 
-        module_file should be the path for the __init__.py associates with
-        module_name
+        "dirname" should be the directory path for the __init__.py associated
+        with module_name
 
         Args:
             parser: an argparse parser.
-            module_file: name of the file for the current module.
+            dirname: directory path of the file for the current module.
             module_name: name of the current module.
 
         Raises:
@@ -33,9 +33,6 @@ class Subparser(object):
                          occurs if a leaf module doesn't provide the
                          get_arguments method inside a class.
         """
-        # Gets the directory of the __init__.py
-        dirname = os.path.dirname(module_file)
-
         # Looks for file in the directory
         files = os.listdir(dirname)
 
@@ -86,14 +83,9 @@ class Subparser(object):
                 new_parser = Subparser.__get_submodule_parser(submodule,
                         submodule_name, subparsers)
 
-                # Tries to import the real submodule, that doesn't have the
-                # "_submodule" suffix. This allows recursion on the directory
-                # tree.
-                new_m = importlib.import_module(module_name+'.'+submodule_name)
-
-                # Calls the load inside __init__.py, which should create a new
-                # Subparser.
-                new_m.load(new_parser)
+                # Recursive call for hierarchy
+                Subparser(new_parser, dirname+'/'+submodule_name,
+                        module_name+'.'+submodule_name)
 
     @staticmethod
     def __get_submodule_parser(submodule, submodule_name, subparsers):

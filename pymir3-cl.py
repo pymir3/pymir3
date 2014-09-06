@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 
 import argparse
+import os.path
 
-import mir3.modules
+import mir3.subparser
 
 def get_parser():
     parser = argparse.ArgumentParser(description="""Minion to run PyMIR3's
                                      tasks""")
-    mir3.modules.load(parser)
+
+    dirname = os.path.dirname(os.path.realpath(__file__))+'/mir3/modules'
+    module_name = 'mir3.modules'
+    mir3.subparser.Subparser(parser, dirname, module_name)
     return parser
 
 def main():
