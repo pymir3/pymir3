@@ -13,14 +13,13 @@ class Energy(mir3.module.Module):
 
     def build_arguments(self, parser):
         parser.add_argument('infile', type=argparse.FileType('r'),
-                        help="""file containing spectrogram""")
+                            help="""file containing spectrogram""")
         parser.add_argument('outfile', type=argparse.FileType('w'),
-                        help="""output track file""")
+                            help="""output track file""")
 
     def run(self, args):
-        s = spectrogram.Spectrogram()
-        s.load(args.infile)
-        
+        s = spectrogram.Spectrogram().load(args.infile)
+
         t = track.FeatureTrack()
         t.data = feats.centroid(s.data) * \
             s.metadata.sampling_configuration.ofs
@@ -29,4 +28,4 @@ class Energy(mir3.module.Module):
         t.metadata.feature = "Centroid"
         t.metadata.filename = s.metadata.input.name
         t.save(args.outfile)
-    
+

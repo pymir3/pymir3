@@ -15,14 +15,13 @@ class Diff(mir3.module.Module):
                             help="""output file""")
 
     def run(self, args):
-        o = track.FeatureTrack()
-        o.load(args.infile)
+        o = track.FeatureTrack().load(args.infile)
 
         if o.data.ndim == 1:
             o.data.shape = (o.data.size, 1)
 
         pad = numpy.zeros( (1, o.data.shape[1]) )
-        
+
         o.data = numpy.vstack( ( pad,
                                  numpy.diff(o.data, axis=0) ) )
 

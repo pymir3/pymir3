@@ -5,7 +5,8 @@ import numpy
 
 class Join(mir3.module.Module):
     def get_help(self):
-        return """Joins two or more feature tracks into one multi-dimensional feature track"""
+        return """Joins two or more feature tracks into one multi-dimensional
+        feature track"""
 
     def build_arguments(self, parser):
         parser.add_argument('input', nargs='+', type=argparse.FileType('r'),
@@ -14,21 +15,19 @@ class Join(mir3.module.Module):
                             file""")
 
     def run(self, args):
-        o = None
-        
+        data = []
+        features = []
+
         t = track.FeatureTrack()
         for a in args.input:
-            if o is None:
-                o = track.FeatureTrack()
-                o.load(a)
-                if o.data.ndim == 1:
-                    o.data.shape = (o.data.size,1)
-            else:
-                t.load(a)
-                if t.data.ndim == 1:
-                    t.data.shape = (t.data.size,1)
-                o.data = numpy.hstack( (o.data, t.data) )
-                o.metadata.feature = o.metadata.feature + \
-                    " " + t.metadata.feature
+            t = t.load(a)
+            if t.data.ndim == 1:
+                t.data.shape = (t.data.size,1)
+            data.append(t.data)
+            features.append(t.metadata.feature)
+
+        o = track.FeatureTrack()
+        o.data = numpy.hstack(data)
+        o.metadata.feature = ' '.join(features)
 
         o.save(args.output)

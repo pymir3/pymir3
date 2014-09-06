@@ -6,7 +6,7 @@ import scipy.stats
 import numpy
 import sys
 import copy
-            
+
 class Stats(mir3.module.Module):
     def get_help(self):
         return """Statistics from a track. Will print on screen."""
@@ -14,14 +14,14 @@ class Stats(mir3.module.Module):
     def build_arguments(self, parser):
         parser.add_argument('infiles', nargs='+', type=argparse.FileType('r'),
                             help="""input track files""")
-        parser.add_argument('outfile', type=argparse.FileType('w'), help="""output
-                            file""")
+        parser.add_argument('outfile', type=argparse.FileType('w'),
+                            help="""output file""")
 
         parser.add_argument('-m','--mean', action='store_true', default=False,
                             help="""output mean (default:
                             %(default)s)""")
-        parser.add_argument('-v','--variance', action='store_true', default=False,
-                            help="""output variance (default:
+        parser.add_argument('-v','--variance', action='store_true',
+                            default=False, help="""output variance (default:
                             %(default)s)""")
         parser.add_argument('-s','--slope', action='store_true', default=False,
                             help="""output slope (default:
@@ -29,26 +29,25 @@ class Stats(mir3.module.Module):
         parser.add_argument('-l','--limits', action='store_true', default=False,
                             help="""output maximum and minimum, including their
                             positions in fraction of the full track length
-                            (default: %(default)s)""")  
+                            (default: %(default)s)""")
         parser.add_argument('-c','--csv', action='store_true', default=False,
                             help="""csv-output (default:
-                            %(default)s)""")  
-        parser.add_argument('-n','--normalize', action='store_true', default=False,
-                            help="""normalize each output column to 0 mean and unit
-                            variance (default: %(default)s)""") 
+                            %(default)s)""")
+        parser.add_argument('-n','--normalize', action='store_true',
+                            default=False, help="""normalize each output column
+                            to 0 mean and unit variance (default:
+                            %(default)s)""")
 
     def run(self, args):
         o = track.FeatureTrack()
 
-
-
         final_output = None
         final_filenames = []
-        
+
         for a in args.infiles:
-            o.load(a)
+            o = o.load(a)
             final_filenames.append(o.metadata.filename)
-            
+
             if o.data.ndim == 1:
                 o.data.shape = (o.data.size, 1)
 
@@ -62,7 +61,7 @@ class Stats(mir3.module.Module):
                              o.data.var(axis=0)))
 
             if args.slope is True:
-                variance =  o.data.var(axis=0)
+                variance = o.data.var(axis=0)
                 lindata = numpy.zeros(variance.shape)
                 for i in xrange(o.data.shape[1]):
                     if variance[i] > 0:
@@ -83,23 +82,21 @@ class Stats(mir3.module.Module):
 
 
                 out.shape = (1, out.size)
-                #        
-                #            
+
             if args.csv is True:
                 for i in xrange(len(out)-1):
                     sys.stdout.write(str(out[i]))
                     sys.stdout.write(",")
                 sys.stdout.write(str(out[-1]))
                 sys.stdout.write('\n')
-                
+
             if final_output is None:
                 final_output = out
             else:
                 final_output = numpy.vstack( (final_output, out) )
-            
+
         # Dealing with feature metadata:
         my_features = o.metadata.feature.split()
-        #print my_features
         new_features = ""
         if args.mean is True:
             for feat in my_features:
@@ -119,8 +116,6 @@ class Stats(mir3.module.Module):
                 new_features = new_features + " " + "min_" + feat
             for feat in my_features:
                 new_features = new_features + " " + "argmin_" + feat
-
-                #print new_features
 
         p = feature_matrix.FeatureMatrix()
         p.data = final_output
