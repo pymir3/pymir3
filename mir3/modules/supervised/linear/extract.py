@@ -10,9 +10,9 @@ class Extract(mir3.module.Module):
     def build_arguments(self, parser):
         parser.add_argument('side', choices=['left', 'right'], help="""side of
                             the linear decomposition to be kept""")
-        parser.add_argument('infile', type=argparse.FileType('r'), help="""input
-                            file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('infile', type=argparse.FileType('rb'),
+                            help="""input file""")
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""output file with one side cleared""")
 
     def run(self, args):

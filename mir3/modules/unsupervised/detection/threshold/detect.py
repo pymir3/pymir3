@@ -15,9 +15,9 @@ class Detect(mir3.module.Module):
     def build_arguments(self, parser):
         parser.add_argument('threshold', type=float, help="""threshold used to
                             binarize""")
-        parser.add_argument('infile', type=argparse.FileType('r'),
+        parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""linear decomposition file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""binarized linear decomposition file""")
 
     def run(self, args):

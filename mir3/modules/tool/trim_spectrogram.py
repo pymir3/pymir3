@@ -22,9 +22,9 @@ class TrimSpectrogram(mir3.module.Module):
                             default=float('inf'), help="""maximum time to keep
                             (default: %(default)s)""")
 
-        parser.add_argument('infile', type=argparse.FileType('r'),
+        parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""original spectrogram file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""trimmed spectrogram file""")
 
     def run(self, args):

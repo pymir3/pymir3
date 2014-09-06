@@ -24,7 +24,7 @@ class BetaNMF(mir3.module.Module):
                             help="""minimum difference between iterations to
                             consider convergence""")
 
-        parser.add_argument('-B','--basis', type=argparse.FileType('r'),
+        parser.add_argument('-B','--basis', type=argparse.FileType('rb'),
                             help="""basis file to be used""")
         parser.add_argument('-s','--size', nargs=3, metavar=('SIZE',
                             'INSTRUMENT', 'NOTE'), help="""size of the
@@ -34,7 +34,7 @@ class BetaNMF(mir3.module.Module):
 
         parser.add_argument('piece', nargs='+', help="""piece spectrogram
                             file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""linear decomposition file""")
 
     def run(self, args):
@@ -58,7 +58,7 @@ class BetaNMF(mir3.module.Module):
         s_list = []
         s_meta = []
         for filename in args.piece:
-            with open(filename, 'r') as handler:
+            with open(filename, 'rb') as handler:
                 s_list.append(spectrogram.Spectrogram().load(handler))
                 s_meta.append(md.FileMetadata(handler))
 

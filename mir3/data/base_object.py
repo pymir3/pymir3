@@ -1,5 +1,8 @@
 import numpy
-import pickle
+try:
+    import cPickle as pickle
+except:
+    import pickle
 import sys
 import zlib
 
@@ -55,15 +58,15 @@ class BaseObject(object):
         BaseObject.__extract_arrays(self, array_list)
 
         # Stores class name to guarantee safe loading
-        pickle.dump(self.__classname, handler)
+        pickle.dump(self.__classname, handler, -1)
 
         # Stores compressed obj
-        self_str = pickle.dumps(self)
+        self_str = pickle.dumps(self, -1)
         self_compressed = zlib.compress(self_str, compression_level)
-        pickle.dump(self_compressed, handler)
+        pickle.dump(self_compressed, handler, -1)
 
         # Stores number of arrays
-        pickle.dump(len(array_list), handler)
+        pickle.dump(len(array_list), handler, -1)
 
         # Stores arrays
         for array in array_list:

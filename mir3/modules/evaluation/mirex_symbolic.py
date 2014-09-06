@@ -25,11 +25,11 @@ class MirexSymbolic(mir3.module.Module):
                             help="""onset tolerance, in seconds (default:
                             %(default)s)""")
 
-        parser.add_argument('estimated', type=argparse.FileType('r'),
+        parser.add_argument('estimated', type=argparse.FileType('rb'),
                             help="""estimated score to evaluate""")
-        parser.add_argument('reference', type=argparse.FileType('r'),
+        parser.add_argument('reference', type=argparse.FileType('rb'),
                             help="""reference score""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""evaluation file""")
 
     def run(self, args):

@@ -19,7 +19,7 @@ class Label2Score(mir3.module.Module):
 
         parser.add_argument('infile', type=argparse.FileType('r'),
                             help="""labels file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""score file""")
 
     def run(self, args):

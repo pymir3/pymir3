@@ -23,7 +23,7 @@ class Tests(mir3.module.Module):
     def run(self, args):
         decompositions = []
         for filename in args.infile:
-            with open(filename, 'r') as handler:
+            with open(filename, 'rb') as handler:
                 decompositions.append(
                         ld.LinearDecomposition().load(handler))
 

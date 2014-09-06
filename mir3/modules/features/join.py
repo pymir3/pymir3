@@ -1,7 +1,8 @@
 import argparse
+import numpy
+
 import mir3.data.feature_track as track
 import mir3.module
-import numpy
 
 class Join(mir3.module.Module):
     def get_help(self):
@@ -9,10 +10,10 @@ class Join(mir3.module.Module):
         feature track"""
 
     def build_arguments(self, parser):
-        parser.add_argument('input', nargs='+', type=argparse.FileType('r'),
+        parser.add_argument('input', nargs='+', type=argparse.FileType('rb'),
                             help="""input track files""")
-        parser.add_argument('output', type=argparse.FileType('w'), help="""track
-                            file""")
+        parser.add_argument('output', type=argparse.FileType('wb'),
+                            help="""track file""")
 
     def run(self, args):
         data = []

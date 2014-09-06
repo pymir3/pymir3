@@ -9,7 +9,7 @@ class Score2Label(mir3.module.Module):
                text"""
 
     def build_arguments(self, parser):
-        parser.add_argument('infile', type=argparse.FileType('r'), help="""score
+        parser.add_argument('infile', type=argparse.FileType('rb'), help="""score
                             file""")
         parser.add_argument('outfile', type=argparse.FileType('w'),
                             help="""labels file""")

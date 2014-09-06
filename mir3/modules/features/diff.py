@@ -9,9 +9,9 @@ class Diff(mir3.module.Module):
         return """Differentiate (y[t] = x[t]-x[t-1]) a track"""
 
     def build_arguments(self, parser):
-        parser.add_argument('infile', type=argparse.FileType('r'), help="""input
-                            file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('infile', type=argparse.FileType('rb'),
+                            help="""input file""")
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""output file""")
 
     def run(self, args):

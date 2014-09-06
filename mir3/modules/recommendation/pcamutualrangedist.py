@@ -1,8 +1,8 @@
 import argparse
 import numpy
 
-import mir3.data.feature_track as track
 import mir3.data.feature_matrix as feature_matrix
+import mir3.data.feature_track as track
 import mir3.lib.knn as knn
 import mir3.lib.pca as pca
 import mir3.module
@@ -13,7 +13,7 @@ class MutualRangeDistance(mir3.module.Module):
         return """Recommendations based on Mutual Range Distance"""
 
     def build_arguments(self, parser):
-        parser.add_argument('database', type=argparse.FileType('r'),
+        parser.add_argument('database', type=argparse.FileType('rb'),
                             help="""input database""")
         parser.add_argument('query', nargs='+', type=str,
                             help="""filenames used as inputs""")

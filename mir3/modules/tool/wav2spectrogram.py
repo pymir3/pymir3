@@ -32,9 +32,9 @@ class Wav2Spectrogram(mir3.module.Module):
                             help="""step, in samples, between windows (default:
                             %(default)s)""")
 
-        parser.add_argument('infile', type=argparse.FileType('r'), help="""wav
+        parser.add_argument('infile', type=argparse.FileType('rb'), help="""wav
                             file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""spectrogram file""")
 
     def run(self, args):
@@ -46,7 +46,7 @@ class Wav2Spectrogram(mir3.module.Module):
                          args.dft_length,
                          args.window_step,
                          args.spectrum_type)
-        
+
         s.save(args.outfile)
 
     def convert(self, wav_file, window_length=2048, dft_length=2048,
@@ -79,19 +79,19 @@ class Wav2Spectrogram(mir3.module.Module):
         rate, data = scipy.io.wavfile.read(wav_file.name)
 
         data = data.astype(numpy.float)
-        
+
         if data.ndim > 1:
             data = numpy.mean(data, axis=1)
 
         data /= 32767.0 # Normalization to -1/+1 range
-            
+
         s.metadata.sampling_configuration.fs = rate
         s.metadata.sampling_configuration.ofs = \
                 s.metadata.sampling_configuration.fs / \
                 s.metadata.sampling_configuration.window_step
 
         nSamples = len(data)
-                
+
         if nSamples == 0:
             raise ValueError("File '%s' has no audio" % wav_file.name)
 
@@ -100,18 +100,18 @@ class Wav2Spectrogram(mir3.module.Module):
         #print numpy.abs(numpy.fft.rfft(data[32:64]))
 
         window = numpy.hanning(window_length)
-        
+
         buffered_data = [ data[k:k+window_length] * window\
                     for k in range(len(data)/window_step)]
 
         buffered_data = numpy.array(buffered_data).T
-        
+
         Pxx = numpy.abs(numpy.fft.rfft(buffered_data,\
                             n = dft_length,\
                             axis = 0)) / float(window_length)
 
         #print Pxx[:,0]
-        
+
         #Pxx, freqs, bins, im = pylab.specgram(data,\
         #                NFFT=s.metadata.sampling_configuration.window_length,\
         #                Fs=s.metadata.sampling_configuration.fs,\
@@ -125,12 +125,12 @@ class Wav2Spectrogram(mir3.module.Module):
 
         if s.metadata.sampling_configuration.spectrum_type == 'power':
             Pxx = Pxx ** 2
-                        
+
         if s.metadata.sampling_configuration.spectrum_type == 'log':
             Pxx = numpy.log10(numpy.sqrt(Pxx) + 10**(-6))
 
         s.data = copy.deepcopy(Pxx)
         # print type(s.data), s.data.shape
         #pylab.show()
-        
+
         return s

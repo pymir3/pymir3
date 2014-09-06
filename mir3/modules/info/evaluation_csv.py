@@ -26,7 +26,7 @@ class EvaluationCSV(mir3.module.Module):
                   "F-Measure"
 
         for name in sorted(args.infile):
-            with open(name, 'r') as f:
+            with open(name, 'rb') as f:
                 e = e.load(f)
             name = e.metadata.reference_input.name
             if args.short_filenames:

@@ -28,7 +28,7 @@ class Any(mir3.module.Module):
         parser.add_argument('-d','--data', action='store_true', default=False,
                             help="""show the data""")
 
-        parser.add_argument('infile', type=argparse.FileType('r'),
+        parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""object file""")
 
     def run(self, args):

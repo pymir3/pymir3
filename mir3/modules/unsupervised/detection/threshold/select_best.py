@@ -11,7 +11,7 @@ class SelectBest(mir3.module.Module):
 
     def run(self, args):
         for filename in args.infile:
-            with open(filename, 'r') as handler:
+            with open(filename, 'rb') as handler:
                 self.add(evaluation.Evaluation().load(handler))
 
         best_th, mean_f = self.get_best()

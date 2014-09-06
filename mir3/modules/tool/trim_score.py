@@ -34,9 +34,9 @@ class TrimScore(mir3.module.Module):
                             default=float('inf'), help="""maximum note pitch
                             (MIDI)""")
 
-        parser.add_argument('infile', type=argparse.FileType('r'),
+        parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""original score file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""trimmed score file""")
 
     def run(self, args):

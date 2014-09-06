@@ -18,7 +18,7 @@ class EvaluationStatistics(mir3.module.Module):
         f = []
 
         for name in args.infile:
-            with open(name, 'r') as h:
+            with open(name, 'rb') as h:
                 e = e.load(h)
             r.append(e.data.recall)
             p.append(e.data.precision)

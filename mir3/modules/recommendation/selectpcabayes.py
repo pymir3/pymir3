@@ -1,20 +1,20 @@
 import argparse
 import numpy
 
-import mir3.data.feature_track as track
 import mir3.data.feature_matrix as feature_matrix
-import mir3.lib.pca as pca
+import mir3.data.feature_track as track
 import mir3.lib.feature_selection as feat_sel
 import mir3.lib.naive_bayes as bayes
+import mir3.lib.pca as pca
 import mir3.module
-
 
 class SelectPCABayes(mir3.module.Module):
     def get_help(self):
-        return """Recommendations based on a naive bayes algorithm with a pca pre-processing step"""
+        return """Recommendations based on a naive bayes algorithm with a pca
+        pre-processing step"""
 
     def build_arguments(self, parser):
-        parser.add_argument('database', type=argparse.FileType('r'),
+        parser.add_argument('database', type=argparse.FileType('rb'),
                             help="""input database""")
         parser.add_argument('query', nargs='+', type=str,
                             help="""filenames used as inputs""")
@@ -55,7 +55,7 @@ class SelectPCABayes(mir3.module.Module):
                                                 orthogonal_training, 7)
         orthogonal_testing = orthogonal_testing * mask.reshape(1, -1)
         orthogonal_training = orthogonal_training * mask.reshape(1, -1)
-        
+
         # naive bayes algorithm
         score = numpy.array(bayes.naive_bayes
                           (orthogonal_testing, orthogonal_training))

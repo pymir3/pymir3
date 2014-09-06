@@ -23,9 +23,9 @@ class Mean(mir3.module.Module):
         parser.add_argument('note', help="""name of the note that created the
                             spectrogram""")
 
-        parser.add_argument('infile', type=argparse.FileType('r'),
+        parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""spectrogram file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""basis file""")
 
     def run(self, args):

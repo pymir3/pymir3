@@ -19,11 +19,11 @@ class MirexFramewise(mir3.module.Module):
         parser.add_argument('--id', default=None, help="""evaluation id to store
                             on result, which may be used for comparisons""")
 
-        parser.add_argument('estimated', type=argparse.FileType('r'),
+        parser.add_argument('estimated', type=argparse.FileType('rb'),
                             help="""estimated score to evaluate""")
-        parser.add_argument('reference', type=argparse.FileType('r'),
+        parser.add_argument('reference', type=argparse.FileType('rb'),
                             help="""reference score""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""evaluation file""")
 
     def run(self, args):

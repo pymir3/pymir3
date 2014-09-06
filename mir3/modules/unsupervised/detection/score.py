@@ -23,9 +23,9 @@ class Score(mir3.module.Module):
 
         parser.add_argument('instrument', help="""instrument whose score will be
                             extracted""")
-        parser.add_argument('infile', type=argparse.FileType('r'),
+        parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""linear decomposition file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""score file""")
 
     def run(self, args):

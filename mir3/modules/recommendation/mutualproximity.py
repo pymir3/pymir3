@@ -1,20 +1,18 @@
 import argparse
 import numpy
 
-import mir3.data.feature_track as track
 import mir3.data.feature_matrix as feature_matrix
-import mir3.module
-import mir3.lib.knn as knn
+import mir3.data.feature_track as track
 import mir3.lib.distances as dist
-
-
+import mir3.lib.knn as knn
+import mir3.module
 
 class MutualProximity(mir3.module.Module):
     def get_help(self):
         return """Recommendations based on Mutual Proximity"""
 
     def build_arguments(self, parser):
-        parser.add_argument('database', type=argparse.FileType('r'),
+        parser.add_argument('database', type=argparse.FileType('rb'),
                             help="""input database""")
         parser.add_argument('query', nargs='+', type=str,
                             help="""filenames used as inputs""")
@@ -54,7 +52,7 @@ class MutualProximity(mir3.module.Module):
         score = dist.minimum_subset_distance(D, (0, testing_data.shape[0]),\
                                     (testing_data.shape[0], D.shape[0]))
         #print score
-        
+
         # distmin algorithm
         #score = numpy.array(knn.distance_mutual_min
         #                  (testing_data, training_data))

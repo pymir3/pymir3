@@ -10,13 +10,13 @@ class Merge(mir3.module.Module):
     def build_arguments(self, parser):
         parser.add_argument('infile', nargs='+', help="""linear decomposition
                             file to be merged""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""merged linear decomposition file""")
 
     def run(self, args):
         d_list = []
         for filename in args.infile:
-            with open(filename, 'r') as handler:
+            with open(filename, 'rb') as handler:
                 d_list.append(ld.LinearDecomposition().load(handler))
 
         new_d = self.merge(d_list)

@@ -1,18 +1,19 @@
 import argparse
 import numpy
 
-import mir3.data.feature_track as track
 import mir3.data.feature_matrix as feature_matrix
-import mir3.lib.pca as pca
+import mir3.data.feature_track as track
 import mir3.lib.naive_bayes as bayes
+import mir3.lib.pca as pca
 import mir3.module
 
 class PCABayes(mir3.module.Module):
     def get_help(self):
-        return """Recommendations based on a naive bayes algorithm with a pca pre-processing step"""
+        return """Recommendations based on a naive bayes algorithm with a pca
+        pre-processing step"""
 
     def build_arguments(self, parser):
-        parser.add_argument('database', type=argparse.FileType('r'),
+        parser.add_argument('database', type=argparse.FileType('rb'),
                             help="""input database""")
         parser.add_argument('query', nargs='+', type=str,
                             help="""filenames used as inputs""")

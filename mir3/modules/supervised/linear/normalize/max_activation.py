@@ -10,9 +10,9 @@ class MaxActivation(mir3.module.Module):
                one"""
 
     def build_arguments(self, parser):
-        parser.add_argument('infile', type=argparse.FileType('r'),
+        parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""basis file""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""normalized basis file""")
 
     def run(self, args):

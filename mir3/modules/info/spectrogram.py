@@ -8,7 +8,7 @@ class Spectrogram(mir3.module.Module):
         return """outputs a matrix in ASCII for the spectrogram"""
 
     def build_arguments(self, parser):
-        parser.add_argument('infile', type=argparse.FileType('r'))
+        parser.add_argument('infile', type=argparse.FileType('rb'))
 
     def run(self, args):
         s = spectrogram.Spectrogram().load(args.infile)

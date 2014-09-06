@@ -1,20 +1,21 @@
 import argparse
-import mir3.data.feature_track as track
-import mir3.data.feature_matrix as feature_matrix
-import mir3.module
-import scipy.stats
-import numpy
-import sys
 import copy
+import numpy
+import scipy.stats
+import sys
+
+import mir3.data.feature_matrix as feature_matrix
+import mir3.data.feature_track as track
+import mir3.module
 
 class Stats(mir3.module.Module):
     def get_help(self):
         return """Statistics from a track. Will print on screen."""
 
     def build_arguments(self, parser):
-        parser.add_argument('infiles', nargs='+', type=argparse.FileType('r'),
+        parser.add_argument('infiles', nargs='+', type=argparse.FileType('rb'),
                             help="""input track files""")
-        parser.add_argument('outfile', type=argparse.FileType('w'),
+        parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""output file""")
 
         parser.add_argument('-m','--mean', action='store_true', default=False,
