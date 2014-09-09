@@ -100,17 +100,20 @@ class Wav2Spectrogram(mir3.module.Module):
         #print numpy.abs(numpy.fft.rfft(data[32:64]))
 
         window = numpy.hanning(window_length)
-        
-        buffered_data = [ data[k:k+window_length] * window\
-                    for k in range(len(data)/window_step)]
+
+        buffered_data = []
+        for k in range( (len(data)/window_step) - 1):
+            this_start = k * window_step
+            this_end = this_start + window_length
+            buffered_data.append(data[this_start:this_end] * window)
 
         buffered_data = numpy.array(buffered_data).T
         
-        buffered_data = buffered_data * numpy.sqrt(window_length)
+        #buffered_data = buffered_data * numpy.sqrt(window_length)
         
         Pxx = numpy.abs(numpy.fft.rfft(buffered_data,\
                             n = dft_length,\
-                            axis = 0)) / float(window_length)
+                            axis = 0)) 
 
         #print Pxx[:,0]
         
