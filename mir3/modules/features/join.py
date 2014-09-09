@@ -26,9 +26,10 @@ class Join(mir3.module.Module):
                 t.data.shape = (t.data.size,1)
             data.append(t.data)
             features.append(t.metadata.feature)
-
+            
         o = track.FeatureTrack()
         o.data = numpy.hstack(data)
         o.metadata.feature = ' '.join(features)
-
+        o.metadata.filename = t.metadata.filename
+        
         o.save(args.output)
