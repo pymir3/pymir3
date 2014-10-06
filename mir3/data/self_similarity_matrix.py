@@ -6,7 +6,7 @@ class SelfSimilarityMatrix(do.DataObject):
     """
 
     def __init__(self):
-        super(FeatureMatrix, self).__init__(md.Metadata(feature=[],
+        super(SelfSimilarityMatrix, self).__init__(md.Metadata(feature=[],
                         filename=[],
                         sampling_configuration=md.Metadata(
                             dft_length=1024, fs=None, ofs=None,
