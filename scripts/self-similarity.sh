@@ -49,6 +49,6 @@ echo "Done!"
 
 echo "Calculating self-similarity matrix..."
 self_similarity_name="${filename%.wav}.ssm"
-./pymir3-cl.py features join $feature_track_name $self_similarity_name
+./pymir3-cl.py features selfsimilarity $feature_track_name $self_similarity_name
 echo "Done!"
 

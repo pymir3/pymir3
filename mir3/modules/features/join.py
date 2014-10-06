@@ -31,5 +31,7 @@ class Join(mir3.module.Module):
         o.data = numpy.hstack(data)
         o.metadata.feature = ' '.join(features)
         o.metadata.filename = t.metadata.filename
+
+        o.metadata.sampling_configuration = t.metadata.sampling_configuration
         
         o.save(args.output)

@@ -6,7 +6,7 @@ import sys
 
 import mir3.data.self_similarity_matrix as self_similarity_matrix
 import mir3.data.feature_track as track
-import mir3.lib.self_similarity
+import mir3.lib.self_similarity as self_similarity
 import mir3.module
 
 class SelfSimilarity(mir3.module.Module):
