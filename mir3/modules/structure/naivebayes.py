@@ -7,6 +7,7 @@ import sys
 import mir3.data.feature_track as track
 import mir3.module
 import mir3.lib.naive_bayes as bayes
+import mir3.lib.median_filtering as median
 
 class Texture(mir3.module.Module):
     def get_help(self):
@@ -37,10 +38,11 @@ class Texture(mir3.module.Module):
         t0 = int(args.start * fs)
         t1 = int(args.end * fs)
         training_data = o.data[t0:t1,:]
-
+        testing_data = median.median_filter(o.data, t1-t0)
+        
         # Applying model in a sliding window
         output = numpy.array(bayes.naive_bayes
-                          (o.data, training_data))
+                          (testing_data, training_data))
         for T0 in xrange(output.shape[0]):
             print T0/float(fs), " ", output[T0]
 
