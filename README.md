@@ -13,13 +13,19 @@ so the user has the option of creating their own python programs to glue the
 modules required. In this case, it's up to the user to save the states she/he
 desires.
 
-Known issues:
+Installing:
 ------
-*ImportError: libmarsyas.so: cannot open shared object file: No such file or
-directory*
+To install, execute the following steps:
 
-Currently we use Marsyas to perform the conversion between a wav sound and its
-spectrogram. As it may be hard to install and adds an unnecessary dependency, we
-**will** implement the conversion inside the framework using only the common
-python scientific libraries. For now, just make sure Marsyas is in the library
-path (see ldconfig).
+1) Download the release branch from the git repository:
+git clone -b release https://github.com/pymir3/pymir3.git
+
+2) CD to the pymir3 directory and execute setup.py:
+cd pymir3
+sudo python setup.py install
+
+3) To test, try switching to another directory and executing:
+python
+import mir3
+
+If no error is displayed, pymir3 is installed!
