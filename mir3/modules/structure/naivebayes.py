@@ -11,16 +11,16 @@ import mir3.lib.median_filtering as median
 
 class Texture(mir3.module.Module):
     def get_help(self):
-        return """Searching structure using textures.."""
+        return """Searching structure using textures and a naive bayesian approach"""
 
     def build_arguments(self, parser):
         parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""input feature track""")
 
-        parser.add_argument('-s','--start', default=0, type=float,
+        parser.add_argument('-s','--start', action='append', type=float,
                             help="""start of desired structure (s) (default:
                             %(default)s)""")
-        parser.add_argument('-e','--end', default=1, type=float,
+        parser.add_argument('-e','--end', action='append', type=float,
                             help="""end of desired structure (s) (default:
                             %(default)s)""")
 
@@ -35,10 +35,21 @@ class Texture(mir3.module.Module):
         fs = o.metadata.sampling_configuration.ofs
 
         # Estimating model
-        t0 = int(args.start * fs)
-        t1 = int(args.end * fs)
-        training_data = o.data[t0:t1,:]
-        testing_data = median.median_filter(o.data, t1-t0)
+        training_data = None
+        max_window = 0
+        for n in xrange(len(args.start)):
+            t0 = int(args.start[n] * fs)
+            t1 = int(args.end[n] * fs)
+            if (t1 - t0) > max_window:
+                max_window = t1 - t0
+                
+            if training_data is None:
+                training_data = o.data[t0:t1,:]
+            else:
+                new_training_data = o.data[t0:t1,:]
+                training_data = numpy.vstack((training_data, new_training_data))
+        
+        testing_data = median.median_filter(o.data, max_window)
         
         # Applying model in a sliding window
         output = numpy.array(bayes.naive_bayes
