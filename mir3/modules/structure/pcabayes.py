@@ -32,7 +32,7 @@ class Texture(mir3.module.Module):
         std_o = o.data.std(axis=0)
         o.data = (o.data - o.data.mean(axis=0))/\
                     numpy.maximum(10**(-6), std_o)
-                
+
         fs = o.metadata.sampling_configuration.ofs
 
         # Estimating model
@@ -43,7 +43,7 @@ class Texture(mir3.module.Module):
             t1 = int(args.end[n] * fs)
             if (t1 - t0) > max_window:
                 max_window = t1 - t0
-                
+
             if training_data is None:
                 training_data = o.data[t0:t1,:]
             else:
@@ -51,11 +51,11 @@ class Texture(mir3.module.Module):
                 training_data = numpy.vstack((training_data, new_training_data))
 
 
-        testing_data = median.median_filter(o.data, max_window)                
+        testing_data = median.median_filter(o.data, max_window)
         # PCA algorithm
         orthogonal_testing, orthogonal_training = pca.subset_PCA \
                           (testing_data, training_data)
-                
+
         # Applying model in a sliding window
         output = numpy.array(bayes.naive_bayes
                           (orthogonal_testing, orthogonal_training))
