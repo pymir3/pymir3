@@ -132,7 +132,7 @@ class Spectrogram(do.DataObject):
         Returns:
             Tuple containing the lower and upper times, respectively.
         """
-        time_scale = 1000.0*self.metadata.sampling_configuration.ofs
+        time_scale = 1.0*self.metadata.sampling_configuration.ofs
 
         lower = bin / time_scale + self.metadata.min_time;
         upper = (bin+1) / time_scale + self.metadata.min_time;
