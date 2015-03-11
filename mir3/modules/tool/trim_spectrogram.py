@@ -35,8 +35,8 @@ class TrimSpectrogram(mir3.module.Module):
         new_s.metadata.input = md.FileMetadata(args.infile)
         new_s.save(args.outfile)
 
-    def trim(self, s, min_freq=0, max_freq=float('inf'), min_time=0,
-             max_time=float('inf'), save_metadata=True):
+    def trim(self, s, min_freq=0, max_freq=float('Inf'), min_time=0,
+             max_time=float('Inf'), save_metadata=True):
         """Cuts some pieces of the spectrogram.
 
         Keeps only a desired rectangle in the frequency/time matrix
@@ -54,16 +54,27 @@ class TrimSpectrogram(mir3.module.Module):
         Returns:
             Trimmed Spectrogram object.
         """
+        # Regard default parameters
+        if max_freq > s.metadata.max_freq:
+            max_freq = s.metadata.max_freq
+
+        if max_time > s.metadata.max_time:
+            max_time = s.metadata.max_time
+
         # Finds frequency and time bounds
         maxK = s.freq_bin(max_freq)
         minK = s.freq_bin(min_freq)
         maxT = s.time_bin(max_time)
         minT = s.time_bin(min_time)
 
+        #print min_time, max_time, min_freq, max_freq
+
         new_s = spectrogram.Spectrogram()
         new_s.data = s.data[minK:maxK+1, minT:maxT+1]
         new_s.metadata.min_freq = s.freq_range(minK)[0]
-        new_s.metadata.min_time = s.time_range(minK)[0]
+        new_s.metadata.min_time = s.time_range(minT)[0]
+        new_s.metadata.max_freq = s.freq_range(maxK)[0]
+        new_s.metadata.max_time = s.time_range(maxT)[0]
         new_s.metadata.sampling_configuration = \
             s.metadata.sampling_configuration
         new_s.metadata.method = md.Metadata(original_input=s.metadata.input,
