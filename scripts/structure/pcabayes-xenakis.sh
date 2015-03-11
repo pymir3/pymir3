@@ -22,6 +22,10 @@ echo "Joining features"
 ./pymir3-cl.py features join $featurefiles /tmp/$$.features.join
 
 echo "Calculating textural similarities"
-./pymir3-cl.py structure pcabayes /tmp/$$.features.join -s 5 -s 15 -e 9 -e 18 > test.dat
+./pymir3-cl.py structure pcabayes /tmp/$$.features.join -s 9.6 -e 13.3 \
+  -s 27 -e 30 > xenakis1.dat
+
+./pymir3-cl.py structure pcabayes /tmp/$$.features.join -s 27 -e 30 \
+  -s 55.3 -e 58.30 > xenakis2.dat
 
 
