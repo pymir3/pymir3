@@ -22,7 +22,7 @@ def make_lanes(canvas, roll_width, offset, space_per_note, minNote, maxNote, spa
         if (note%12) in whiteNotes:
             color_rect = (255,255,255)
         else:
-            color_rect = (200,200,200)
+            color_rect = (170,170,170)
 
         canvas.add(Rectangle((roll_width,initY),space_per_note,rec_width,color_rect))
         note=note-1
@@ -72,14 +72,16 @@ def add_note(canvas, note, roll_width, CanvasOffset, space_per_note, space_per_s
     offset = note[1]
     pitch = note[2]
     noteY = CanvasOffset + (maxNote-pitch)*space_per_note+ 0.5*(1-height_ratio)*space_per_note
-    noteX0 = roll_width + (onset-minT)*space_per_second
-    noteX1 = (offset-onset)*space_per_second
+    noteX0 = roll_width + (onset-minT) * space_per_second
+    noteX1 = (offset - onset) * space_per_second
 
-
-    canvas.add(Rectangle( (noteX0, noteY), space_per_note*height_ratio, noteX1, color) )
+    canvas.add(Rectangle( (noteX0, noteY), space_per_note * height_ratio,\
+        noteX1, color) )
     return canvas
 
-def plotList(score_file, width=400, height=300, roll_width=30, tLimits=None, nLimits=None, fontsize=12,  color=(100,100,100), thickness=0.5, previousState=None):
+def plotList(score_file, width=400, height=300, roll_width=40, tLimits=None,
+        nLimits=None, fontsize=14,  color=(220,220,220), thickness=0.5,
+        previousState=None):
     # This functions returns a Scene (see the svglib) that is a representation for the transcription. The parameters are:
     # width, height: the total width and height of the plot
     # roll_width: the width of the reference roll on the left. If you use 0, then you will see no reference keyboard
@@ -117,7 +119,6 @@ def plotList(score_file, width=400, height=300, roll_width=30, tLimits=None, nLi
     space_per_second = (width-roll_width)/(maxT-minT)
     legendY = height-fontsize
 
-    print space_per_note
     if previousState==None:
         canvas = Scene('svg',height,width)
         canvas = make_keyboard(canvas, roll_width, 0, fontsize, space_per_note, minNote, maxNote)
