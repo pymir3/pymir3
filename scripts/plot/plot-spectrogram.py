@@ -20,7 +20,7 @@ def plot(input_filename, output_filename, size=(3.45,2.0)):
     max_time = s.metadata.max_time
 
     im = plt.imshow(d, aspect='auto', origin='lower', cmap=plt.cm.gray,\
-            extent=[min_time, max_time, min_freq, max_freq])
+            extent=[min_time, max_time, min_freq/1000.0, max_freq/1000.0])
     plt.xlabel('Time (s)')
     plt.ylabel('Frequency (kHz)')
     fig = plt.gcf()
