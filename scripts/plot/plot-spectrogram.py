@@ -5,7 +5,7 @@ import numpy
 
 import mir3.data.spectrogram as spectrogram
 
-def plot(input_filename, output_filename, size=(400,200)):
+def plot(input_filename, output_filename, size=(3.45,2.0)):
     """Plots the a spectrogram to an output file
     """
     s = spectrogram.Spectrogram().load(input_filename)
@@ -24,8 +24,8 @@ def plot(input_filename, output_filename, size=(400,200)):
     plt.xlabel('Time (s)')
     plt.ylabel('Frequency (kHz)')
     fig = plt.gcf()
-    width_inches = size[0]/80.0
-    height_inches = size[1]/80.0
+    width_inches = size[0]#/80.0
+    height_inches = size[1]#/80.0
     fig.set_size_inches( (width_inches, height_inches) )
     plt.savefig(output_filename, bbox_inches='tight')
 
@@ -36,10 +36,12 @@ if __name__ == "__main__":
 help="""Input spectrogram file""")
     parser.add_argument('outfile',\
 help="""Output figure file""")
-    parser.add_argument('--width', type=int, default=400, help="""Output width (pixels).\
-            Default: 400""")
-    parser.add_argument('--height', type=int, default=200, help="""Output height (pixels).\
-            Default: 200""")
+    parser.add_argument('--width', type=int, default=3.45, help="""Output width\
+            (inches).\
+            Default: 3.45 (one column)""")
+    parser.add_argument('--height', type=int, default=2.0, help="""Output\
+            height (inches).\
+            Default: 2.0""")
     args = parser.parse_args()
     plot(args.infile, args.outfile, (args.width, args.height))
 
