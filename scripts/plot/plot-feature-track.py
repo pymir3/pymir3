@@ -26,7 +26,9 @@ def plot(input_filename, output_filename, scale=None, dim=0, size=(3.45,2.0)):
         ylabel += str(scale)
         ylabel += ')'
 
-    x_axis = numpy.array(range(len(d))) / s.metadata.sampling_configuration.ofs
+    x_axis = numpy.array(range(len(d))) / \
+            float(s.metadata.sampling_configuration.ofs)
+
     im = plt.plot(x_axis, d)
     plt.xlabel('Time (s)')
     plt.ylabel(ylabel)
