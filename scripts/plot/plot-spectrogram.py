@@ -1,17 +1,19 @@
 
 import argparse
 import matplotlib.pyplot as plt
+import numpy
 
 import mir3.data.spectrogram as spectrogram
 
 def plot(input_filename, output_filename, size=(400,200)):
     """Plots the a spectrogram to an output file
     """
-    s = spectrogram.Spectrogram()
-    s.load(input_filename)
-
+    s = spectrogram.Spectrogram().load(input_filename)
+    print s.metadata
+    print s.data.size
     d = s.data
     d = d/numpy.max(d)
+    d = 1 - d
     im = plt.imshow(d, aspect='auto', origin='lower', cmap=plt.cm.gray)
     plt.xlabel('Time (s)')
     plt.ylabel('Frequency (kHz)')
@@ -24,8 +26,10 @@ def plot(input_filename, output_filename, size=(400,200)):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Plot a spectrogram')
-    parser.add_argument('infile', help="""Input spectrogram file""")
-    parser.add_argument('outfile', help="""Output figure file""")
+    parser.add_argument('infile', type=argparse.FileType('rb'),\
+help="""Input spectrogram file""")
+    parser.add_argument('outfile',\
+help="""Output figure file""")
     parser.add_argument('--width', type=int, default=400, help="""Output width (pixels).\
             Default: 400""")
     parser.add_argument('--height', type=int, default=200, help="""Output height (pixels).\
