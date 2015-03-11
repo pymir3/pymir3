@@ -14,7 +14,14 @@ def plot(input_filename, output_filename, size=(400,200)):
     d = s.data
     d = d/numpy.max(d)
     d = 1 - d
-    im = plt.imshow(d, aspect='auto', origin='lower', cmap=plt.cm.gray)
+
+    min_freq = s.metadata.min_freq
+    max_freq = s.metadata.max_freq
+    min_time = s.metadata.min_time
+    max_time = s.metadata.max_time
+
+    im = plt.imshow(d, aspect='auto', origin='lower', cmap=plt.cm.gray,\
+            extent=[min_time, max_time, min_freq, max_freq])
     plt.xlabel('Time (s)')
     plt.ylabel('Frequency (kHz)')
     fig = plt.gcf()
