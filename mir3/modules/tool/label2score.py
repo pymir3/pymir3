@@ -61,7 +61,7 @@ class Label2Score(mir3.module.Module):
             # case of a failure, tries as name.
             try:
                 notes.append(note.Note(onset=onset, offset=offset,
-                                       pitch=int(l[2])))
+                                       pitch=int(float(l[2]))))
             except ValueError, TypeError:
                 notes.append(note.Note(onset=onset, offset=offset, name=l[2]))
 
