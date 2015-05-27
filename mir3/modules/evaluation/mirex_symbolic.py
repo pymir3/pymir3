@@ -73,44 +73,29 @@ class MirexSymbolic(mir3.module.Module):
         # Don't use default comparison because:
         # 1) some crazy person may want to change it, and that could break this
         # code
-        # 2) we don't need to order offset and pitch
+        # 2) we don't need to sort offset and pitch
         estimated_data = sorted(estimated.data, key=lambda n: n.data.onset)
         reference_data = sorted(reference.data, key=lambda n: n.data.onset)
         negative_duration_tolerance = (duration_tolerance < 0)
 
         # Iterates estimated data to match the reference
-        for e in estimated_data:
-            e_onset = e.data.onset
-            e_duration = e.data.duration
-            e_name = e.to_name()
+        i_ref = 0 # Index in which we are screening reference data
+        i_est = 0 # Index for screening estimated data
+        correct = 0 # Match counter
+        while (i_est < len(estimated_data)) and\
+                (i_ref < len(reference_data)):
 
-            # As the notes are ordered by onset, we can remove from the
-            # reference every note whose onset is below the current lower bound
-            for i in xrange(len(reference_data)):
-                if reference_data[i].data.onset >= e_onset - onset_tolerance:
-                    break
-            reference_data = reference_data[i:]
+            if (abs(estimated_data[i_est].data.onset -\
+                    reference_data[i_ref].data.onset) < onset_tolerance) and\
+                    (estimated_data[i_est].to_name() ==\
+                    reference_data[i_ref].to_name()):
+                correct += 1
 
-            for r in reference_data:
-                # Checks if onset is above range. If so, we can stop the search
-                # because all other notes after it will also be above
-                if r.data.onset > e_onset + onset_tolerance:
-                    break
-
-                # Checks if notes match in duration and name if required
-                if (negative_duration_tolerance or
-                         (abs(e_duration-r.data.duration) < \
-                          max(r.data.duration * duration_tolerance,
-                              onset_tolerance))) \
-                    and (ignore_pitch or e_name == r.to_name()):
-                    correct += 1
-
-                    # As each reference note can match only a single estimation,
-                    # we remove the matched reference
-                    reference_data.remove(r)
-
-                    # Stops looking for references, as we got a match
-                    break
+            if reference_data[i_ref].data.onset <\
+                    estimated_data[i_est].data.onset:
+                i_ref += 1
+            else:
+                i_est += 1
 
         # Creates evaluation object with the description of the method
         e = evaluation.Evaluation(n_est, n_ref, correct)
