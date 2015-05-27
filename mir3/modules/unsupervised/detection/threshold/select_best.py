@@ -39,7 +39,7 @@ class SelectBest(mir3.module.Module):
             return
 
         th = evaluation.metadata.method.id
-        if th in self.f_thresholds:
+        if th in self.f_thresholds.keys():
             self.f_thresholds[th] += evaluation.data.f
             self.n_thresholds[th] += 1.0
         else:
