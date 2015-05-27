@@ -62,9 +62,12 @@ class SelectBest(mir3.module.Module):
         """
         best_f = 0.0
         best_th = 0.0
+        #print "Evaluating thresholds..."
+        #print "Thresholds to evaluate:", self.f_thresholds
         for th in self.f_thresholds:
-            if self.f_thresholds[th]/self.n_thresholds[th] > best_f:
-                best_f = self.f_thresholds[th]/self.n_thresholds[th]
+            #print th, self.f_thresholds[th]/self.n_thresholds[th]
+            if self.f_thresholds[th] > best_f:
+                best_f = self.f_thresholds[th]
                 best_th = th
 
         return best_th, self.f_thresholds[best_th]/self.n_thresholds[best_th]

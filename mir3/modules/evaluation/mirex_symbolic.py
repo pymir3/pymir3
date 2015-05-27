@@ -90,12 +90,14 @@ class MirexSymbolic(mir3.module.Module):
                     (estimated_data[i_est].to_name() ==\
                     reference_data[i_ref].to_name()):
                 correct += 1
-
-            if reference_data[i_ref].data.onset <\
-                    estimated_data[i_est].data.onset:
                 i_ref += 1
-            else:
                 i_est += 1
+            else:
+                if reference_data[i_ref].data.onset <\
+                        estimated_data[i_est].data.onset:
+                    i_ref += 1
+                else:
+                    i_est += 1
 
         # Creates evaluation object with the description of the method
         e = evaluation.Evaluation(n_est, n_ref, correct)
