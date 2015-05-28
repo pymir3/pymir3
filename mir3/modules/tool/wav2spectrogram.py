@@ -81,14 +81,14 @@ class Wav2Spectrogram(mir3.module.Module):
         data = data.astype(numpy.float)
 
         data /= 32767.0 # Normalization to -1/+1 range
-        
+
         if data.ndim > 1:
             data = numpy.sum(data, axis=1)
-            
+
         s.metadata.sampling_configuration.fs = rate
         s.metadata.sampling_configuration.ofs = \
                 s.metadata.sampling_configuration.fs / \
-                s.metadata.sampling_configuration.window_step
+                float(s.metadata.sampling_configuration.window_step)
 
         nSamples = len(data)
 
@@ -108,12 +108,12 @@ class Wav2Spectrogram(mir3.module.Module):
             buffered_data.append(data[this_start:this_end] * window)
 
         buffered_data = numpy.array(buffered_data).T
-        
+
         #buffered_data = buffered_data * numpy.sqrt(window_length)
-        
+
         Pxx = numpy.abs(numpy.fft.rfft(buffered_data,\
                             n = dft_length,\
-                            axis = 0)) 
+                            axis = 0))
 
         #print Pxx[:,0]
 

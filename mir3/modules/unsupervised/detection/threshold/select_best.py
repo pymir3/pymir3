@@ -27,7 +27,6 @@ class SelectBest(mir3.module.Module):
         The threshold for each evaluation is used as an identifier so that we
         can merge the results of many evaluations.
 
-        Args:
             evaluation: single evaluation object or a list of evaluations.
 
         Returns:
