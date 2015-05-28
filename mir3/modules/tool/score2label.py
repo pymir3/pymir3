@@ -32,7 +32,7 @@ class Score2Label(mir3.module.Module):
         """
         lines = []
         for n in sorted(s.data):
-            lines.append('   %.7e   %.7e   %.7e\n' % (n.metadata.onset,
-                         n.metadata.offset, n.metadata.pitch))
+            lines.append('   %.7e   %.7e   %.7e\n' % (n.data.onset,
+                         n.data.offset, n.data.pitch))
 
         return lines

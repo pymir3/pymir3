@@ -12,6 +12,8 @@ class Spectrogram(do.DataObject):
         -method: details about the method used.
         -min_freq: minimum frequency represented in the spectrogram. Default: 0.
         -min_time: minimum time represented in the spectrogram. Default: 0.
+        -max_freq: maximum frequency represented in the spectrogram.
+        -max_time: maximum time represented in the spectrogram.
         -sampling_configuration: metadata with sampling details.
             -dft_length: size of the dft. Default: 1024.
             -fs: sampling frequency. Default: None.
@@ -33,6 +35,8 @@ class Spectrogram(do.DataObject):
                         method=None,
                         min_freq=0.,
                         min_time=0.,
+                        max_freq=0.,
+                        max_time=0.,
                         sampling_configuration=md.Metadata(
                             dft_length=1024,
                             fs=None,
@@ -128,7 +132,7 @@ class Spectrogram(do.DataObject):
         Returns:
             Tuple containing the lower and upper times, respectively.
         """
-        time_scale = 1000.0*self.metadata.sampling_configuration.ofs
+        time_scale = 1.0*self.metadata.sampling_configuration.ofs
 
         lower = bin / time_scale + self.metadata.min_time;
         upper = (bin+1) / time_scale + self.metadata.min_time;

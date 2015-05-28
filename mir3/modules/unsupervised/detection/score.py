@@ -97,8 +97,8 @@ class Score(mir3.module.Module):
                 elif not activation[0,t] and note_start != -1:
                     # If minum length is met, adds note
                     if t-note_start > minimum_window:
-                        s.append(note.Note(onset=note_start/ofs, offset=t/ofs,
-                                           name=k[1]))
+                        s.append(note.Note(onset=note_start/float(ofs),\
+                            offset=t/float(ofs), name=k[1]))
                     # Marks note as finished
                     note_start = -1
 
