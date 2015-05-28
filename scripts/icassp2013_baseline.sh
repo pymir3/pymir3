@@ -20,7 +20,7 @@ max_freq=5000
 window_length=2048
 dft_length=4096
 beta=0.5
-n_tests=5
+n_tests=10
 minimum_note_length=0.05
 
 echo 'Converting wav to spectrograms...'
