@@ -95,7 +95,7 @@ class Wav2Spectrogram(mir3.module.Module):
         s.metadata.sampling_configuration.fs = rate
         s.metadata.sampling_configuration.ofs = \
                 s.metadata.sampling_configuration.fs / \
-                s.metadata.sampling_configuration.window_step
+                float(s.metadata.sampling_configuration.window_step)
 
         nSamples = len(data)
 
