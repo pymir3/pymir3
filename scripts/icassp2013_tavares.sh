@@ -56,19 +56,6 @@ then
   ./pymir3-cl.py supervised linear merge `find "$database"/Samples/Audio/Piano -name '*.mean.dec'` "$database"/Samples/Audio/piano.mean.dec
 fi
 
-echo 'Computing activations...'
-for name in `find "$database"/Pieces/Audio -name '*.spec'`
-do
-  target_name="${name%.spec}.mean.dec"
-  if [ ! -e "$target_name" ]
-  then
-    echo "$name"
-    ./pymir3-cl.py supervised linear decomposer beta_nmf --beta $beta --basis "$database"/Samples/Audio/piano.mean.dec "$name" /tmp/$$
-    ./pymir3-cl.py supervised linear extract right /tmp/$$ "$target_name"
-    rm /tmp/$$
-  fi
-done
-
 echo 'Converting labels...'
 for name in `find "$database"/Pieces/Labels/Piano -name '*.txt'`
 do
@@ -80,31 +67,35 @@ do
   fi
 done
 
-echo 'Computing threshold values to test...'
-thresholds=`./pymir3-cl.py unsupervised detection threshold tests -n $n_tests "$database"/Pieces/Audio/*.mean.dec`
-echo $thresholds
-
-
-echo 'Applying candidate thresholds'
-for name in `find "$database"/Pieces/Audio -name '*.mean.dec'`
+echo 'Processing each individual piece...'
+for name in `find "$database"/Pieces/Audio -name '*.spec'`
 do
- for th in $thresholds
-  do
-    th_name="${name%.mean.dec}_th_${th}.mean"
-    echo $name $th
-
-    target_name1="${th_name}.bdec"
-    if [ ! -e "$target_name1" ]
+    echo $name
+    echo "Computing activation"
+    basename="${name%.spec}"
+    target_name="${name%.spec}.mean.dec"
+    if [ ! -e "$target_name" ]
     then
-      ./pymir3-cl.py unsupervised detection threshold detect $th "$name" "$target_name1"
+      ./pymir3-cl.py supervised linear decomposer beta_nmf --beta $beta --basis "$database"/Samples/Audio/piano.mean.dec "$name" /tmp/$$
+      ./pymir3-cl.py supervised linear extract right /tmp/$$ "$target_name"
+      rm /tmp/$$
     fi
-  done
-done
 
+    echo 'Computing threshold values to test...'
+    thresholds=`./pymir3-cl.py unsupervised detection threshold tests -n $n_tests "$basename"*.mean.dec`
+    echo $thresholds
 
-for name in `find "$database"/Pieces/Audio -name '*.wav'`
-do
-    basename="${name%.wav}"
+    echo 'Applying thresholds'
+
+    for th in $thresholds
+    do
+        th_name="${basename%.mean.dec}_th_${th}.mean"
+        echo $target_name $th
+
+        target_name1="${th_name}.bdec"
+        ./pymir3-cl.py unsupervised detection threshold detect $th "$target_name" "$target_name1"
+    done
+
     echo $name
     bdecnames=`ls $basename*.bdec`
     echo $bdecnames
@@ -114,7 +105,7 @@ do
     ./pymir3-cl.py tool trim_score --minimum-duration $minimum_note_length /tmp/$$ "$target_name2"
     rm /tmp/$$
     target_name3="${best_bdec}.max_periodicity.symbolic.eval"
-    score_name=`echo "${name%.wav}.score" | sed 's,/Audio/,/Labels/Piano/,'`
+    score_name=`echo "${name%.spec}.score" | sed 's,/Audio/,/Labels/Piano/,'`
     ./pymir3-cl.py evaluation mirex_symbolic "$target_name2" "$score_name" "$target_name3" --id $th
     echo $target_name3
 done
