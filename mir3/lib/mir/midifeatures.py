@@ -9,10 +9,10 @@ def range(sequence):
     min_pitch = 999
     max_pitch = 0
     for note in sequence:
-        if note.pitch < min_pitch:
-            min_pitch = note.pitch
-        if note.pitch > max_pitch:
-            max_pitch = note.pitch
+        if note.data.pitch < min_pitch:
+            min_pitch = note.data.pitch
+        if note.data.pitch > max_pitch:
+            max_pitch = note.data.pitch
 
     return (min_pitch, max_pitch)
 
@@ -23,5 +23,7 @@ def note_histogram(sequence, min_pitch=20, max_pitch=108):
         histogram[note.pitch-min_pitch] += 1
 
     return histogram
+
+
 
 
