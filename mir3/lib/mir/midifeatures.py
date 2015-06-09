@@ -16,13 +16,23 @@ def range(sequence):
 
     return (min_pitch, max_pitch)
 
-def note_histogram(sequence, min_pitch=20, max_pitch=108):
-    """Returns a note histogram of the sequence"""
-    histogram = numpy.zeros((1, max_pitch-min_pitch))
+def pitchclass_histogram(sequence, duration=False):
+    """Returns a pitch-class histogram of the sequence
+
+    0 represents C, 1 represents C# and so on.
+    If duration is set to True, then the histogram will consider the note
+    durations (default is considering each occurence as a count)
+    """
+    histogram = numpy.zeros(12)
     for note in sequence:
-        histogram[note.pitch-min_pitch] += 1
+        pitchclass = note.data.pitch % 12
+        if duration is True:
+            histogram[pitchclass] += note.data.offset - note.data.onset
+        else:
+            histogram[pitchclass] += 1
 
     return histogram
+
 
 
 
