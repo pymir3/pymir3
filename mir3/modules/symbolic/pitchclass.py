@@ -13,12 +13,15 @@ class Range(mir3.module.Module):
     screen"""
 
     def build_arguments(self, parser):
-        parser.add_argument('infile', type=argparse.FileType('rb'),
-                            help="""file containing score""")
+        parser.add_argument('infile', type=argparse.FileType('rb'),\
+                help="""file containing score""")
+        parser.add_argument('-d', '--duration', default=False,\
+                action='store_true', help="""Use duration as weights for the\
+                histogram""")
 
     def run(self, args):
         s = score.Score().load(args.infile)
-        histogram = feats.pitchclass_histogram(s.data)
+        histogram = feats.pitchclass_histogram(s.data, args.duration)
         for i in xrange(12):
             print histogram[i],
         print " "

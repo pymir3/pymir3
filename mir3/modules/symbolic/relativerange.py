@@ -5,18 +5,16 @@ import mir3.data.score as score
 import mir3.lib.mir.midifeatures as feats
 import mir3.module
 
-class Intervals(mir3.module.Module):
-    """Calculates the interval histogram from a score"""
+class RelativeRange(mir3.module.Module):
+    """Calculates relative range statistics from a score"""
 
     def get_help(self):
-        return """Pitch class histogram from a score. Prints the values on
-    screen"""
+        return """Relative range statistics from a score. Prints the values on
+    screen. Returns: maxRange, meanRange, standard_deviationRange"""
 
     def build_arguments(self, parser):
         parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""file containing score""")
-        parser.add_argument('--fold', '-f', type=int, default=12,\
-                help="""Number of semitones to fold spectrogram into""")
         parser.add_argument('--time_tolerance', '-t', type=float,\
                 default=0.005,\
                 help="""Tolerance (s) between two consecutive events so they are
@@ -31,10 +29,8 @@ class Intervals(mir3.module.Module):
     def run(self, args):
         s = score.Score().load(args.infile)
         events = feats.event_list(s.data)
-        histogram = feats.interval_histogram(events, args.fold,\
+        (maxRange, meanRange, devRange) = feats.relative_range(events,\
                 args.time_tolerance, args.duration)
-        for i in xrange(args.fold):
-            print histogram[i],
-        print " "
+        print maxRange, meanRange, devRange
 
 

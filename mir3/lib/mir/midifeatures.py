@@ -31,6 +31,7 @@ def pitchclass_histogram(sequence, duration=False):
         else:
             histogram[pitchclass] += 1
 
+    histogram /= numpy.sum(histogram)
     return histogram
 
 # Event lists:
@@ -108,7 +109,7 @@ def note_density(eventList, time_resolution=0.005, duration=False):
     return (dMean, dDev, dMax, dMin)
 
 
-def interval_histogram(eventList, folded=True,\
+def interval_histogram(eventList, folds=12,\
         time_resolution=0.005, duration=False):
     """Returns interval histogram
 
@@ -124,9 +125,6 @@ def interval_histogram(eventList, folded=True,\
 
     note_accumulator = []
     interval_accumulator = []
-    onsets = 0
-    offsets = 0
-    time_array = []
     current_time = 0.0
     event_number = 0 # counter
     while event_number < len(eventList):
@@ -134,15 +132,12 @@ def interval_histogram(eventList, folded=True,\
 
         if (abs(event[0] - current_time) > time_resolution):
             # Accumulate and proceed to next event
-            if duration is True:
-                time_array.append(event[0]-current_time)
-            else:
-                time_array.append(1)
 
             for x in xrange(len(note_accumulator)):
                 for y in xrange(x):
-                    interval_accumulator.append(abs(note_accumulator[x]-\
-                            note_accumulator[y]))
+                    interval_accumulator.append(\
+                            [abs(note_accumulator[x] - note_accumulator[y]),\
+                            event[0]-current_time])
 
             current_time = event[0]
 
@@ -150,21 +145,76 @@ def interval_histogram(eventList, folded=True,\
         if event[2] == 1:
             # Add a new onset
             note_accumulator.append(event[1])
-            onsets += 1
         else:
             note_accumulator.remove(event[1])
-            offsets += 1
+
 
         event_number += 1
 
-    if folded is True:
-        hist = numpy.zeros(12)
+    hist = numpy.zeros(folds)
+    if duration is True:
         for i in interval_accumulator:
-            hist[i%12] += 1
+            hist[i[0]%folds] += i[1]
+    else:
+        for i in interval_accumulator:
+            hist[i[0]%folds] += 1.0
 
     hist = hist / numpy.sum(hist)
 
     return hist
+
+
+def relative_range(eventList,
+        time_resolution=0.005, duration=False):
+    """Returns interval histogram
+
+    If duration is set to True, then these statistics will be weighted acording
+    to their time.
+
+    The time resolution is used to detect chords that are not played exactly at
+    the given time.
+    """
+
+    time_accumulator = []
+    range_accumulator = []
+    note_accumulator = []
+    current_time = 0.0
+    event_number = 0 # counter
+    while event_number < len(eventList):
+        event = eventList[event_number]
+
+        if (abs(event[0] - current_time) > time_resolution):
+            # Accumulate and proceed to next event
+            if len(note_accumulator) > 0:
+                range_accumulator.append(max(note_accumulator) -\
+                    min(note_accumulator))
+                time_accumulator.append(event[0]-current_time)
+
+            current_time = event[0]
+
+        if event[2] == 1:
+            # Add a new onset
+            note_accumulator.append(event[1])
+        else:
+            note_accumulator.remove(event[1])
+
+        event_number += 1
+
+    range_array = numpy.array(range_accumulator)
+    if duration is True:
+        time_array = numpy.array(time_accumulator)
+        maxRange = numpy.max(range_array)
+        meanRange = numpy.sum(range_array * time_array) /\
+                numpy.sum(time_array)
+        devRange = numpy.sum(time_accumulator * ((range_array-meanRange)**2))/\
+                numpy.sum(time_array)
+    else:
+        maxRange = numpy.max(range_array)
+        meanRange = numpy.mean(range_array)
+        devRange = numpy.dev(range_array)
+
+    return (maxRange, meanRange, devRange)
+
 
 
 
