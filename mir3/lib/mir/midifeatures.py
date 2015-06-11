@@ -33,6 +33,80 @@ def pitchclass_histogram(sequence, duration=False):
 
     return histogram
 
+# Event lists:
+# A list containing all onsets and offsets of a note sequence.
+# The list will contain information as:
+# time pitch event_type (1 = onset, 0 = offset)
+# TODO: If this list gets used very often, then in will be ported to a data
+# structure of its own.
+
+def event_list(sequence):
+    event_list = []
+    for note in sequence:
+        new_onset = [note.data.onset, note.data.pitch, 1]
+        new_offset = [note.data.offset, note.data.pitch, 0]
+        event_list.append(new_onset)
+        event_list.append(new_offset)
+
+    sorted_list = sorted(event_list, key=lambda x: x[0])
+
+    return sorted_list
+
+def note_density(eventList, time_resolution=0.005, duration=False):
+    """Returns note density (number of simultaneous notes) statistics
+
+    Returns:
+    (mean, std, min, max)
+
+    If duration is set to True, then these statistics will be weighted acording
+    to their time.
+
+    The time resolution is used to detect chords that are not played exactly at
+    the given time.
+    """
+
+
+    density_accumulator = 0
+    densities = []
+    onsets = 0
+    offsets = 0
+    time_array = []
+    current_time = 0.0
+    event_number = 0 # counter
+    while event_number < len(eventList):
+        event = eventList[event_number]
+
+        if (abs(event[0] - current_time) > time_resolution):
+            # Accumulate and proceed to next event
+            if duration is True:
+                time_array.append(event[0]-current_time)
+            else:
+                time_array.append(1)
+            densities.append(onsets-offsets)
+            current_time = event[0]
+
+
+        if event[2] == 1:
+            # Add a new onset
+            density_accumulator += 1
+            onsets += 1
+        else:
+            density_accumulator -= 1
+            offsets += 1
+
+        event_number += 1
+
+    # Estimate statistics:
+    d = numpy.array(densities)
+    t = numpy.array(time_array)
+
+    dMean = numpy.mean(d)
+    dDev = numpy.std(d)
+    dMax = numpy.max(d)
+    dMin = numpy.min(d)
+
+    return (dMean, dDev, dMax, dMin)
+
 
 
 
