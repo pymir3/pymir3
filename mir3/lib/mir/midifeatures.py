@@ -108,6 +108,66 @@ def note_density(eventList, time_resolution=0.005, duration=False):
     return (dMean, dDev, dMax, dMin)
 
 
+def interval_histogram(eventList, folded=True,\
+        time_resolution=0.005, duration=False):
+    """Returns interval histogram
+
+    If folded is True, the resulting histogram will have all intervals folded to
+    a 12-tone scale (%12)
+
+    If duration is set to True, then these statistics will be weighted acording
+    to their time.
+
+    The time resolution is used to detect chords that are not played exactly at
+    the given time.
+    """
+
+    note_accumulator = []
+    interval_accumulator = []
+    onsets = 0
+    offsets = 0
+    time_array = []
+    current_time = 0.0
+    event_number = 0 # counter
+    while event_number < len(eventList):
+        event = eventList[event_number]
+
+        if (abs(event[0] - current_time) > time_resolution):
+            # Accumulate and proceed to next event
+            if duration is True:
+                time_array.append(event[0]-current_time)
+            else:
+                time_array.append(1)
+
+            for x in xrange(len(note_accumulator)):
+                for y in xrange(x):
+                    interval_accumulator.append(abs(note_accumulator[x]-\
+                            note_accumulator[y]))
+
+            current_time = event[0]
+
+
+        if event[2] == 1:
+            # Add a new onset
+            note_accumulator.append(event[1])
+            onsets += 1
+        else:
+            note_accumulator.remove(event[1])
+            offsets += 1
+
+        event_number += 1
+
+    if folded is True:
+        hist = numpy.zeros(12)
+        for i in interval_accumulator:
+            hist[i%12] += 1
+
+    hist = hist / numpy.sum(hist)
+
+    return hist
+
+
+
 
 
 
