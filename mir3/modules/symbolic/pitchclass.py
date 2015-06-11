@@ -15,10 +15,17 @@ class Range(mir3.module.Module):
     def build_arguments(self, parser):
         parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""file containing score""")
-
+        parser.add_argument('--normalize', action='store_true',
+                            default=False, help="Normalize histogram to unit\
+                            sum")
+        parser.add_argument('--time', action='store_true',
+                            default=False, help="Weight notes according to\
+                            their duration")
     def run(self, args):
         s = score.Score().load(args.infile)
-        histogram = feats.pitchclass_histogram(s.data)
+        histogram = feats.pitchclass_histogram(s.data, args.time)
+        if args.normalize is True:
+            histogram = histogram / numpy.sum(histogram)
         for i in xrange(12):
             print histogram[i],
         print " "
