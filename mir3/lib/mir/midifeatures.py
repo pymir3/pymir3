@@ -34,6 +34,19 @@ def pitchclass_histogram(sequence, duration=False):
     histogram /= numpy.sum(histogram)
     return histogram
 
+def tonality(histogram):
+    """Calculates tonality of the pitchclass_histogram.
+
+    Returns the estimated tonality (argmax(pitchclass_histogram)) and a
+    flipped histogram considering [0] to be the estimated tonic
+    """
+    tonality = numpy.argmax(histogram)
+    new_histogram =\
+            numpy.concatenate((histogram[tonality:],histogram[0:tonality]))
+    return (tonality, new_histogram)
+
+
+
 # Event lists:
 # A list containing all onsets and offsets of a note sequence.
 # The list will contain information as:

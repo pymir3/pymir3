@@ -18,10 +18,17 @@ class Range(mir3.module.Module):
         parser.add_argument('-d', '--duration', default=False,\
                 action='store_true', help="""Use duration as weights for the\
                 histogram""")
+        parser.add_argument('-t', '--tonality', default=False,\
+                action='store_true', help="""Estimate tonality and rotate the
+                histogram so the first value corresponds to the tonic""")
 
     def run(self, args):
         s = score.Score().load(args.infile)
         histogram = feats.pitchclass_histogram(s.data, args.duration)
+        if args.tonality is True:
+            (tone, histogram) = feats.tonality(histogram)
+            print tone,
+
         for i in xrange(12):
             print histogram[i],
         print " "
