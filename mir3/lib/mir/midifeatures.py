@@ -229,6 +229,40 @@ def relative_range(eventList,
     return (maxRange, meanRange, devRange)
 
 
+def rhythm_histogram(eventList, rhythm_bins=24,\
+        time_resolution=0.005):
+    """Estimates rhythm histogram, given an event list
+
+    The time resolution is used to detect chords that are not played exactly at
+    the given time.
+    """
+
+    current_time = 0.0
+    event_number = 0 # counter
+    ioi_list = []
+    last_ioi = None
+    while event_number < len(eventList):
+        event = eventList[event_number]
+
+        if (abs(event[0] - current_time) > time_resolution) and\
+                    (event[2] == 1):
+            this_ioi = float(event[0] - current_time)
+
+            if last_ioi is not None:
+                ioi_list.append(this_ioi / last_ioi)
+
+            last_ioi = this_ioi
+            current_time = event[0]
+
+        event_number += 1
+
+    ioi_list = numpy.array(ioi_list)
+    ioi_list = numpy.log2(ioi_list)
+
+    rhythm_histogram = numpy.histogram(ioi_list, bins=rhythm_bins,\
+            range=(-6, 6), density=True)
+
+    return rhythm_histogram
 
 
 
