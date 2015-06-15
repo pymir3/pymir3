@@ -21,7 +21,7 @@ class Rhythm(mir3.module.Module):
     def run(self, args):
         s = score.Score().load(args.infile)
         events = feats.event_list(s.data)
-        histogram, lim = feats.rhythm_histogram(events, args.resolution + 1)
+        histogram, lim = feats.rhythm_histogram(events, args.resolution)
 
         for i in xrange(args.resolution):
             print histogram[i],
