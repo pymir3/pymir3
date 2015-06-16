@@ -15,7 +15,7 @@ class Rhythm(mir3.module.Module):
     def build_arguments(self, parser):
         parser.add_argument('infile', type=argparse.FileType('rb'),\
                 help="""file containing score""")
-        parser.add_argument('-r', '--resolution', default=24,\
+        parser.add_argument('-r', '--resolution', default=25,\
                 help="""Number of bins in the histogram""")
 
     def run(self, args):
