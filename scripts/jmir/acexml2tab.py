@@ -20,10 +20,29 @@ args = parser.parse_args()
 xmldoc = minidom.parse(args.infile)
 dataset_list = xmldoc.getElementsByTagName('data_set')
 
+if args.csv is True:
+    separator = ", "
+else:
+    separator = "\t"
+
+fout = open(args.outfile, 'wb')
 for dataset in dataset_list:
+    lineout = ""
+
     dataset_id = dataset.getElementsByTagName('data_set_id')
-    print dataset_id[0].toxml()
-    print dataset_id[0].childNodes[0].nodeValue # YAY !
+    lineout += dataset_id[0].childNodes[0].nodeValue
+
+    features = dataset.getElementsByTagName('feature')
+    for feat in features:
+        values = feat.getElementsByTagName('v')
+        for val in values:
+            lineout += separator
+            lineout += val.childNodes[0].nodeValue.replace(',', '.')
+
+    lineout += "\n"
+    fout.write(lineout)
+
+fout.close()
 
 #print(len(itemlist))
 #print(itemlist[0].attributes['name'].value)
