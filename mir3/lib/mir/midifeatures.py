@@ -224,7 +224,7 @@ def relative_range(eventList,
     else:
         maxRange = numpy.max(range_array)
         meanRange = numpy.mean(range_array)
-        devRange = numpy.dev(range_array)
+        devRange = numpy.std(range_array)
 
     return (maxRange, meanRange, devRange)
 
