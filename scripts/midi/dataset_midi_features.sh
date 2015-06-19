@@ -14,7 +14,7 @@ fi
 for name in `find "$database" -name '*.mid'`
 do
     #echo ./pymir3-cl.py tool midi2score $name /tmp/$$.score
-    ./pymir3-cl.py tool midi2score 0 $name /tmp/$$.score
+    ./pymir3-cl.py tool midi2score 1 $name /tmp/$$.score
 
 
     feats=''
