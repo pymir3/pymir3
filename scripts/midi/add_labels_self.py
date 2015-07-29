@@ -41,7 +41,10 @@ if args.label is not None:
 first_line = True
 attN = 1
 with open(args.infile, 'rb') as f:
+
+
     for line in f:
+        print line
         p = line.replace('\n', '').split(' ')
         lineout = ""
         ID = p[0].split('/')[-1]
@@ -52,16 +55,16 @@ with open(args.infile, 'rb') as f:
             lineout += separator
             lineout += p[i]
 
-    if first_line is True:
-        for i in range(1, len(p)):
-            title += separator
-            title += i
-        title += "\n"
-        fout.write(title)
-        first_line = False
+        if first_line is True:
+            for i in range(1, len(p)):
+                title += separator
+                title += str(i)
+            title += "\n"
+            fout.write(title)
+            first_line = False
 
-    lineout += "\n"
-    fout.write(lineout)
+        lineout += "\n"
+        fout.write(lineout)
 
 fout.close()
 
