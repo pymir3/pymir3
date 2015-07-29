@@ -61,10 +61,10 @@ for dataset in dataset_list:
         for val in values:
             lineout += separator
             lineout += val.childNodes[0].nodeValue.replace(',', '.')
-        if first_line is True:
-            title += separator
-            title += str(attN)
-            attN += 1
+            if first_line is True:
+                title += separator
+                title += str(attN)
+                attN += 1
 
     if first_line is True:
         title += "\n"
