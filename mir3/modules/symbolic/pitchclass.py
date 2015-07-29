@@ -21,6 +21,10 @@ class Range(mir3.module.Module):
         parser.add_argument('-t', '--tonality', default=False,\
                 action='store_true', help="""Estimate tonality and rotate the
                 histogram so the first value corresponds to the tonic""")
+        parser.add_argument('--statistics', '-s', default=False,\
+                action='store_true',\
+                help="""Also outputs statistics (mean, std deviation,
+                entropy and indexes of 4 greatest values)""")
 
     def run(self, args):
         s = score.Score().load(args.infile)
@@ -28,6 +32,19 @@ class Range(mir3.module.Module):
         if args.tonality is True:
             (tone, histogram) = feats.tonality(histogram)
             print tone,
+
+        if args.statistics is True:
+            h = numpy.array(histogram)
+            print numpy.mean(h),
+            print numpy.std(h),
+            print numpy.sum(numpy.array([h[i] * numpy.log2(h[i])\
+                    for i in xrange(len(h))\
+                    if h[i] > 0])),
+            for i in xrange(4):
+                m = numpy.argmax(h)
+                print m,
+                h[m] = 0
+
 
         for i in xrange(12):
             print histogram[i],

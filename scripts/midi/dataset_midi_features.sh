@@ -23,7 +23,13 @@ do
     feats=$name
     for feature in density intervals pitchclass range relativerange rhythm
     do
-    thisfeat=`./pymir3-cl.py symbolic $feature /tmp/$$.score`
+        tag=""
+        if [ "$feature" = "intervals" ] | [ "$feature" = "pitchclass" ]
+        then
+            tag=" -s "
+        fi
+
+    thisfeat=`./pymir3-cl.py symbolic $feature $tag /tmp/$$.score`
     feats=`echo $feats $thisfeat`
     done
 

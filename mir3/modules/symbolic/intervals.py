@@ -24,7 +24,10 @@ class Intervals(mir3.module.Module):
         parser.add_argument('--duration', '-d', default=False,\
                 action='store_true',\
                 help="""Consider duration as weights when estimating""")
-
+        parser.add_argument('--statistics', '-s', default=False,\
+                action='store_true',\
+                help="""Also outputs statistics (mean, std deviation,
+                entropy and indexes of 4 greatest values)""")
 
 
 
@@ -35,6 +38,20 @@ class Intervals(mir3.module.Module):
                 args.time_tolerance, args.duration)
         for i in xrange(args.fold):
             print histogram[i],
+
+        if args.statistics is True:
+            h = numpy.array(histogram)
+            print numpy.mean(h),
+            print numpy.std(h),
+            print numpy.sum(numpy.array([h[i] * numpy.log2(h[i])\
+                    for i in xrange(len(h))\
+                    if h[i] > 0])),
+
+            for i in xrange(4):
+                m = numpy.argmax(h)
+                print m,
+                h[m] = 0
+
         print " "
 
 
