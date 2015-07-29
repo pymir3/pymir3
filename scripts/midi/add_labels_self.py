@@ -1,9 +1,8 @@
-#acexml2tab.py
+#add_labels_self.py
 #
-# Converts ACE XML files to tabular string texts.
+# Adds labels as a columns in files
 
 import argparse
-import xml.dom.minidom as minidom
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('infile', help='input filename')
@@ -18,9 +17,6 @@ args = parser.parse_args()
 #print args.infile
 #print args.outfile
 #print args.csv
-
-xmldoc = minidom.parse(args.infile)
-dataset_list = xmldoc.getElementsByTagName('data_set')
 
 if args.csv is True:
     separator = ", "
@@ -44,29 +40,22 @@ if args.label is not None:
 
 first_line = True
 attN = 1
-for dataset in dataset_list:
-    lineout = ""
-
-    dataset_id = dataset.getElementsByTagName('data_set_id')
-    ID = dataset_id[0].childNodes[0].nodeValue.split('/')[-1]
-    lineout += ID
-
-    if args.label is not None:
+with open(args.infile, 'rb') as f:
+    for line in f:
+        p = line.replace('\n', '').split(' ')
+        lineout = ""
+        ID = p[0].split('/')[-1]
+        lineout += ID
         lineout += separator
         lineout += labeldict[ID]
-
-    features = dataset.getElementsByTagName('feature')
-    for feat in features:
-        values = feat.getElementsByTagName('v')
-        for val in values:
+        for i in range(1, len(p)):
             lineout += separator
-            lineout += val.childNodes[0].nodeValue.replace(',', '.')
-        if first_line is True:
-            title += separator
-            title += str(attN)
-            attN += 1
+            lineout += p[i]
 
     if first_line is True:
+        for i in range(1, len(p)):
+            title += separator
+            title += i
         title += "\n"
         fout.write(title)
         first_line = False
@@ -80,4 +69,5 @@ fout.close()
 #print(itemlist[0].attributes['name'].value)
 #for s in itemlist:
 #        print(s.attributes['name'].value)
+
 

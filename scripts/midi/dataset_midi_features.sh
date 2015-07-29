@@ -3,7 +3,10 @@ set -o errexit
 
 # Gets features from a directory of midi files.
 
+
 database=${1%/}
+
+outputfile=$2
 
 if [ ! -d "$database" -o -z "$database" ]
 then
@@ -13,18 +16,18 @@ fi
 
 for name in `find "$database" -name '*.mid'`
 do
-    #echo ./pymir3-cl.py tool midi2score $name /tmp/$$.score
+    #echo ./pymir3-cl.py tool midi2score 1 $name /tmp/$$.score
     ./pymir3-cl.py tool midi2score 1 $name /tmp/$$.score
 
 
-    feats=''
+    feats=$name
     for feature in density intervals pitchclass range relativerange rhythm
     do
     thisfeat=`./pymir3-cl.py symbolic $feature /tmp/$$.score`
     feats=`echo $feats $thisfeat`
     done
 
-echo $name $feats
+    echo $feats
 done
 
 
