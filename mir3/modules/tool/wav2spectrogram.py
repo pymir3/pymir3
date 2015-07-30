@@ -72,6 +72,8 @@ class Wav2Spectrogram(mir3.module.Module):
         s.metadata.sampling_configuration.dft_length    = dft_length
         s.metadata.sampling_configuration.window_step   = window_step
         s.metadata.sampling_configuration.spectrum_type = spectrum_type
+
+
         if save_metadata:
             s.metadata.input = md.FileMetadata(wav_file)
 
@@ -84,6 +86,11 @@ class Wav2Spectrogram(mir3.module.Module):
 
         if data.ndim > 1:
             data = numpy.sum(data, axis=1)
+
+        s.metadata.min_time = 0.0
+        s.metadata.min_freq = 0.0
+        s.metadata.max_time = len(data) / float(rate)
+        s.metadata.max_freq = 0.5 * rate
 
         s.metadata.sampling_configuration.fs = rate
         s.metadata.sampling_configuration.ofs = \
