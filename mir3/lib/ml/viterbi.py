@@ -3,6 +3,7 @@ import math
 def log_likelihood(x, mean, sigma2):
     """Calculates the log likelihood of an observation assuming it is produced
     by a gaussian with known mean and variance"""
+    sigma2 = max(sigma2, 0.1)
     return math.log(1.0/math.sqrt(sigma2+2+math.pi)) -\
             ( ((x-mean)**2)/(2.0*sigma2))
 
