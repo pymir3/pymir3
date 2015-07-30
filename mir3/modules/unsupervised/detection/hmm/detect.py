@@ -57,28 +57,30 @@ class Detect(mir3.module.Module):
                            activation_input=metadata,
                            original_method=None)
 
+        # Trains HMM on full matrix
+        A = numpy.array([[]])
+        for k in d.data.right.keys():
+            A = numpy.hstack((A, d.data.right[k]))
+        A.shape = (A.shape[1], 1)
+
+        mu = numpy.mean(A)
+        sigma = numpy.std(A)
+        init_mean = numpy.array([mu-sigma, mu+sigma])
+        init_transition = numpy.array([ [0.5, 0.5], [0.5, 0.5] ])
+        init_covar = numpy.array( [[sigma],[sigma]] )
+        start_prob = numpy.array( [0.5, 0.5] )
+
+        model = hmm.GaussianHMM(n_components=2, covariance_type='diag',\
+                startprob=start_prob, transmat=init_transition)
+        model.mean_ = init_mean
+        model.covar_ = init_covar
+
+        model.fit([A])
+
         # Binarizes the data and adjusts the metadata
         for k in d.data.right.keys():
-
-            # Separate high-value and low-value samples
-            (lin, col) = d.data.right[k].shape
-            d.data.right[k].shape=(lin*col, 1)
-
-            mu = numpy.mean(d.data.right[k])
-            sigma = numpy.std(d.data.right[k])
-            init_mean = numpy.array([mu-sigma, mu+sigma])
-            init_transition = numpy.array([ [0.5, 0.5], [0.5, 0.5] ])
-            init_covar = numpy.array( [[sigma],[sigma]] )
-            start_prob = numpy.array( [0.5, 0.5] )
-
-            model = hmm.GaussianHMM(n_components=2, covariance_type='diag',\
-                    startprob=start_prob, transmat=init_transition)
-            model.mean_ = init_mean
-            model.covar_ = init_covar
-
-            model.fit([d.data.right[k]])
-            prob, x = model.decode(d.data.right[k])
-            x.shape = (lin, col)
+            prob, x = model.decode(d.data.right[k].transpose())
+            x.shape = d.data.right[k].shape
             d.data.right[k] = x
 
             d.metadata.right[k] = md.Metadata(method="hmm",
