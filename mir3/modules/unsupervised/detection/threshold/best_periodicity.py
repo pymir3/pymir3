@@ -26,7 +26,7 @@ class BestPeriodicity(mir3.module.Module):
 
     def find_best_periodicity(self, args):
         best_file_name = None
-        best_periodicity = 0.0
+        best_periodicity = -1.0
         this_periodicity = 0.0
         for filename in args.infile:
             with open(filename, 'rb') as handler:
