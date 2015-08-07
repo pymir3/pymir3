@@ -61,16 +61,18 @@ class Detect(mir3.module.Module):
         # Trains HMM on full matrix
         A = []
         for k in d.data.right.keys():
-            A.append(d.data.right[k].transpose())
+            J = d.data.right[k].transpose()
+            Jdiff = numpy.diff(J, axis=0)
+            A.append(numpy.hstack((J[:-1,], Jdiff)))
 
         mu = 1.0
         sigma = 2.0
-        init_mean = numpy.array([mu-sigma, mu+sigma])
+        init_mean = numpy.array([[mu-sigma, mu+sigma], [mu-sigma, mu+sigma]])
         init_transition = numpy.array([ [0.5, 0.5], [0.5, 0.5] ])
-        init_covar = numpy.array( [[sigma],[sigma]] )
+        init_covar = numpy.array( [[sigma, sigma],[sigma, sigma]] )
         start_prob = numpy.array( [1.0, 0.0] )
 
-        model = hmm.GaussianHMM(n_components=2, covariance_type='diag',\
+        model = hmm.GaussianHMM(n_components=2, covariance_type='full',\
                 startprob=start_prob, transmat=init_transition)
         model.mean_ = init_mean
         model.covar_ = init_covar
@@ -79,8 +81,14 @@ class Detect(mir3.module.Module):
 
         # Binarizes the data and adjusts the metadata
         for k in d.data.right.keys():
-            prob, x = model.decode(d.data.right[k].transpose())
-            x.shape = d.data.right[k].shape
+            J = d.data.right[k].transpose()
+            Jdiff = numpy.diff(J, axis=0)
+            Jfull = numpy.hstack((J[1:,], Jdiff))
+
+            prob, x = model.decode(Jfull)
+            x.shape = (1, d.data.right[k].shape[1]-1)
+
+            x = numpy.hstack( (numpy.array([[0]]), x) )
             d.data.right[k] = x
 
             d.metadata.right[k] = md.Metadata(method="hmm",
