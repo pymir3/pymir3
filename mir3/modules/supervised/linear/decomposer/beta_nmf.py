@@ -303,10 +303,10 @@ class BetaNMF(mir3.module.Module):
                       B,
                       A,
                       beta=beta,
-                      updateB=True,
-                      updateA=True,
-                      minDelta=min_delta,
-                      maxIterations=max_iterations)
+                      update_B=True,
+                      update_A=True,
+                      min_delta=min_delta,
+                      max_iterations=max_iterations)
 
     def compute_activation(self, X, B, A, beta=2., min_delta=0.,
                            max_iterations=100):
