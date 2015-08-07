@@ -39,21 +39,21 @@ done
 echo 'Converting samples spectrogram to basis...'
 for name in `find "$database"/Samples/Audio/Piano -name '*.spec'`
 do
-  target_name="${name%.spec}.mean.dec"
+  target_name="${name%.spec}.beta.dec"
   if [ ! -e "$target_name" ]
   then
     echo "$name"
     note=`basename "${name}" | sed 's/^.\{4\}//;s/\.spec$//'`
-    ./pymir3-cl.py supervised linear decomposer mean piano "$note" "$name" /tmp/$$
+    ./pymir3-cl.py supervised linear decomposer beta_nmf -s 1 piano "$note" "$name" /tmp/$$
     ./pymir3-cl.py supervised linear extract left /tmp/$$ "$target_name"
     rm /tmp/$$
   fi
 done
 
 echo 'Merging basis...'
-if [ ! -e "$database"/Samples/Audio/piano.mean.dec ]
+if [ ! -e "$database"/Samples/Audio/piano.beta.dec ]
 then
-  ./pymir3-cl.py supervised linear merge `find "$database"/Samples/Audio/Piano -name '*.mean.dec'` "$database"/Samples/Audio/piano.mean.dec
+  ./pymir3-cl.py supervised linear merge `find "$database"/Samples/Audio/Piano  -name '*.beta.dec'` "$database"/Samples/Audio/piano.beta.dec
 fi
 
 echo 'Converting labels...'
@@ -73,23 +73,23 @@ do
     echo $name
     echo "Computing activation"
     basename="${name%.spec}"
-    target_name="${name%.spec}.mean.dec"
+    target_name="${name%.spec}.beta.dec"
     if [ ! -e "$target_name" ]
     then
-      ./pymir3-cl.py supervised linear decomposer beta_nmf --beta $beta --basis "$database"/Samples/Audio/piano.mean.dec "$name" /tmp/$$
+      ./pymir3-cl.py supervised linear decomposer beta_nmf --beta $beta --basis  "$database"/Samples/Audio/piano.beta.dec "$name" /tmp/$$
       ./pymir3-cl.py supervised linear extract right /tmp/$$ "$target_name"
       rm /tmp/$$
     fi
 
     echo 'Computing threshold values to test...'
-    thresholds=`./pymir3-cl.py unsupervised detection threshold tests -n $n_tests "$basename"*.mean.dec`
+    thresholds=`./pymir3-cl.py unsupervised detection threshold tests -n  $n_tests "$basename"*.beta.dec`
     echo $thresholds
 
     echo 'Applying thresholds'
 
     for th in $thresholds
     do
-        th_name="${basename%.mean.dec}_th_${th}.mean"
+        th_name="${basename%.beta.dec}_th_${th}.beta"
         echo $target_name $th
 
         target_name1="${th_name}.bdec"
@@ -97,19 +97,19 @@ do
     done
 
     echo $name
-    bdecnames=`ls $basename*.mean.bdec`
+    bdecnames=`ls $basename*.beta.bdec`
     echo $bdecnames
     best_bdec=`./pymir3-cl.py unsupervised detection threshold best_periodicity $bdecnames`
     ./pymir3-cl.py unsupervised detection score piano "$best_bdec" /tmp/$$
-    target_name2="${best_bdec}.max_periodicity.score"
+    target_name2="${best_bdec}.beta.max_periodicity.score"
     ./pymir3-cl.py tool trim_score --minimum-duration $minimum_note_length /tmp/$$ "$target_name2"
     rm /tmp/$$
-    target_name3="${best_bdec}.mean.max_periodicity.symbolic.eval"
+    target_name3="${best_bdec}.beta.max_periodicity.symbolic.eval"
     score_name=`echo "${name%.spec}.score" | sed 's,/Audio/,/Labels/Piano/,'`
     ./pymir3-cl.py evaluation mirex_symbolic "$target_name2" "$score_name" "$target_name3" --id $th
     echo $target_name3
 done
 
-evaluations=`find "$database"/Pieces/Audio/ -name "*mean.max_periodicity.symbolic.eval"`
+evaluations=`find "$database"/Pieces/Audio/ -name "*beta.max_periodicity.symbolic.eval"`
 ./pymir3-cl.py info evaluation_csv $evaluations
 ./pymir3-cl.py info evaluation_statistics $evaluations
