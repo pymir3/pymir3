@@ -31,7 +31,7 @@ do
   then
     echo "$name"
     ./pymir3-cl.py tool wav2spectrogram -l $window_length -L $dft_length "$name" /tmp/$$
-    ./pymir3-cl.py tool trim_spectrogram -f $min_freq -F $max_freq /tmp/$$.trim
+    ./pymir3-cl.py tool trim_spectrogram -f $min_freq -F $max_freq /tmp/$$ /tmp/$$.trim
     ./pymir3-cl.py tool tensor_spectrogram -f 2 /tmp/$$.trim "$target_name"
     rm /tmp/$$ /tmp/$$.trim
   fi

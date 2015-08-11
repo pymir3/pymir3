@@ -2,7 +2,7 @@ import argparse
 import numpy
 import copy
 import scipy.io.wavfile
-import pylab
+
 
 import mir3.data.metadata as md
 import mir3.data.spectrogram as spectrogram
