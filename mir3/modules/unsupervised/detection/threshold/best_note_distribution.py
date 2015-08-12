@@ -35,14 +35,11 @@ class BestNoteDistribution(mir3.module.Module):
                 a = sc.Score().load(handler)
                 event_list = feats.event_list(a.data)
                 if len(event_list) > 0: # Avoids empty scores
-                    (dens_mean, dens_std, dens_min, dens_max) = \
-                        feats.note_density(event_list)
-                    if dens_max < 10: # Avoids scores that are obviously wrong
-                        (max_range, mean_range, std_range) = \
-                            feats.relative_range(event_list)
-                        if max_range < best_score:
-                            best_score = max_range
-                            best_file_name = filename
+                    (max_range, mean_range, std_range) = \
+                        feats.relative_range(event_list)
+                    if max_range < best_score:
+                        best_score = max_range
+                        best_file_name = filename
 
 
         print best_file_name

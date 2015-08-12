@@ -113,10 +113,10 @@ do
 
     target_name3="${basename}.beta.best_note_distribution.symbolic.eval"
     score_name=`echo "${name%.spec}.score" | sed 's,/Audio/,/Labels/Piano/,'`
-    if [ ! -e "$target_name3" ]
-    then
+    #if [ ! -e "$target_name3" ]
+    #then
         ./pymir3-cl.py evaluation mirex_symbolic "$final_target" "$score_name" "$target_name3" --id $th
-    fi
+    #fi
     echo $target_name3
 done
 
