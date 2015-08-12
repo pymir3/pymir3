@@ -6,6 +6,9 @@ import numpy
 
 def range(sequence):
     """Returns the note rance in a tuplet (min_note, max_note)"""
+    if len(sequence) == 0:
+        return (0, 0)
+
     min_pitch = 999
     max_pitch = 0
     for note in sequence:
@@ -24,6 +27,9 @@ def pitchclass_histogram(sequence, duration=False):
     durations (default is considering each occurence as a count)
     """
     histogram = numpy.zeros(12)
+    if len(sequence) == 0:
+        return histogram
+
     for note in sequence:
         pitchclass = note.data.pitch % 12
         if duration is True:
@@ -78,7 +84,8 @@ def note_density(eventList, time_resolution=0.005, duration=False):
     The time resolution is used to detect chords that are not played exactly at
     the given time.
     """
-
+    if len(eventList) == 0:
+        return (0, 0, 0, 0)
 
     density_accumulator = 0
     densities = []
@@ -135,6 +142,9 @@ def interval_histogram(eventList, folds=12,\
     The time resolution is used to detect chords that are not played exactly at
     the given time.
     """
+    if len(eventList) == 0:
+        return numpy.zeros(folds)
+
 
     note_accumulator = []
     interval_accumulator = []
@@ -187,6 +197,8 @@ def relative_range(eventList,
     The time resolution is used to detect chords that are not played exactly at
     the given time.
     """
+    if len(eventList) == 0:
+        return (0, 0, 0)
 
     time_accumulator = []
     range_accumulator = []
@@ -241,6 +253,7 @@ def rhythm_histogram(eventList, rhythm_bins=24,\
     event_number = 0 # counter
     ioi_list = []
     last_ioi = None
+
     while event_number < len(eventList):
         event = eventList[event_number]
 
