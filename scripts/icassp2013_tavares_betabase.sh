@@ -97,7 +97,7 @@ do
     done
 
     echo $name
-    bdecnames=`ls $basename*.beta.bdec`
+    bdecnames=`ls ${basename%.}_th*.beta.bdec`
     echo $bdecnames
     best_bdec=`./pymir3-cl.py unsupervised detection threshold best_periodicity $bdecnames`
     ./pymir3-cl.py unsupervised detection score piano "$best_bdec" /tmp/$$

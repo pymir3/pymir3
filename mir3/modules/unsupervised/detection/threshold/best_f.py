@@ -52,7 +52,10 @@ class BestNoteDistribution(mir3.module.Module):
 
                 r = float(n_correct)/n_ref
                 p = float(n_correct)/n_est
-                f = 2*(r*p)/(r+p)
+                if (r+p) > 0:
+                    f = 2*(r*p)/(r+p)
+                else:
+                    f = 0.0
 
                 sys.stderr.write(filename + ': ' + str(r) + \
                         ', ' + str(p) + ', ' + str(f) + '\n')
