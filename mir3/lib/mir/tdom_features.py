@@ -25,6 +25,4 @@ def zero_crossings(wav_data, frame_length, window_size):
         ret = numpy.hstack((ret, k))
         begin += window_size
     
-    print ret
-    
     return ret
