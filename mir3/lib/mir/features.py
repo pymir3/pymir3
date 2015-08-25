@@ -41,3 +41,25 @@ def rolloff(A, alpha=0.95):
                         numpy.maximum(0.0000001, numpy.sum(A, 0))) < alpha, 0)
 
                         
+def low_energy(A, texture_length):
+    """Low energy feature for each texture window"""    
+    energy_ = energy(A)
+    step = texture_length
+    total_aw = len(energy_)
+    begin = 0
+    end = begin + step - 1 
+    ret = numpy.array(())
+    
+    while end < total_aw:
+        avg_energy = numpy.mean(energy_[begin:end+1])
+        above_average = 0
+        for i in range(begin, end+1):
+            if energy_[i] > avg_energy:
+                above_average += 1
+        pct = above_average / float(step)
+        ret = numpy.hstack((ret, pct))
+        begin+=1
+        end+=1    
+    
+    return ret
+    

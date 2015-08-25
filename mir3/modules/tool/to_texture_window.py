@@ -9,8 +9,8 @@ class ToTextureWindow(mir3.module.Module):
         return """calculates texture windows from feature tracks"""
     
     def build_arguments(self, parser):
-        parser.add_argument('-s','--texture-window-size', type=int, default=50,
-                    help="""how many analysis windows per texture window""")
+        parser.add_argument('-S','--texture-window-size', type=int, default=1024,
+                    help="""how many analysis windows (frames) per texture window""")
         
         parser.add_argument('infile', type=argparse.FileType('rb'), help="""feature track""")
         parser.add_argument('outfile', type=argparse.FileType('wb'),
