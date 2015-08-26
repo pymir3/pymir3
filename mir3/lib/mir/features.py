@@ -23,7 +23,7 @@ def flux(A):
     a = numpy.diff(A, axis = 1)
     s = numpy.sum(numpy.maximum(a, 0), axis=0)
     s0 = numpy.sum(A, axis=0)
-    return numpy.hstack ((numpy.array([0]), s))/s0
+    return numpy.hstack ((numpy.array([0]), s))/numpy.maximum(s0, 0.0000001)
 
 
 def centroid(A):

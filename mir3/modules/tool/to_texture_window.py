@@ -28,20 +28,26 @@ class ToTextureWindow(mir3.module.Module):
         step = args.texture_window_size
         total_aw = len(analysis_track.data)
         
-        begin = 1
-        end = begin + step -1
-        
-        #print step, total_aw, begin, end
+        begin = 0
+        end = begin + step
         
         ret = numpy.array(())
+        dT = analysis_track.data.T 
+        it = 1 if dT.ndim == 1 else dT.shape[0]
         
-        #print analysis_track.data
+        for i in range(it):
+            a = numpy.array(())
+            begin = 0
+            end = begin + step
+            while end <= total_aw:
+                b = numpy.mean(dT[begin:end]) if dT.ndim == 1 else numpy.mean(dT[i,begin:end])
+                a = numpy.hstack((a, b))
+                begin+=1
+                end+=1
+            #print "Ficou assim:", a, a.shape
+            ret = numpy.hstack((ret, a))
         
-        while end <= total_aw:
-            ret = numpy.hstack((ret, numpy.mean(analysis_track.data[begin:end+1])))
-            begin+=1
-            end+=1
-            
+        ret.shape = (it, ret.shape[0] / it) if dT.ndim != 1 else (ret.shape[0])
+        ret = ret.T
         window_track.data = ret
-        
         window_track.save(args.outfile)

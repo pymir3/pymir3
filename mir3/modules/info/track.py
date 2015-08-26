@@ -36,8 +36,6 @@ class Track(mir3.module.Module):
 
         if args.norm:
             b = (b - b.mean(axis=0))/numpy.maximum(0.00001, b.std(axis=0))
-
-
         
         for n in xrange(b.shape[0]):
             # TODO: update to use metadata
@@ -47,3 +45,7 @@ class Track(mir3.module.Module):
             for k in xrange(b.shape[1]):
                 print b[n,k],
             print ""
+
+        print b.shape
+        print a.metadata.feature
+        
