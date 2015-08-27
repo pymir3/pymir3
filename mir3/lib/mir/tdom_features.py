@@ -13,16 +13,14 @@ def zero_crossings(wav_data, frame_length, window_size):
         
     f = numpy.vectorize(sign, otypes=[int])
     
-    wav_data = f(wav_data)
-    begin = 0
-    limit = len(wav_data)
+    wav_data = f(wav_data) 
     
     ret = numpy.array(())
-    while begin <= (limit - 0):
-        end = min((begin + frame_length - 1),limit)
-        k = numpy.array((numpy.sum(numpy.abs(numpy.diff(wav_data[begin:end])), dtype=float)))
+    for k in range ((len(wav_data)/window_size) - 1):
+        this_start = k* window_size
+        this_end = this_start + frame_length
+        k = numpy.array((numpy.sum(numpy.abs(numpy.diff(wav_data[this_start:this_end])), dtype=float)))
         k/=2
         ret = numpy.hstack((ret, k))
-        begin += window_size
     
     return ret
