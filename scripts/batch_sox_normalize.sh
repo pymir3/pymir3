@@ -4,8 +4,9 @@ directory=$1
 for f in `ls $directory`
 do
   fname=$directory/$f
-sox $fname -b 16 channels 1 rate 44100 norm /tmp/$$.wav
-rm $fname
-mv /tmp/$$.wav $fname
+  mpg123 -w $fname.wav $fname
+  sox $fname.wav -b 16 -c 1 -r 44100 $fname norm
+#rm $fname
+#mv /tmp/$$.wav $fname
 done
 

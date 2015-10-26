@@ -76,7 +76,7 @@ def mfcc(input, nceps=13):
 
     This is based on the talkbox module:
     http://pydoc.net/Python/scikits.talkbox/0.2.4.dev/scikits.talkbox.features.mfcc/
-    
+
     References
     ----------
     .. [1] S.B. Davis and P. Mermelstein, "Comparison of parametric
@@ -103,7 +103,8 @@ def mfcc(input, nceps=13):
     fbank = trfbank(fs, nfft, lowfreq, linsc, logsc, nlinfil, nlogfil)[0]
     fbank = fbank.T[0:input.data.shape[0], :]
 
-    mspec = np.log10(np.dot(fbank.T, input.data)).T
+
+    mspec = np.log10(np.dot(fbank.T, input.data)+(10**(-6))).T
 
     # Use the DCT to 'compress' the coefficients (spectrum -> cepstrum domain)
     ceps = dct(mspec, type=2, norm='ortho', axis=-1)[:, :nceps]
