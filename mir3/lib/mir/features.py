@@ -12,7 +12,7 @@ symmetrical part).
 def flatness(A):
     """Spectral flatness of each frame"""
     return numpy.exp(  numpy.mean(numpy.log(numpy.maximum(A, 0.0001)), 0) ) / \
-        numpy.mean(A, 0)
+       (numpy.mean(A, 0) + (10**(-6)))
 
 def energy(A):
     """Energy of each frame"""
@@ -22,8 +22,9 @@ def flux(A):
     """Spectral flux of each frame"""
     a = numpy.diff(A, axis = 1)
     s = numpy.sum(numpy.maximum(a, 0), axis=0)
-    s0 = numpy.sum(A, axis=0)
-    return numpy.hstack ((numpy.array([0]), s))/numpy.maximum(s0, 0.0000001)
+    s0 = numpy.sum(A, axis=0) + (10**(-6))
+    return numpy.hstack ((numpy.array([0]), s))/s0
+
 
 
 def centroid(A):
@@ -40,16 +41,15 @@ def rolloff(A, alpha=0.95):
     return numpy.sum ( (numpy.cumsum(A, 0)/\
                         numpy.maximum(0.0000001, numpy.sum(A, 0))) < alpha, 0)
 
-                        
 def low_energy(A, texture_length):
-    """Low energy feature for each texture window"""    
+    """Low energy feature for each texture window"""
     energy_ = energy(A)
     step = texture_length
     total_aw = len(energy_)
     begin = 0
-    end = begin + step - 1 
+    end = begin + step - 1
     ret = numpy.array(())
-    
+
     while end < total_aw:
         avg_energy = numpy.mean(energy_[begin:end+1])
         above_average = 0
@@ -59,7 +59,7 @@ def low_energy(A, texture_length):
         pct = above_average / float(step)
         ret = numpy.hstack((ret, pct))
         begin+=1
-        end+=1    
-    
+        end+=1
+
     return ret
-    
+

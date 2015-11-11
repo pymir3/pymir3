@@ -76,7 +76,7 @@ def mfcc(input, nceps=13):
 
     This is based on the talkbox module:
     http://pydoc.net/Python/scikits.talkbox/0.2.4.dev/scikits.talkbox.features.mfcc/
-    
+
     References
     ----------
     .. [1] S.B. Davis and P. Mermelstein, "Comparison of parametric
