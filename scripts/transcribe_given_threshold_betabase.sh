@@ -1,9 +1,9 @@
 #!/bin/bash
 set -o errexit
 
-if [ $# -lt 1 ]
+if [ $# -lt 2 ]
 then
-  echo "Usage: $0 <dataset directory>"
+  echo "Usage: $0 <dataset directory> <threshold>"
   exit 1
 fi
 
@@ -13,8 +13,9 @@ then
   exit 1
 fi
 
-database="$1"
 
+database="$1"
+th="$2"
 min_freq=10
 max_freq=5000
 window_length=2048
@@ -56,6 +57,19 @@ then
   ./pymir3-cl.py supervised linear merge `find "$database"/Samples/Audio/Piano  -name '*.beta.dec'` "$database"/Samples/Audio/piano.beta.dec
 fi
 
+echo 'Computing activations...'
+for name in `find "$database"/Pieces/Audio -name '*.spec'`
+do
+  target_name="${name%.spec}.beta.dec"
+  if [ ! -e "$target_name" ]
+  then
+    echo "$name"
+    ./pymir3-cl.py supervised linear decomposer beta_nmf --beta $beta --basis  "$database"/Samples/Audio/piano.beta.dec "$name" /tmp/$$
+    ./pymir3-cl.py supervised linear extract right /tmp/$$ "$target_name"
+    rm /tmp/$$
+  fi
+done
+
 echo 'Converting labels...'
 for name in `find "$database"/Pieces/Labels/Piano -name '*.txt'`
 do
@@ -67,49 +81,46 @@ do
   fi
 done
 
-echo 'Processing each individual piece...'
-for name in `find "$database"/Pieces/Audio -name '*.spec'`
+#echo 'Computing threshold values to test...'
+#thresholds=`./pymir3-cl.py unsupervised detection threshold tests -n $n_tests "$database"/Pieces/Audio/*.beta.dec`
+#echo $thresholds
+
+
+echo 'Applying threshold...'
+for name in `find "$database"/Pieces/Audio -name '*.beta.dec'`
 do
-    echo $name
-    echo "Computing activation"
-    basename="${name%.spec}"
-    target_name="${name%.spec}.beta.dec"
-    if [ ! -e "$target_name" ]
-    then
-      ./pymir3-cl.py supervised linear decomposer beta_nmf --beta $beta --basis  "$database"/Samples/Audio/piano.beta.dec "$name" /tmp/$$
-      ./pymir3-cl.py supervised linear extract right /tmp/$$ "$target_name"
-      rm /tmp/$$
-    fi
+  score_name=`echo "${name%.beta.dec}.score" | sed 's,/Audio/,/Labels/Piano/,'`
+  th_name="${name%.beta.dec}_th_${th}.beta"
+  echo $name $th
 
-    echo 'Computing threshold values to test...'
-    thresholds=`./pymir3-cl.py unsupervised detection threshold tests -n  $n_tests "$basename"*.beta.dec`
-    echo $thresholds
+  target_name1="${th_name}.bdec"
+  if [ ! -e "$target_name1" ]
+  then
+    ./pymir3-cl.py unsupervised detection threshold detect $th "$name" "$target_name1"
+  fi
 
-    echo 'Applying thresholds'
-
-    for th in $thresholds
-    do
-        th_name="${basename%.beta.dec}_th_${th}.beta"
-        echo $target_name $th
-
-        target_name1="${th_name}.bdec"
-        ./pymir3-cl.py unsupervised detection threshold detect $th "$target_name" "$target_name1"
-    done
-
-    echo $name
-    bdecnames=`ls ${basename%.}_th*.beta.bdec`
-    echo $bdecnames
-    best_bdec=`./pymir3-cl.py unsupervised detection threshold best_periodicity $bdecnames`
-    ./pymir3-cl.py unsupervised detection score piano "$best_bdec" /tmp/$$
-    target_name2="${best_bdec}.beta.max_periodicity.score"
+  target_name2="${th_name}.score"
+  if [ ! -e "$target_name2" ]
+  then
+    ./pymir3-cl.py unsupervised detection score piano "$target_name1" /tmp/$$
     ./pymir3-cl.py tool trim_score --minimum-duration $minimum_note_length /tmp/$$ "$target_name2"
     rm /tmp/$$
-    target_name3="${best_bdec}.beta.max_periodicity.symbolic.eval"
-    score_name=`echo "${name%.spec}.score" | sed 's,/Audio/,/Labels/Piano/,'`
+  fi
+
+  target_name3="${th_name}.symbolic.eval"
+  if [ ! -e "$target_name3" ]
+  then
     ./pymir3-cl.py evaluation mirex_symbolic "$target_name2" "$score_name" "$target_name3" --id $th
-    echo $target_name3
+  fi
 done
 
-evaluations=`find "$database"/Pieces/Audio/ -name "*beta.max_periodicity.symbolic.eval"`
+
+#echo 'Selecting best threshold'
+#final_th=`./pymir3-cl.py unsupervised detection threshold select_best "$database"/Pieces/Audio/*.beta.symbolic.eval`
+
+echo 'Final evaluation:'
+echo $final_th
+
+evaluations=`find "$database"/Pieces/Audio/ -name "*${th}.beta.symbolic.eval"`
 ./pymir3-cl.py info evaluation_csv $evaluations
 ./pymir3-cl.py info evaluation_statistics $evaluations

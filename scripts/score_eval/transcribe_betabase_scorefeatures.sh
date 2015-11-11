@@ -93,23 +93,33 @@ do
         echo $target_name $th
 
         target_name1="${th_name}.bdec"
-        ./pymir3-cl.py unsupervised detection threshold detect $th "$target_name" "$target_name1"
+        target_name2="${th_name}.bdec.score"
+        if [ ! -e "$target_name1" ]
+        then
+            ./pymir3-cl.py unsupervised detection threshold detect $th "$target_name" "$target_name1"
+        fi
+
+        if [ ! -e "$target_name2" ]
+        then
+            ./pymir3-cl.py unsupervised detection score piano "$target_name1"  /tmp/$$
+            ./pymir3-cl.py tool trim_score -d $minimum_note_length  /tmp/$$ "$target_name2"
+        fi
     done
 
-    echo $name
-    bdecnames=`ls ${basename%.}_th*.beta.bdec`
-    echo $bdecnames
-    best_bdec=`./pymir3-cl.py unsupervised detection threshold best_periodicity $bdecnames`
-    ./pymir3-cl.py unsupervised detection score piano "$best_bdec" /tmp/$$
-    target_name2="${best_bdec}.beta.max_periodicity.score"
-    ./pymir3-cl.py tool trim_score --minimum-duration $minimum_note_length /tmp/$$ "$target_name2"
-    rm /tmp/$$
-    target_name3="${best_bdec}.beta.max_periodicity.symbolic.eval"
+    scorenames=`ls $basename*.score`
+    best_score=`./pymir3-cl.py unsupervised detection threshold best_note_distribution $scorenames`
+    final_target="${best_score}.selected"
+    cp $best_score $final_target
+
+    target_name3="${basename}.beta.best_note_distribution.symbolic.eval"
     score_name=`echo "${name%.spec}.score" | sed 's,/Audio/,/Labels/Piano/,'`
-    ./pymir3-cl.py evaluation mirex_symbolic "$target_name2" "$score_name" "$target_name3" --id $th
+    #if [ ! -e "$target_name3" ]
+    #then
+        ./pymir3-cl.py evaluation mirex_symbolic "$final_target" "$score_name" "$target_name3" --id $th
+    #fi
     echo $target_name3
 done
 
-evaluations=`find "$database"/Pieces/Audio/ -name "*beta.max_periodicity.symbolic.eval"`
+evaluations=`find "$database"/Pieces/Audio/ -name "*beta.best_note_distribution.symbolic.eval"`
 ./pymir3-cl.py info evaluation_csv $evaluations
 ./pymir3-cl.py info evaluation_statistics $evaluations

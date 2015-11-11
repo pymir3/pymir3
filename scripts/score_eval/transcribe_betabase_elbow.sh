@@ -99,17 +99,17 @@ do
     echo $name
     bdecnames=`ls ${basename%.}_th*.beta.bdec`
     echo $bdecnames
-    best_bdec=`./pymir3-cl.py unsupervised detection threshold best_periodicity $bdecnames`
+    best_bdec=`./pymir3-cl.py unsupervised detection threshold elbow $bdecnames`
     ./pymir3-cl.py unsupervised detection score piano "$best_bdec" /tmp/$$
-    target_name2="${best_bdec}.beta.max_periodicity.score"
+    target_name2="${best_bdec}.beta.elbow.score"
     ./pymir3-cl.py tool trim_score --minimum-duration $minimum_note_length /tmp/$$ "$target_name2"
     rm /tmp/$$
-    target_name3="${best_bdec}.beta.max_periodicity.symbolic.eval"
+    target_name3="${best_bdec}.beta.elbow.symbolic.eval"
     score_name=`echo "${name%.spec}.score" | sed 's,/Audio/,/Labels/Piano/,'`
     ./pymir3-cl.py evaluation mirex_symbolic "$target_name2" "$score_name" "$target_name3" --id $th
     echo $target_name3
 done
 
-evaluations=`find "$database"/Pieces/Audio/ -name "*beta.max_periodicity.symbolic.eval"`
+evaluations=`find "$database"/Pieces/Audio/ -name "*beta.elbow.symbolic.eval"`
 ./pymir3-cl.py info evaluation_csv $evaluations
 ./pymir3-cl.py info evaluation_statistics $evaluations
