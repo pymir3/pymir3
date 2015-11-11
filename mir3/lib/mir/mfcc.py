@@ -103,7 +103,7 @@ def mfcc(input, nceps=13):
     fbank = trfbank(fs, nfft, lowfreq, linsc, logsc, nlinfil, nlogfil)[0]
     fbank = fbank.T[0:input.data.shape[0], :]
 
-    mspec = np.log10(np.dot(fbank.T, input.data)).T
+    mspec = np.log10(np.maximum(np.dot(fbank.T, input.data), 0.0000001)).T
 
     # Use the DCT to 'compress' the coefficients (spectrum -> cepstrum domain)
     ceps = dct(mspec, type=2, norm='ortho', axis=-1)[:, :nceps]

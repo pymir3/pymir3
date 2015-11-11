@@ -13,7 +13,7 @@ class Mfcc(mir3.module.Module):
         return """Spectral flow of each frame of a spectrogram"""
 
     def build_arguments(self, parser):
-        parser.add_argument('-n','--number', type=int, default=13,
+        parser.add_argument('-n','--number', type=int, default=5,
                             help="""number of mfccs to calculate (default:
                             %(default)s)""")
         parser.add_argument('infile', type=argparse.FileType('rb'),

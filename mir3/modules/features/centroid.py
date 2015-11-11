@@ -6,7 +6,7 @@ import mir3.data.spectrogram as spectrogram
 import mir3.lib.mir.features as feats
 import mir3.module
 
-class Energy(mir3.module.Module):
+class Centroid(mir3.module.Module):
     """Calculates the spectral centroid track from a spectrogram"""
 
     def get_help(self):

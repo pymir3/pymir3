@@ -47,6 +47,19 @@ class Stats(mir3.module.Module):
 
         for a in args.infiles:
             o = o.load(a)
+            
+            #print o.metadata.feature
+            
+            a = numpy.array(o.metadata.feature.split())
+            i = a.argsort()
+            
+            #print a
+            #print o.data.mean(axis=0)
+            
+            #print i
+            #print a[i]
+            #print o.data.mean(axis=0)[i], "\n"
+            
             final_filenames.append(o.metadata.filename)
 
             if o.data.ndim == 1:
@@ -55,14 +68,14 @@ class Stats(mir3.module.Module):
             out = numpy.array([])
             if args.mean is True:
                 out = numpy.hstack((out,
-                             o.data.mean(axis=0)))
+                             o.data.mean(axis=0)[i]))
 
             if args.variance is True:
                 out = numpy.hstack((out,
-                             o.data.var(axis=0)))
+                             o.data.var(axis=0)[i]))
 
             if args.slope is True:
-                variance = o.data.var(axis=0)
+                variance = o.data.var(axis=0)[i]
                 lindata = numpy.zeros(variance.shape)
                 for i in xrange(o.data.shape[1]):
                     if variance[i] > 0:
@@ -73,13 +86,13 @@ class Stats(mir3.module.Module):
 
             if args.limits is True:
                 out = numpy.hstack((out,
-                             o.data.max(axis=0)))
+                             o.data.max(axis=0)[i]))
                 out = numpy.hstack((out,
-                             o.data.argmax(axis=0)/float(o.data.shape[0])))
+                             o.data.argmax(axis=0)[i]/float(o.data.shape[0])))
                 out = numpy.hstack((out,
-                             o.data.min(axis=0)))
+                             o.data.min(axis=0)[i]))
                 out = numpy.hstack((out,
-                             o.data.argmin(axis=0)/float(o.data.shape[0])))
+                             o.data.argmin(axis=0)[i]/float(o.data.shape[0])))
 
 
                 out.shape = (1, out.size)
@@ -98,6 +111,7 @@ class Stats(mir3.module.Module):
 
         # Dealing with feature metadata:
         my_features = o.metadata.feature.split()
+        my_features.sort()
         new_features = ""
         if args.mean is True:
             for feat in my_features:
@@ -119,7 +133,7 @@ class Stats(mir3.module.Module):
                 new_features = new_features + " " + "argmin_" + feat
 
         p = feature_matrix.FeatureMatrix()
-        p.data = final_output
+        p.data = final_output.copy()
 
         if args.normalize:
             std_p = p.data.std(axis=0)

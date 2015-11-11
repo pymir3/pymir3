@@ -7,9 +7,10 @@ set -o errexit
 
 database=${1%/}
 
-window_length=2048
-dft_length=2048
-window_step=1024
+window_length=1024
+dft_length=1024
+window_step=512
+texture_window_size=43
 
 if [ ! -d "$database" -o -z "$database" ]
 then
