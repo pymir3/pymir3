@@ -8,6 +8,8 @@ import mir3.data.metadata as md
 import mir3.data.spectrogram as spectrogram
 import mir3.module
 
+import time
+
 class Wav2Spectrogram(mir3.module.Module):
     def get_help(self):
         return """extract the spectrogram of a wav file"""
@@ -41,13 +43,16 @@ class Wav2Spectrogram(mir3.module.Module):
         if args.dft_length is None:
             args.dft_length = args.window_length
 
+        t = time.time()
         s = self.convert(args.infile,
                          args.window_length,
                          args.dft_length,
                          args.window_step,
                          args.spectrum_type)
-
+        print "Conversion time:", time.time()-t
+        t = time.time()
         s.save(args.outfile)
+        print "Save time:", time.time()-t
 
     def convert(self, wav_file, window_length=2048, dft_length=2048,
                 window_step=1024,
@@ -78,10 +83,12 @@ class Wav2Spectrogram(mir3.module.Module):
             s.metadata.input = md.FileMetadata(wav_file)
 
         # Calculates data
+        t = time.time()
         rate, data = scipy.io.wavfile.read(wav_file.name)
-
+        print "Open wav file:", time.time()-t
+        t = time.time()
         data = data.astype(numpy.float)
-
+        print "Convert to float:", time.time()-t
         data /= 32767.0 # Normalization to -1/+1 range
 
         if data.ndim > 1:
@@ -107,21 +114,28 @@ class Wav2Spectrogram(mir3.module.Module):
         #print numpy.abs(numpy.fft.rfft(data[32:64]))
 
         window = numpy.hanning(window_length)
+        t = time.time()
 
         buffered_data = []
-        for k in range( (len(data)/window_step) - 1):
+        for k in xrange( (len(data)/window_step) - 1):
             this_start = k * window_step
             this_end = this_start + window_length
             buffered_data.append(data[this_start:this_end] * window)
 
+        print "Buffering:", time.time()-t
+        t = time.time()
+
         buffered_data = numpy.array(buffered_data).T
+        print "Convert to NP-array:", time.time()-t
 
         #buffered_data = buffered_data * numpy.sqrt(window_length)
 
+        t = time.time()
         Pxx = numpy.abs(numpy.fft.rfft(buffered_data,\
                             n = dft_length,\
                             axis = 0))
 
+        print "Convert to time domain:", time.time()-t
         #print Pxx[:,0]
 
         #Pxx, freqs, bins, im = pylab.specgram(data,\
@@ -141,7 +155,9 @@ class Wav2Spectrogram(mir3.module.Module):
         if s.metadata.sampling_configuration.spectrum_type == 'log':
             Pxx = numpy.log10(numpy.sqrt(Pxx) + 10**(-6))
 
+        t = time.time()
         s.data = copy.deepcopy(Pxx)
+        print "Copy final data:", time.time()-t
         # print type(s.data), s.data.shape
         #pylab.show()
 
