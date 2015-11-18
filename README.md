@@ -18,14 +18,19 @@ Installing:
 To install, execute the following steps:
 
 1) Download the release branch from the git repository:
+
 git clone -b release https://github.com/pymir3/pymir3.git
 
 2) CD to the pymir3 directory and execute setup.py:
+
 cd pymir3
+
 sudo python setup.py install
 
 3) To test, try switching to another directory and executing:
+
 python
+
 import mir3
 
 If no error is displayed, pymir3 is installed!
@@ -35,10 +40,13 @@ Dependencies:
 Before installing, you may have to install:
 
 1) git
+
 sudo apt-get install git
 
 2) numpy and scipy modules for python:
+
 sudo apt-get install python-numpy
+
 sudo apt-get install python-scipy
 
 
