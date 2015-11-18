@@ -29,3 +29,16 @@ python
 import mir3
 
 If no error is displayed, pymir3 is installed!
+
+Dependencies:
+------
+Before installing, you may have to install:
+
+1) git
+sudo apt-get install git
+
+2) numpy and scipy modules for python:
+sudo apt-get install python-numpy
+sudo apt-get install python-scipy
+
+
