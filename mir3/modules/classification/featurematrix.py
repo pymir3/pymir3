@@ -9,6 +9,7 @@ import mir3.module
 
 from sklearn.cross_validation import train_test_split
 from sklearn import mixture
+from sklearn import svm
 
 class FromFeatureMatrix(mir3.module.Module):
     def get_help(self):
@@ -47,7 +48,7 @@ class FromFeatureMatrix(mir3.module.Module):
         data_train, data_test, label_train, label_test =\
             train_test_split(a.data, labels, train_size=.5)
 
-        C = self.classify_gmm(data_train, label_train, data_test, label_test)
+        C = self.classify_svm(data_train, label_train, data_test, label_test)
         print "Accuracy:", 100*C, "%"
 
 
@@ -83,6 +84,31 @@ class FromFeatureMatrix(mir3.module.Module):
 
         # Evaluation
         hits = 0
+        for x in xrange(len(output_labels)):
+            if output_labels[x] == test_cl[x]:
+                hits += 1
+
+        # Precision
+        return hits / float(len(output_labels))
+
+    def classify_svm(self, train_in, train_cl, test_in, test_cl):
+        """Run an SVM-based classification experiment.
+
+        Returns:
+        * precision (fraction of correct classifications)
+        """
+        # Training
+        s = svm.SVC(C=100.)
+        s.fit(train_in, train_cl)
+
+        print s.predict(train_in)
+        print train_cl
+
+        # Evaluation
+        hits = 0
+        output_labels = s.predict(test_in)
+        print output_labels
+        print test_cl
         for x in xrange(len(output_labels)):
             if output_labels[x] == test_cl[x]:
                 hits += 1
