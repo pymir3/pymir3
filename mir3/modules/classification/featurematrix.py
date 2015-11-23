@@ -61,8 +61,9 @@ class FromFeatureMatrix(mir3.module.Module):
 
 
 
-        C = self.classify_svm(data_train, label_train, data_test, label_test)
-        print "Accuracy:", 100*C, "%"
+        C1 = self.classify_svm(data_train, label_train, data_test, label_test)
+        C2 = self.classify_svm(data_test, label_test, data_train, label_train)
+        print "Accuracy:", 50*(C1+C2), "%"
 
 
     def classify_gmm(self, train_in, train_cl, test_in, test_cl):
@@ -111,7 +112,7 @@ class FromFeatureMatrix(mir3.module.Module):
         * precision (fraction of correct classifications)
         """
         # Training
-        s = svm.SVC(C=100., tol=10**(-4.), decision_function_shape='ovr')#, class_weight='balanced')
+        s = svm.SVC(C=100., tol=10**(-4.), decision_function_shape='ovr')
         s = s.fit(train_in, train_cl)
 
         # Evaluation
