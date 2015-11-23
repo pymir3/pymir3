@@ -112,7 +112,9 @@ class FromFeatureMatrix(mir3.module.Module):
         * precision (fraction of correct classifications)
         """
         # Training
-        s = svm.SVC(C=100., tol=10**(-4.), decision_function_shape='ovr')
+        s = svm.SVC(C=100., tol=10**(-4.), kernel='poly', degree=1,
+                coef0=1.0, gamma=1.0, decision_function_shape='ovr')
+        #s = svm.LinearSVC(C=100., tol=10**(-4.))
         s = s.fit(train_in, train_cl)
 
         # Evaluation
