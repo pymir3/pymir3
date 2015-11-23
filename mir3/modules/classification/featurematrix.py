@@ -7,9 +7,10 @@ import mir3.data.feature_matrix as feature_matrix
 import mir3.data.feature_track as track
 import mir3.module
 
-from sklearn.cross_validation import train_test_split
+from sklearn.cross_validation import train_test_split, StratifiedKFold
 from sklearn import mixture
 from sklearn import svm
+from sklearn import preprocessing
 
 class FromFeatureMatrix(mir3.module.Module):
     def get_help(self):
@@ -44,9 +45,21 @@ class FromFeatureMatrix(mir3.module.Module):
         file_label_dict = self.label_list(open(args.labels, 'rb'))
 
         labels = self.sort_labels(a.metadata, file_label_dict)
+        norm_data = preprocessing.normalize(preprocessing.scale(a.data))
 
-        data_train, data_test, label_train, label_test =\
-            train_test_split(a.data, labels, train_size=.5)
+        #data_train, data_test, label_train, label_test =\
+        #    train_test_split(preprocessing.normalize\
+        #         (preprocessing.scale(a.data)), labels, train_size=.5)
+
+        skf = StratifiedKFold(labels, n_folds=2)
+        for train_index, test_index in skf:
+            data_train, data_test = norm_data[train_index,:],\
+                        norm_data[test_index,:]
+
+            label_train, label_test = [labels[x] for x in train_index],\
+                                        [labels[x] for x in test_index]
+
+
 
         C = self.classify_svm(data_train, label_train, data_test, label_test)
         print "Accuracy:", 100*C, "%"
@@ -98,17 +111,12 @@ class FromFeatureMatrix(mir3.module.Module):
         * precision (fraction of correct classifications)
         """
         # Training
-        s = svm.SVC(C=100.)
-        s.fit(train_in, train_cl)
-
-        print s.predict(train_in)
-        print train_cl
+        s = svm.SVC(C=100., tol=10**(-4.), decision_function_shape='ovr')#, class_weight='balanced')
+        s = s.fit(train_in, train_cl)
 
         # Evaluation
         hits = 0
         output_labels = s.predict(test_in)
-        print output_labels
-        print test_cl
         for x in xrange(len(output_labels)):
             if output_labels[x] == test_cl[x]:
                 hits += 1
