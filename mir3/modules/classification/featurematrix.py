@@ -10,6 +10,7 @@ import mir3.module
 from sklearn.cross_validation import train_test_split, StratifiedKFold
 from sklearn import mixture
 from sklearn import svm
+from sklearn import neural_network
 from sklearn import preprocessing
 
 class FromFeatureMatrix(mir3.module.Module):
@@ -18,6 +19,8 @@ class FromFeatureMatrix(mir3.module.Module):
                     GMMs (future work: implement others)"""
 
     def build_arguments(self, parser):
+        parser.add_argument('algorithm', choices=['gmm', 'rbm', 'svm'],
+                            help="""Classification method to use""")
         parser.add_argument('database', type=argparse.FileType('rb'),
                             help="""input database""")
         parser.add_argument('labels', type=str,
@@ -59,12 +62,16 @@ class FromFeatureMatrix(mir3.module.Module):
             label_train, label_test = [labels[x] for x in train_index],\
                                         [labels[x] for x in test_index]
 
+        if args.algorithm == 'svm':
+            classifier = self.classify_svm
+        elif args.algorithm == 'rbm':
+            classifier = self.classify_rbm
+        elif args.algorithm == 'gmm':
+            classifier = self.classify_gmm
 
-
-        C1 = self.classify_svm(data_train, label_train, data_test, label_test)
-        C2 = self.classify_svm(data_test, label_test, data_train, label_train)
+        C1 = classifier(data_train, label_train, data_test, label_test)
+        C2 = classifier(data_test, label_test, data_train, label_train)
         print "Accuracy:", 50*(C1+C2), "%"
-
 
     def classify_gmm(self, train_in, train_cl, test_in, test_cl):
         """Run a GMM-based classification experiment.
@@ -94,6 +101,53 @@ class FromFeatureMatrix(mir3.module.Module):
             prob = []
             for m in xrange(len(mixtures)):
                 prob.append(mixtures[m].score(test_in[d,:])[0])
+            output_labels.append(prob.index(max(prob))+1)
+
+        # Evaluation
+        hits = 0
+        for x in xrange(len(output_labels)):
+            if output_labels[x] == test_cl[x]:
+                hits += 1
+
+        # Precision
+        return hits / float(len(output_labels))
+
+
+    def classify_rbm(self, train_in, train_cl, test_in, test_cl):
+        """Run a Restricted Boltzmann Machine-based classification experiment.
+
+        Returns:
+        * precision (fraction of correct classifications)
+        """
+        # Training
+        i = min((numpy.min(train_in), numpy.min(test_in)))
+        train_in -= i
+        test_in -= i
+
+        m = max((numpy.max(train_in), numpy.max(test_in)))
+        train_in /= m
+        test_in /= m
+
+        labels = set(train_cl)
+        n_labels = len(labels)
+        mixtures = []
+        mixture_labels = []
+        for k in labels:
+            data = [train_in[i] for i in xrange(len(train_cl))\
+                        if train_cl[i] == k]
+
+            r = neural_network.BernoulliRBM(n_components=4,
+                    learning_rate=10**(-1.), batch_size=30, n_iter=1000)
+            r.fit(data)
+            mixtures.append(r)
+            mixture_labels.append(k)
+
+        # Testing
+        output_labels = []
+        for d in xrange(len(test_cl)):
+            prob = []
+            for m in xrange(len(mixtures)):
+                prob.append(mixtures[m].score_samples(test_in[d,:]))
             output_labels.append(prob.index(max(prob))+1)
 
         # Evaluation
