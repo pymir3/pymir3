@@ -34,13 +34,17 @@ done
 echo 'Calculating features from spectrograms...'
 for name in `find "$database" -name '*.spec'`
 do
-	feature_file="${name%.spec}.filterbank.track"
+  target_name="${name%.spec}.features"
+  if [ ! -e $target_name ]
+  then
+	feature_file="${name%.spec}.$feature.track"
 	if [ ! -e "$feature_file" ]
 	then
 		echo Calculating filterbank for "$name"
-			./pymir3-cl.py features filterbank 50 100 150 250 300 400 800 1600 3200 6400 $name $feature_file
+			./pymir3-cl.py features identity $name $feature_file
 			./pymir3-cl.py tool to_texture_window -S $texture_window_size $feature_file $feature_file.texture
 	fi
+  fi
 
 done
 
@@ -60,8 +64,8 @@ done
 
 # Join features in a single file
 echo "Calculating statistics from all feature tracks"
-final_name="$database"/features-filterbank.dataset
-./pymir3-cl.py features stats -m -v `find "$database" -name '*.filterbank.track.texture'` $final_name
+final_name="$database"/features-identity.dataset
+./pymir3-cl.py features stats -m -v `find "$database" -name '*.texture'` $final_name
 #./minion.py info features $final_name
 
 

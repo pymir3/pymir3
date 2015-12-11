@@ -20,7 +20,7 @@ fi
 
 # Compute spectrogram
 echo 'Converting wav to spectrograms...'
-for name in `find "$database" -name '*.wav'` 
+for name in `find "$database" -name '*.wav'`
 #for name in $(ls -1 $database/*.wav | sort -n -k1.4)
 do
   target_name="${name%.wav}.spec"
@@ -67,11 +67,17 @@ do
 			rm "$database"/*.track
   fi
 
+  texture_name="${name%.spec}.textures"
+  if [ ! -e $texture_name ]
+  then
+    ./pymir3-cl.py tool to_texture_window -S $texture_window_size $target_name $texture_name
+  fi
+
 done
 
 echo "Calculating statistics from all feature tracks"
 final_name="$database"/features.dataset
-./pymir3-cl.py features stats -m -v -s -l -n `find "$database" -name '*.features'` $final_name
+./pymir3-cl.py features stats -m -v -s -l -n `find "$database" -name '*.textures'` $final_name
 #./minion.py info features $final_name
 
 
