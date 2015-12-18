@@ -12,6 +12,7 @@ from sklearn import mixture
 from sklearn import svm
 from sklearn import neural_network
 from sklearn import preprocessing
+from sklearn import pipeline
 
 class FromFeatureMatrix(mir3.module.Module):
     def get_help(self):
@@ -89,7 +90,7 @@ class FromFeatureMatrix(mir3.module.Module):
                         if train_cl[i] == k]
 
             g = mixture.GMM(covariance_type='diag',
-                        n_components = max(1, min(5, len(data)-2)),
+                        n_components = max(1, min(10, len(data)-2)),
                         min_covar = 0.01)
             g.fit(data)
             mixtures.append(g)
@@ -125,33 +126,25 @@ class FromFeatureMatrix(mir3.module.Module):
         test_in -= i
 
         m = max((numpy.max(train_in), numpy.max(test_in)))
-        train_in /= m
-        test_in /= m
+        train_in /= float(m)
+        test_in /= float(m)
 
         labels = set(train_cl)
         n_labels = len(labels)
         mixtures = []
         mixture_labels = []
-        for k in labels:
-            data = [train_in[i] for i in xrange(len(train_cl))\
-                        if train_cl[i] == k]
+        r = neural_network.BernoulliRBM(n_components=2000,
+               learning_rate=10**(-3.), batch_size=10, n_iter=50)
 
-            r = neural_network.BernoulliRBM(n_components=4,
-                    learning_rate=10**(-1.), batch_size=30, n_iter=1000)
-            r.fit(data)
-            mixtures.append(r)
-            mixture_labels.append(k)
+        s = svm.SVC(C=100., tol=10**(-4.), kernel='poly', degree=1,
+                coef0=1.0, gamma=1.0, decision_function_shape='ovr')
 
-        # Testing
-        output_labels = []
-        for d in xrange(len(test_cl)):
-            prob = []
-            for m in xrange(len(mixtures)):
-                prob.append(mixtures[m].score_samples(test_in[d,:]))
-            output_labels.append(prob.index(max(prob))+1)
+        classifier = pipeline.Pipeline(steps=[('rbm', r), ('svc', s)])
+        classifier.fit(train_in, train_cl)
 
         # Evaluation
         hits = 0
+        output_labels = classifier.predict(test_in)
         for x in xrange(len(output_labels)):
             if output_labels[x] == test_cl[x]:
                 hits += 1
