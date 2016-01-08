@@ -39,9 +39,25 @@ class FromFeatureMatrix(mir3.module.Module):
 
     def sort_labels(self, metadata, file_label_dict):
         labels = []
+        ldict = {}
+
         for i in xrange(len(metadata.filename)):
             fname = metadata.filename[i].split('/')[-1]
-            labels.append(int(file_label_dict[fname]))
+            if file_label_dict[fname] in ldict:
+                ldict[file_label_dict[fname]] += 1
+            else:
+                ldict[file_label_dict[fname]] = 1
+
+        k = ldict.keys()
+        for q in k:
+            print q, ldict[q]
+
+        for i in xrange(len(metadata.filename)):
+            fname = metadata.filename[i].split('/')[-1]
+            if ldict[file_label_dict[fname]] > 2:
+                labels.append(k.index(file_label_dict[fname]))
+
+        print labels
         return labels
 
     def run(self, args):
