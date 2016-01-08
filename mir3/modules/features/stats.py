@@ -47,21 +47,20 @@ class Stats(mir3.module.Module):
 
         for a in args.infiles:
             o = o.load(a)
-            
+
             #print o.metadata.feature
-            
+
             a = numpy.array(o.metadata.feature.split())
             i = a.argsort()
-            
+
             #print a
             #print o.data.mean(axis=0)
-            
+
             #print i
             #print a[i]
             #print o.data.mean(axis=0)[i], "\n"
-            
-            final_filenames.append(o.metadata.filename)
 
+            final_filenames.append(o.metadata.filename)
             if o.data.ndim == 1:
                 o.data.shape = (o.data.size, 1)
 

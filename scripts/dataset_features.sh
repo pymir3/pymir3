@@ -10,7 +10,7 @@ database=${1%/}
 window_length=1024
 dft_length=1024
 window_step=512
-texture_window_size=43
+texture_window_size=1
 
 if [ ! -d "$database" -o -z "$database" ]
 then
