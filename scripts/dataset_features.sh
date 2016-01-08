@@ -66,18 +66,11 @@ do
 			./pymir3-cl.py features join `find "$database" -name '*.track'` $target_name
 			rm "$database"/*.track
   fi
-
-  texture_name="${name%.spec}.textures"
-  if [ ! -e $texture_name ]
-  then
-    ./pymir3-cl.py tool to_texture_window -S $texture_window_size $target_name $texture_name
-  fi
-
 done
 
 echo "Calculating statistics from all feature tracks"
 final_name="$database"/features.dataset
-./pymir3-cl.py features stats -m -v -s -l -n `find "$database" -name '*.textures'` $final_name
+./pymir3-cl.py features stats -m -v -s -n `find "$database" -name '*.features'` $final_name
 #./minion.py info features $final_name
 
 

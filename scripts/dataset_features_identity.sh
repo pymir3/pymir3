@@ -11,6 +11,7 @@ window_length=1024
 dft_length=1024
 window_step=512
 texture_window_size=40
+feature='spectrogram'
 
 if [ ! -d "$database" -o -z "$database" ]
 then
@@ -42,7 +43,7 @@ do
 	then
 		echo Calculating filterbank for "$name"
 			./pymir3-cl.py features identity $name $feature_file
-			./pymir3-cl.py tool to_texture_window -S $texture_window_size $feature_file $feature_file.texture
+			#./pymir3-cl.py tool to_texture_window -S $texture_window_size $feature_file $feature_file.texture
 	fi
   fi
 
@@ -65,7 +66,9 @@ done
 # Join features in a single file
 echo "Calculating statistics from all feature tracks"
 final_name="$database"/features-identity.dataset
-./pymir3-cl.py features stats -m -v `find "$database" -name '*.texture'` $final_name
+
+./pymir3-cl.py features stats -m -v -s `find "$database" -name '*.track'` $final_name
+
 #./minion.py info features $final_name
 
 

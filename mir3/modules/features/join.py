@@ -16,6 +16,7 @@ class Join(mir3.module.Module):
                             help="""track file""")
 
     def run(self, args):
+        print "Joining features"
         data = []
         features = []
 
@@ -26,12 +27,15 @@ class Join(mir3.module.Module):
                 t.data.shape = (t.data.size,1)
             data.append(t.data)
             features.append(t.metadata.feature)
-            
+            print a.name, t.metadata.feature, t.data.shape
+
         o = track.FeatureTrack()
+
         o.data = numpy.hstack(data)
+
         o.metadata.feature = ' '.join(features)
         o.metadata.filename = t.metadata.filename
 
         o.metadata.sampling_configuration = t.metadata.sampling_configuration
-        
+
         o.save(args.output)

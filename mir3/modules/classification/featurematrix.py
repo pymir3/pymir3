@@ -49,15 +49,12 @@ class FromFeatureMatrix(mir3.module.Module):
                 ldict[file_label_dict[fname]] = 1
 
         k = ldict.keys()
-        for q in k:
-            print q, ldict[q]
 
         for i in xrange(len(metadata.filename)):
             fname = metadata.filename[i].split('/')[-1]
-            if ldict[file_label_dict[fname]] > 2:
+            if ldict[file_label_dict[fname]] > 3:
                 labels.append(k.index(file_label_dict[fname]))
 
-        print labels
         return labels
 
     def run(self, args):
@@ -101,6 +98,7 @@ class FromFeatureMatrix(mir3.module.Module):
         n_labels = len(labels)
         mixtures = []
         mixture_labels = []
+
         for k in labels:
             data = [train_in[i] for i in xrange(len(train_cl))\
                         if train_cl[i] == k]
