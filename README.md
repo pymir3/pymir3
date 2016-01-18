@@ -43,10 +43,10 @@ Before installing, you may have to install:
 
 sudo apt-get install git
 
-2) numpy and scipy modules for python:
+2) numpy, scipy and scikit-learn modules for python:
 
 sudo apt-get install python-numpy
 
 sudo apt-get install python-scipy
 
-
+sudo apt-get install python-sklearn

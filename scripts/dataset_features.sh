@@ -10,7 +10,7 @@ database=${1%/}
 window_length=1024
 dft_length=1024
 window_step=512
-texture_window_size=43
+texture_window_size=1
 
 if [ ! -d "$database" -o -z "$database" ]
 then
@@ -20,7 +20,7 @@ fi
 
 # Compute spectrogram
 echo 'Converting wav to spectrograms...'
-for name in `find "$database" -name '*.wav'` 
+for name in `find "$database" -name '*.wav'`
 #for name in $(ls -1 $database/*.wav | sort -n -k1.4)
 do
   target_name="${name%.wav}.spec"
@@ -66,12 +66,11 @@ do
 			./pymir3-cl.py features join `find "$database" -name '*.track'` $target_name
 			rm "$database"/*.track
   fi
-
 done
 
 echo "Calculating statistics from all feature tracks"
 final_name="$database"/features.dataset
-./pymir3-cl.py features stats -m -v -s -l -n `find "$database" -name '*.features'` $final_name
+./pymir3-cl.py features stats -m -v -s -n `find "$database" -name '*.features'` $final_name
 #./minion.py info features $final_name
 
 

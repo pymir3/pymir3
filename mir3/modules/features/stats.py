@@ -47,21 +47,22 @@ class Stats(mir3.module.Module):
 
         for a in args.infiles:
             o = o.load(a)
-            
+
             #print o.metadata.feature
-            
+
             a = numpy.array(o.metadata.feature.split())
             i = a.argsort()
-            
+
             #print a
             #print o.data.mean(axis=0)
-            
+
             #print i
             #print a[i]
             #print o.data.mean(axis=0)[i], "\n"
-            
-            final_filenames.append(o.metadata.filename)
 
+ #           print o.data.shape
+
+            final_filenames.append(o.metadata.filename)
             if o.data.ndim == 1:
                 o.data.shape = (o.data.size, 1)
 
@@ -70,16 +71,18 @@ class Stats(mir3.module.Module):
                 out = numpy.hstack((out,
                              o.data.mean(axis=0)[i]))
 
+#            print out.shape
+
             if args.variance is True:
                 out = numpy.hstack((out,
                              o.data.var(axis=0)[i]))
 
+#            print out.shape
             if args.slope is True:
                 variance = o.data.var(axis=0)[i]
                 lindata = numpy.zeros(variance.shape)
                 for i in xrange(o.data.shape[1]):
-                    if variance[i] > 0:
-                        lindata[i] = scipy.stats.linregress(o.data[:,i],\
+                    lindata[i] = scipy.stats.linregress(o.data[:,i],\
                                             range(o.data.shape[0]))[0]
 
                 out = numpy.hstack((out,lindata))

@@ -1,12 +1,13 @@
 
 directory=$1
 
-for f in `ls $directory`
+for f in `ls $directory/*.wav`
 do
-  fname=$directory/$f
-  mpg123 -w $fname.wav $fname
-  sox $fname.wav -b 16 -c 1 -r 44100 $fname norm
+  fname=$f
+  #mpg123 -w $fname.wav $fname
+  sox $fname -b 16 -c 1 -r 44100 /tmp/$$.wav norm
+
 #rm $fname
-#mv /tmp/$$.wav $fname
+  mv /tmp/$$.wav $fname
 done
 
