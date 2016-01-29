@@ -55,9 +55,11 @@ class Stats(mir3.module.Module):
             content = f.readlines()
             for line in content:
                 L = line.split()
+                #print L
                 onsets.append(float(L[0]))
                 offsets.append(float(L[1]))
-                L[2].replace('-', '+')
+                L[2] = L[2].replace('_', '-')
+                L[2] = L[2].replace('-', '+')
                 labels.append(str(L[2].split('+')[0]))
                 #print onsets[-1], offsets[-1], labels[-1]
         #exit()
