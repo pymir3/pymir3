@@ -5,6 +5,7 @@ import numpy as np
 
 #import mir3.modules.features as feat
 import mir3.lib.mir.features as mir
+import mir3.lib.mir.mfcc as mfcc
 import mir3.modules.features.filterbank as fbank
 import mir3.modules.tool.wav2spectrogram as wav2spec
 import mir3.data.spectrogram as spec
@@ -46,6 +47,8 @@ def audio_feature_extraction(filename_in, frame_len=1024, frame_step=512):
     rolloff.shape = (rolloff.shape[0],1)
     low_energy.shape = (low_energy.shape[0],1)
 
+    # MFCCs
+    mfccs = mfcc.mfcc(s.data, 30)
 
     # Filterbank with triangular frequencies
     f = fbank.FilterBank()
@@ -65,7 +68,7 @@ def audio_feature_extraction(filename_in, frame_len=1024, frame_step=512):
 
 
     all_features = np.hstack( (flatness, energy, flux, centroid, rolloff,\
-        low_energy, filterbank_out, s.data.T) )
+        low_energy, mfccs, filterbank_out, s.data.T) )
 
     return all_features
 
