@@ -24,7 +24,6 @@ class TDZeroCrossings(mir3.module.Module):
     def run(self, args):
         
         rate, data = scipy.io.wavfile.read(args.infile)
-        
         t = track.FeatureTrack()
         t.data = td_feats.zero_crossings(data, args.frame_length, args.window_size)
 

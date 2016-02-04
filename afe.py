@@ -11,7 +11,7 @@ import mir3.modules.tool.wav2spectrogram as wav2spec
 import mir3.data.spectrogram as spec
 import mir3.data.feature_track as track
 
-def audio_feature_extraction(filename_in, frame_len=1024, frame_step=512):
+def audio_feature_extraction(filename_in, frame_len=1024, frame_step=512, data_as_feature=False):
     """Extracts features from an audio file.
 
     Inputs:
@@ -19,6 +19,7 @@ def audio_feature_extraction(filename_in, frame_len=1024, frame_step=512):
     extracted
     frame_len and frame_step - frame length and step between frames (in samples)
     for the framewise feature processing
+    data_as_feature - whether or not to include the wav data as a feture in the output
 
     Outputs:
     numpy array in which each column represents a different feature and each
@@ -48,7 +49,7 @@ def audio_feature_extraction(filename_in, frame_len=1024, frame_step=512):
     low_energy.shape = (low_energy.shape[0],1)
 
     # MFCCs
-    mfccs = mfcc.mfcc(s.data, 30)
+    mfccs = mfcc.mfcc(s, 30)
 
     # Filterbank with triangular frequencies
     f = fbank.FilterBank()
@@ -68,7 +69,10 @@ def audio_feature_extraction(filename_in, frame_len=1024, frame_step=512):
 
 
     all_features = np.hstack( (flatness, energy, flux, centroid, rolloff,\
-        low_energy, mfccs, filterbank_out, s.data.T) )
+            low_energy, mfccs, filterbank_out) )
+
+    if data_as_feature:
+        all_features = np.hstack((all_features, s.data.T))
 
     return all_features
 
