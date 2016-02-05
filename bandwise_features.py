@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.io.wavfile
+import copy
 import mir3.lib.mir.features as mir
 import mir3.lib.mir.mfcc as mfcc
 import mir3.modules.features.filterbank as fbank
@@ -15,6 +16,9 @@ import mir3.modules.features.centroid as feat_centroid
 import mir3.modules.features.rolloff as feat_rolloff
 import mir3.modules.features.low_energy as feat_lowenergy
 import mir3.modules.features.td_zero_crossings as feat_zerocrossings
+
+import mir3.modules.features.join as feat_join
+import mir3.modules.features.stats as feat_stats
 
 class FrequencyBand:
     def bands(self):
@@ -66,15 +70,17 @@ class BandwiseFeatures:
         #keeping the time-domain data for computing time-domain features
         rate, audio_data = scipy.io.wavfile.read(infile)
         audio_data = audio_data.astype(np.float)
-        audio_data /= 32767.0 # Normalization to -1/+1 range
+        audio_data /= np.max(np.abs(audio_data)) # Normalization to -1/+1 range
         self.audio_data = np.copy(audio_data)
 
         audio_file.close()
 
         if db_spec:
-            self.spectrogram.data = 20 * np.log10(self.spectrogram.data)
+            self.spectrogram.data = 20 * np.log10(self.spectrogram.data + np.finfo(np.float).eps)
 
         self.band_features = np.array([])
+        self.joined_features = None
+        self.cropped = None
 
     def calculate_features_per_band(self, frequency_band):
         """
@@ -92,40 +98,61 @@ class BandwiseFeatures:
         for b in frequency_band.bands():
             lowbin = self.spectrogram.freq_bin(b[0])
             highbin = self.spectrogram.freq_bin(b[1])
-            print "calculating features for band in bin range: ", lowbin, highbin
+            #print "calculating features for band in bin range: ", lowbin, highbin
 
             features = []
 
             flatness_feature = flatness.calc_track_band(self.spectrogram, lowbin, highbin)
+            flatness_feature.metadata.feature += ("_" + str(b[0]))
             features.append(flatness_feature)
 
             energy_feature = energy.calc_track_band(self.spectrogram, lowbin, highbin)
+            energy_feature.metadata.feature += ("_" + str(b[0]))
             features.append(energy_feature)
 
             flux_feature = flux.calc_track_band(self.spectrogram, lowbin, highbin)
+            flux_feature.metadata.feature += ("_" + str(b[0]))
             features.append(flux_feature)
 
             centroid_feature = centroid.calc_track_band(self.spectrogram, lowbin, highbin)
+            centroid_feature.metadata.feature += ("_" + str(b[0]))
             features.append(centroid_feature)
 
             rolloff_feature = rolloff.calc_track_band(self.spectrogram, lowbin, highbin)
+            rolloff_feature.metadata.feature += ("_" + str(b[0]))
             features.append(rolloff_feature)
 
             lowenergy_feature = lowenergy.calc_track_band(self.spectrogram, 10, lowbin, highbin)
+            lowenergy_feature.metadata.feature += ("_" + str(b[0]))
             features.append(lowenergy_feature)
 
             #TODO: MFCCs e (caracteristicas no dominio do tempo? -- claro, sem separacao em bandas)
 
-            print features
-
             self.band_features = np.hstack((self.band_features, features))
 
-            # for i in features[3].data:
-            #     print i
+    def join_bands(self, crop=False):
 
+        if self.cropped is not None:
+            if self.cropped != crop:
+                self.joined_features = None
 
-    def calculate_stats(self):
-        pass
+        if self.joined_features is None:
+
+            join = feat_join.Join()
+
+            features = self.band_features
+
+            if crop:
+                min = np.min( [x.data.shape for x in self.band_features] )
+                features = []
+                for i in self.band_features:
+                    features.append(copy.copy(i))
+                    features[-1].data = np.resize(features[-1].data, min)
+
+            self.joined_features = join.join(features)
+            self.cropped = crop
+
+        return self.joined_features
 
 if __name__ == "__main__":
     #for i in a.bands():
@@ -136,13 +163,27 @@ if __name__ == "__main__":
     print feats.spectrogram.data.shape
     # plt.pcolormesh(feats.spectrogram.data)
     # plt.show()
+    # plt.plot(feats.audio_data)
+    # plt.show()
     a = LinearBand(low=int(feats.spectrogram.metadata.min_freq),
                    high=int(feats.spectrogram.metadata.max_freq),
                    step=1000)
 
-    feats.calculate_features_per_band(a)
+    import time
 
-    print feats.band_features[0]
+    T0 = time.time()
+    feats.calculate_features_per_band(a)
+    T1 = time.time()
+    print "Feature extraction took ", T1-T0, " seconds"
+
+    print feats.join_bands(crop=True).data.shape
+
+    stats = feat_stats.Stats()
+    m = stats.stats([feats.joined_features], mean=True, variance=True, slope=False,limits=False, csv=False, normalize=False)
+
+    print m.data
+
+    #print feats.band_features[0]
 
 
 
