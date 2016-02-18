@@ -10,8 +10,6 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.NOTSET)
 logger.addHandler(ch)
 
-from guppy import hpy
-
 if __name__ == "__main__":
 
     files = sorted(glob.glob("/home/juliano/Music/genres_wav/*.wav"))
