@@ -23,7 +23,6 @@ class Features(mir3.module.Module):
 
     def run(self, args):
         a = feature_matrix.FeatureMatrix().load(args.infile)
-
         if args.labels is True:
             print "Stored ", len(a.metadata.filename), " files"
             for f in a.metadata.filename:

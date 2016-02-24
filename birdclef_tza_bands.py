@@ -42,7 +42,7 @@ def tza_bands():
     stats = feat_stats.Stats()
     m = stats.stats(all_features, mean=True, variance=True, slope=False,limits=False, csv=False, normalize=True)
 
-    f = open("dataset_features.fm", "wb")
+    f = open("birdclef_tza_bands.fm", "wb")
 
     m.save(f)
 
@@ -88,7 +88,7 @@ def tza_bands_lessnoise():
     f.close()
 
 if __name__ == "__main__":
-    tza_bands_lessnoise()
+    tza_bands()
 
 
 

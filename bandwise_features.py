@@ -2,7 +2,6 @@ import numpy as np
 import scipy.io.wavfile
 import copy
 import mir3.lib.mir.features as mir
-import mir3.lib.mir.mfcc as mfcc
 import mir3.modules.features.filterbank as fbank
 import mir3.modules.tool.wav2spectrogram as wav2spec
 import mir3.data.spectrogram as spec
@@ -15,7 +14,8 @@ import mir3.modules.features.flux as feat_flux
 import mir3.modules.features.centroid as feat_centroid
 import mir3.modules.features.rolloff as feat_rolloff
 import mir3.modules.features.low_energy as feat_lowenergy
-import mir3.modules.features.td_zero_crossings as feat_zerocrossings
+import mir3.lib.mir.mfcc as mfcc
+import mir3.lib.mir.tdom_features as tdomf
 
 import mir3.modules.features.join as feat_join
 import mir3.modules.features.stats as feat_stats
@@ -61,6 +61,7 @@ class BandwiseFeatures:
         self.window_step = window_step
         self.db_spec = db_spec
 
+
         #load the auio file and compute its spectrum
         audio_file = open(infile, 'rb')
         self.spectrogram = wav2spec.Wav2Spectrogram().convert(audio_file, dft_length=dft_len,\
@@ -72,7 +73,7 @@ class BandwiseFeatures:
         audio_data = audio_data.astype(np.float)
         audio_data /= np.max(np.abs(audio_data)) # Normalization to -1/+1 range
         self.audio_data = np.copy(audio_data)
-
+        self.samplingrate = rate
         audio_file.close()
 
         if db_spec:
@@ -133,6 +134,29 @@ class BandwiseFeatures:
 
             self.band_features = np.hstack((self.band_features, features))
 
+        #MFCC hack
+        t = track.FeatureTrack()
+        t.data = mfcc.mfcc(self.spectrogram,13)
+        t.metadata.sampling_configuration = self.spectrogram.metadata.sampling_configuration
+        feature = ""
+        for i in range(13):
+            feature = feature + "MFCC_"+ str(i) + " "
+        t.metadata.feature = feature
+        t.metadata.filename = self.spectrogram.metadata.input.name
+
+        self.band_features = np.hstack((self.band_features, t))
+
+        #Zero crossings
+        t = track.FeatureTrack()
+        t.data = tdomf.zero_crossings(self.audio_data, 1024, 512)
+        t.metadata.sampling_configuration.fs = self.samplingrate
+        t.metadata.sampling_configuration.ofs = self.samplingrate / 1024
+        t.metadata.sampling_configuration.window_length = 512
+        t.metadata.feature = "TDZeroCrossings"
+        t.metadata.filename = self.spectrogram.metadata.input.name
+
+        self.band_features = np.hstack((self.band_features, t))
+
     def join_bands(self, crop=False):
 
         if self.cropped is not None:
@@ -150,7 +174,13 @@ class BandwiseFeatures:
                 features = []
                 for i in self.band_features:
                     features.append(copy.copy(i))
-                    features[-1].data = np.resize(features[-1].data, min)
+                    if features[-1].data.ndim > 1:
+                        features[-1].data = np.resize(features[-1].data, (min[0], features[-1].data.shape[1]))
+                    else:
+                        features[-1].data = np.resize(features[-1].data, min)
+
+                    if features[-1].data.ndim > 2:
+                        print "ERROR: unexpected number of dimensions."
 
             self.joined_features = join.join(features)
             self.cropped = crop
@@ -161,7 +191,7 @@ if __name__ == "__main__":
     #for i in a.bands():
     #    print i
 
-    feats = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav')
+    feats = BandwiseFeatures('/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN26407.wav')
 
     print feats.spectrogram.data.shape
     # plt.pcolormesh(feats.spectrogram.data)

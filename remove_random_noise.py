@@ -10,7 +10,7 @@ def inDb(a):
 def saveBMP(data, filename):
     pass
 
-def remove_random_noise(spectrogram, plot=False, outputPng=False, filter_compensation='log10', passes=1):
+def remove_random_noise(spectrogram, plot=False, outputPngName=None, filter_compensation='log10', passes=1):
     nxMx = spectrogram.data
 
     nxMx = nxMx / np.max(np.abs(nxMx))
@@ -18,15 +18,15 @@ def remove_random_noise(spectrogram, plot=False, outputPng=False, filter_compens
     means = np.mean(nxMx, axis=1)
     stdevs = np.std(nxMx, axis=1)
 
+    fs = spectrogram.metadata.sampling_configuration.fs
+    H = spectrogram.metadata.sampling_configuration.window_step
+    N = spectrogram.metadata.sampling_configuration.dft_length
+    freq_per_bin = fs / len(means)
+
+    frmTime = H * np.arange(nxMx.shape[1])/float(fs)
+    binFreq = freq_per_bin*np.arange(len(means))
+
     if plot:
-
-        fs = spectrogram.metadata.sampling_configuration.fs
-        H = spectrogram.metadata.sampling_configuration.window_step
-        N = spectrogram.metadata.sampling_configuration.dft_length
-        freq_per_bin = fs / len(means)
-
-        frmTime = H * np.arange(nxMx.shape[1])/float(fs)
-        binFreq = freq_per_bin*np.arange(len(means))
 
         plt.figure(1)
         plt.subplot(311)
@@ -75,17 +75,28 @@ def remove_random_noise(spectrogram, plot=False, outputPng=False, filter_compens
         binFreq,
         inDb(nf_nxMx2))
 
-    if outputPng:
+    if outputPngName is not None:
         f = plt.figure(2)
         plt.pcolormesh(frmTime, binFreq,inDb(nf_nxMx))
-        #plt.axis('off')
-        plt.savefig('foo.png', bbox_inches='tight', pad_inches=0, dpi=300)
+        plt.axis('off')
+        plt.savefig(outputPngName, bbox_inches='tight', pad_inches=0, dpi=300)
 
     if plot:
         plt.figure(1)
         plt.show(1)
 
     spectrogram.data = nf_nxMx
+
+
+def remove_random_noise_from_wav(filename, plot=False, outputPngName=None, filter_compensation='log10', passes=1):
+
+    audio_file = open(filename, 'rb')
+    spec = wav2spec.Wav2Spectrogram().convert(audio_file, dft_length=2048,\
+                                                              window_step=1024,\
+                                                              window_length=2047)
+    remove_random_noise(spec, plot=plot, outputPngName=outputPngName, filter_compensation=filter_compensation, passes=passes)
+
+    audio_file.close()
 
 if __name__ == "__main__":
 
@@ -114,11 +125,7 @@ if __name__ == "__main__":
 
     #(fs, x) = UF.wavread("/home/juliano/Music/genres_wav/rock.00000.wav")
 
-    audio_file = open(filename, 'rb')
-    spec = wav2spec.Wav2Spectrogram().convert(audio_file, dft_length=2048,\
-                                                              window_step=1024,\
-                                                              window_length=2047)
-    remove_random_noise(spec, True, True, passes=3)
+    remove_random_noise_from_wav(filename, True, 'foo.png', filter_compensation='log10', passes=3)
 
 
 
