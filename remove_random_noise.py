@@ -85,6 +85,8 @@ def remove_random_noise(spectrogram, plot=False, outputPngName=None, filter_comp
         plt.figure(1)
         plt.show(1)
 
+    plt.close()
+
     spectrogram.data = nf_nxMx
 
 

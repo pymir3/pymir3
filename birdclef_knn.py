@@ -51,7 +51,7 @@ if __name__ == "__main__":
     if do_pca:
         transform = PCA()
         clf = Pipeline([('pca', transform), ('svc', svm.SVC(C=300))])
-        n_components = [20, 40, 100, 130]
+        n_components = [20, 30, 40, 50, 60, 70, 100, 120, 130, 150]
         estimator = GridSearchCV(clf,
                              dict(pca__n_components=n_components))
         estimator.fit(features, labels)

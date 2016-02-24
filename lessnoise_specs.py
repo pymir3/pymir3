@@ -5,7 +5,7 @@ filename, file_extension = os.path.splitext('/path/to/somefile.ext')
 if __name__ == "__main__":
 
     wavdir = "./links/"
-    wavs = glob.glob(wavdir + "*.wav")
+    wavs = sorted(glob.glob(wavdir + "*.wav"))
     pngdir = "./pngs/"
     #print wavs
 
