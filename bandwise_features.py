@@ -82,6 +82,9 @@ class BandwiseFeatures:
         self.joined_features = None
         self.cropped = None
 
+    def spec_to_db(self):
+        self.spectrogram.data = 20 * np.log10(self.spectrogram.data + np.finfo(np.float).eps)
+
     def calculate_features_per_band(self, frequency_band):
         """
         :param frequency_band: FrequencyBand
