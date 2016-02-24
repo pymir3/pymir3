@@ -6,13 +6,14 @@ import time
 import mir3.modules.features.stats as feat_stats
 import remove_random_noise as rrn
 logger = logging.getLogger("birdclef_tza_bands")
-logger.setLevel(logging.NOTSET)
+logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
-ch.setLevel(logging.NOTSET)
+ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
 def tza_bands():
-    files = sorted(glob.glob("/home/juliano/Music/genres_wav/*.wav"))
+    #files = sorted(glob.glob("/home/juliano/Music/genres_wav/*.wav"))
+    files = sorted(glob.glob("links/*.wav"))
     numfiles = len(files)
 
     all_features = []
@@ -48,7 +49,7 @@ def tza_bands():
     f.close()
 
 def tza_bands_lessnoise():
-    files = sorted(glob.glob("/home/juliano/Music/genres_wav/*.wav"))
+    files = sorted(glob.glob("links/*.wav"))
     numfiles = len(files)
 
     all_features = []
@@ -60,8 +61,7 @@ def tza_bands_lessnoise():
 
         feats = BF.BandwiseFeatures(i, db_spec=False)
 
-        rrn.remove_random_noise(feats.spectrogram, filter_compensation='linear')
-
+        rrn.remove_random_noise(feats.spectrogram, filter_compensation='log10', passes=1)
         feats.spec_to_db()
 
         #print feats.spectrogram.data.shape
@@ -81,14 +81,14 @@ def tza_bands_lessnoise():
     stats = feat_stats.Stats()
     m = stats.stats(all_features, mean=True, variance=True, slope=False,limits=False, csv=False, normalize=True)
 
-    f = open("dataset_features_lessnoise_linear.fm", "wb")
+    f = open("birdclef_tza_bands_lessnoise_log10.fm", "wb")
 
     m.save(f)
 
     f.close()
 
 if __name__ == "__main__":
-    tza_bands()
+    tza_bands_lessnoise()
 
 
 

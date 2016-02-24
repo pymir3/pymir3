@@ -17,7 +17,7 @@ if __name__ == "__main__":
     do_pca = True
 
     ### bands
-    csv = np.genfromtxt("dataset_features.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("birdclef_tza_bands.csv", dtype='string' ,skip_header=1, delimiter=',')
 
     features = np.asfarray(csv.T[:-1].T)
     labels =  csv.T[-1:].T
