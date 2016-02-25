@@ -17,7 +17,15 @@ if __name__ == "__main__":
     do_pca = True
 
     ### bands
-    csv = np.genfromtxt("birdclef_tza_bands.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("genres_tza_bands.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("genres_tza_mel_bands.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("genres_tza_bands_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
+
+    ### one band
+    #csv = np.genfromtxt("genres_tza_one_band.csv", dtype='string' ,skip_header=1, delimiter=
+    csv = np.genfromtxt("genres_tza_mel_bands_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("genres_tza_one_band_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
+
 
     features = np.asfarray(csv.T[:-1].T)
     labels =  csv.T[-1:].T

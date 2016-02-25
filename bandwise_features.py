@@ -20,9 +20,11 @@ import mir3.lib.mir.tdom_features as tdomf
 import mir3.modules.features.join as feat_join
 import mir3.modules.features.stats as feat_stats
 
+
 class FrequencyBand:
     def bands(self):
         pass
+
 
 class LinearBand(FrequencyBand):
 
@@ -32,13 +34,52 @@ class LinearBand(FrequencyBand):
         self.step = step
         self.i = low
 
-
     def bands(self):
         for i in range(self.low, self.high, self.step):
             end = i + self.step
             if end > self.high:
                 end = i + (self.step - (end - self.high))
             yield (i, end)
+
+
+class OneBand(FrequencyBand):
+
+    def __init__(self, low=0, high=22050):
+        self.low = low
+        self.high = high
+
+    def bands(self):
+        yield (self.low, self.high)
+
+
+def mel_to_hz(mel):
+    return 700 * (10**(float(mel) / 2595)-1)
+
+
+def hz_to_mel(hz):
+    return 2595 * np.log10(1 + (float(hz) / 700))
+
+
+class MelBand(FrequencyBand):
+
+    def __init__(self, low=0, high=22050, step = 300):
+        self.low = low
+        self.high = high
+        self.step = step
+        self.low_mel = hz_to_mel(low)
+        self.high_mel = hz_to_mel(high)
+
+        #print "low hz = %d, low mel = %d, high hz = %d, high mel = %d" % (self.low, self.low_mel, self.high, self.high_mel)
+
+
+    def bands(self):
+        for i in range(np.int(self.low_mel), np.int(self.high_mel), self.step):
+            beg = int(np.floor(mel_to_hz(i)))
+            end = int(np.floor(mel_to_hz(i + self.step)))-1
+            if end > self.high:
+                end = self.high
+            yield (beg, end)
+
 
 
 class BandwiseFeatures:
@@ -191,7 +232,8 @@ if __name__ == "__main__":
     #for i in a.bands():
     #    print i
 
-    feats = BandwiseFeatures('/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN26407.wav')
+    #feats = BandwiseFeatures('/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN26407.wav')
+    feats = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav')
 
     print feats.spectrogram.data.shape
     # plt.pcolormesh(feats.spectrogram.data)
@@ -202,10 +244,13 @@ if __name__ == "__main__":
                    high=int(feats.spectrogram.metadata.max_freq),
                    step=1000)
 
+    b = MelBand(low=int(feats.spectrogram.metadata.min_freq),
+                   high=int(feats.spectrogram.metadata.max_freq),
+                   step=300)
     import time
 
     T0 = time.time()
-    feats.calculate_features_per_band(a)
+    feats.calculate_features_per_band(b)
     T1 = time.time()
     print "Feature extraction took ", T1-T0, " seconds"
 

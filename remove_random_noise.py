@@ -24,10 +24,9 @@ def remove_random_noise(spectrogram, plot=False, outputPngName=None, filter_comp
     freq_per_bin = fs / len(means)
 
     frmTime = H * np.arange(nxMx.shape[1])/float(fs)
-    binFreq = freq_per_bin*np.arange(len(means))
+    binFreq = freq_per_bin*np.arange(len(means)) * 0.5
 
     if plot:
-
         plt.figure(1)
         plt.subplot(311)
         plt.pcolormesh(frmTime, binFreq, inDb(nxMx))
@@ -103,7 +102,7 @@ def remove_random_noise_from_wav(filename, plot=False, outputPngName=None, filte
 if __name__ == "__main__":
 
     #filename = "/home/juliano/Music/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN29603.wav"
-    #filename = "/home/juliano/Music/genres_wav/rock.00000.wav"
+    filename = "/home/juliano/Music/genres_wav/rock.00000.wav"
 
     #filename = "/home/juliano/birds/BAND_TAILED_NIGHTHAWK/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN11254.wav"
     #filename = "/home/juliano/birds/BAND_TAILED_NIGHTHAWK/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN15299.wav"
@@ -114,8 +113,8 @@ if __name__ == "__main__":
     #filename = "/home/juliano/base_teste_rafael_94_especies/BAY_WREN/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN17844.wav"
     #filename = "/home/juliano/base_teste_rafael_94_especies/BAY_WREN/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN24787.wav"
 
-    filename = "/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2014_BIRDAMAZON_XC_WAV_RN929.wav"
-    filename = "/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN26407.wav"
+    #filename = "/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2014_BIRDAMAZON_XC_WAV_RN929.wav"
+    #filename = "/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN26407.wav"
 
     #filename = "/home/juliano/birds/MARSH_TAPACULO/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN17091.wav"
     #filename = "/home/juliano/birds/MARSH_TAPACULO/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN21923.wav"
