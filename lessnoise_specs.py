@@ -6,7 +6,7 @@ if __name__ == "__main__":
 
     wavdir = "./links/"
     wavs = sorted(glob.glob(wavdir + "*.wav"))
-    pngdir = "./pngs/"
+    pngdir = "./pngs/2passes/"
     #print wavs
 
     for f in wavs:

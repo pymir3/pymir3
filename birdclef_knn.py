@@ -16,14 +16,23 @@ if __name__ == "__main__":
     do_anova = True
     do_pca = True
 
-    ### bands
+    ### linear bands
     #csv = np.genfromtxt("genres_tza_bands.csv", dtype='string' ,skip_header=1, delimiter=',')
-    #csv = np.genfromtxt("genres_tza_mel_bands.csv", dtype='string' ,skip_header=1, delimiter=',')
+
     #csv = np.genfromtxt("genres_tza_bands_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
+
+    ### mel bands
+    #csv = np.genfromtxt("genres_tza_mel_bands.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("genres_tza_mel_bands_100.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("birdclef_tza_mel_bands_100.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("birdclef_tza_mel_bands_300.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("birdclef_tza_mel_bands_500.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("birdclef_tza_mel_bands_300_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("genres_tza_mel_bands_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("genres_tza_mel_bands_100_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
 
     ### one band
     #csv = np.genfromtxt("genres_tza_one_band.csv", dtype='string' ,skip_header=1, delimiter=
-    csv = np.genfromtxt("genres_tza_mel_bands_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
     #csv = np.genfromtxt("genres_tza_one_band_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
 
 
@@ -49,7 +58,7 @@ if __name__ == "__main__":
 
     if do_anova:
         transform = SelectPercentile(f_classif)
-        clf = Pipeline([('anova', transform), ('svc', svm.SVC(C=300))])
+        clf = Pipeline([('anova', transform), ('svc', svm.SVC(kernel='rbf', C=300))])
         clf.set_params(anova__percentile=70)
         scores = cross_validation.cross_val_score(clf, features, labels)
 
@@ -58,8 +67,10 @@ if __name__ == "__main__":
 
     if do_pca:
         transform = PCA()
-        clf = Pipeline([('pca', transform), ('svc', svm.SVC(C=300))])
-        n_components = [20, 30, 40, 50, 60, 70, 100, 120, 130, 150]
+        clf = Pipeline([('pca', transform), ('svc', svm.SVC(C=300, kernel='rbf'))])
+
+        n_components = np.floor(np.linspace(1, features.shape[1], 10)).astype(int)
+
         estimator = GridSearchCV(clf,
                              dict(pca__n_components=n_components))
         estimator.fit(features, labels)

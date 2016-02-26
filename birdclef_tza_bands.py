@@ -5,6 +5,7 @@ import bandwise_features as BF
 import time
 import mir3.modules.features.stats as feat_stats
 import remove_random_noise as rrn
+from multiprocessing import Pool
 
 logger = logging.getLogger("birdclef_tza_bands")
 logger.setLevel(logging.DEBUG)
@@ -13,102 +14,117 @@ ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
 
 
-def tza_bands():
-    files = sorted(glob.glob("/home/juliano/Music/genres_wav/*.wav"))
-    # files = sorted(glob.glob("links/*.wav"))
-    numfiles = len(files)
+class BandJob:
+    """
+    :type filename: string
+    :type band_iterator: string
+    :type band_step: int
+    :type lnf_use: bool
+    :type lnf_compensation: string
+    :type lnf_passes: int
+    """
 
-    all_features = []
-    k = 0
-    for i in files:
-        if k % 50 == 0:
-            print float(k) / numfiles * 100, "% completed."
-        k += 1
+    def __init__(self, filename, band_iterator='mel', band_step=500, lnf_use=False, lnf_compensation='log10', lnf_passes=1):
+        self.filename = filename
+        self.band_iterator = band_iterator
+        self.band_step = band_step
+        self.lnf_use = lnf_use
+        self.lnf_compensation = lnf_compensation
+        self.lnf_passes = lnf_passes
 
-        feats = BF.BandwiseFeatures(i)
 
-        # print feats.spectrogram.data.shape
+class BandExperiment:
 
-        # a = BF.OneBand(low=int(feats.spectrogram.metadata.min_freq),
-        #                high=int(feats.spectrogram.metadata.max_freq))
+    def __init__(self, wav_path, output_file,
+                 band_iterator='mel',
+                 band_step=500,
+                 lnf_use=False,
+                 lnf_compensation='log10',
+                 lnf_passes=1,
+                 mean=True, variance=True, slope=False, limits=False, csv=False, normalize=True):
+        self.wav_path=wav_path
+        self.output_file=output_file
+        self.band_iterator=band_iterator
+        self.band_step=band_step
+        self.lnf_use=lnf_use
+        self.lnf_compensation=lnf_compensation
+        self.lnf_passes=lnf_passes
+        self.mean=mean
+        self.variance=variance
+        self.slope=slope
+        self.limits=limits
+        self.csv=csv
+        self.normalize=normalize
 
-        # a = BF.LinearBand(low=int(feats.spectrogram.metadata.min_freq),
-        #                   high=int(feats.spectrogram.metadata.max_freq),
-        #                   step=1000)
 
-        a = BF.MelBand(low=int(feats.spectrogram.metadata.min_freq),
-                          high=int(feats.spectrogram.metadata.max_freq),
-                          step=100)
+def tza_bands_parallel(experiment, n_processes = 1):
+    """
+    :type experiment: BandExperiment
+    :type n_processes: int
+    """
 
-        logger.debug("Extracting features for %s", i)
-        T0 = time.time()
-        feats.calculate_features_per_band(a)
-        T1 = time.time()
-        logger.debug("Feature extraction took %f seconds", T1 - T0)
+    files = sorted(glob.glob(experiment.wav_path + "*.wav"))
+    jobs = []
+    for f in files:
+        jobs.append(BandJob(f, experiment.band_iterator, experiment.band_step,
+                            lnf_use=experiment.lnf_use,
+                            lnf_compensation=experiment.lnf_compensation,
+                            lnf_passes=experiment.lnf_passes))
 
-        feats.join_bands(crop=True)
-        all_features.append(feats.joined_features)
+    pool = Pool(processes=n_processes)
+
+    features = pool.map(tza_bands, jobs)
 
     stats = feat_stats.Stats()
-    m = stats.stats(all_features, mean=True, variance=True, slope=False, limits=False, csv=False, normalize=True)
+    m = stats.stats(features,
+                    mean=experiment.mean,
+                    variance=experiment.variance,
+                    slope=experiment.slope,
+                    limits=experiment.limits,
+                    csv=experiment.csv,
+                    normalize=experiment.normalize)
 
-    f = open("genres_tza_mel_bands_100.fm", "wb")
+    f = open(experiment.output_file, "wb")
 
     m.save(f)
 
     f.close()
 
 
-def tza_bands_lessnoise():
-    files = sorted(glob.glob("/home/juliano/Music/genres_wav/*.wav"))
-    # files = sorted(glob.glob("links/*.wav"))
-    numfiles = len(files)
+def tza_bands(job):
+    """
+    :type job: BandJob
+    """
 
-    all_features = []
-    k = 0
-    for i in files:
-        if k % 50 == 0:
-            print float(k) / numfiles * 100, "% completed."
-            100, "% completed."
-        k += 1
-
-        feats = BF.BandwiseFeatures(i, db_spec=False)
-
-        rrn.remove_random_noise(feats.spectrogram, filter_compensation='log10', passes=1)
+    if job.lnf_use:
+        feats = BF.BandwiseFeatures(job.filename, db_spec=False)
+        rrn.remove_random_noise(feats.spectrogram, filter_compensation=job.lnf_compensation, passes=job.lnf_passes)
         feats.spec_to_db()
+    else:
+        feats = BF.BandwiseFeatures(job.filename)
 
-        # print feats.spectrogram.data.shape
+    if job.band_iterator == 'one':
+        a = BF.OneBand(low=int(feats.spectrogram.metadata.min_freq),
+                       high=int(feats.spectrogram.metadata.max_freq))
 
-        # a = BF.OneBand(low=int(feats.spectrogram.metadata.min_freq),
-        #                high=int(feats.spectrogram.metadata.max_freq))
-
-        # a = BF.LinearBand(low=int(feats.spectrogram.metadata.min_freq),
-        #                   high=int(feats.spectrogram.metadata.max_freq),
-        #                   step=1000)
-
+    if job.band_iterator == 'linear':
+        a = BF.LinearBand(low=int(feats.spectrogram.metadata.min_freq),
+                          high=int(feats.spectrogram.metadata.max_freq),
+                          step=job.band_step)
+    if job.band_iterator == 'mel':
         a = BF.MelBand(low=int(feats.spectrogram.metadata.min_freq),
                           high=int(feats.spectrogram.metadata.max_freq),
-                          step=100)
+                          step=job.band_step)
 
-        logger.debug("Extracting features for %s", i)
-        T0 = time.time()
-        feats.calculate_features_per_band(a)
-        T1 = time.time()
-        logger.debug("Feature extraction took %f seconds", T1 - T0)
+    logger.debug("Extracting features for %s", job.filename)
+    T0 = time.time()
+    feats.calculate_features_per_band(a)
+    T1 = time.time()
+    logger.debug("Feature extraction took %f seconds", T1 - T0)
 
-        feats.join_bands(crop=True)
-        all_features.append(feats.joined_features)
-
-    stats = feat_stats.Stats()
-    m = stats.stats(all_features, mean=True, variance=True, slope=False, limits=False, csv=False, normalize=True)
-
-    f = open("genres_tza_mel_bands_100_lessnoise_log10.fm", "wb")
-
-    m.save(f)
-
-    f.close()
-
+    feats.join_bands(crop=True)
+    return feats.joined_features
 
 if __name__ == "__main__":
-    #tza_bands()
-    tza_bands_lessnoise()
+    exp = BandExperiment("./links/", "birdclef_tza_mel_bands_1000.fm", band_iterator='mel', band_step=500)
+    tza_bands_parallel(exp, n_processes=4)
