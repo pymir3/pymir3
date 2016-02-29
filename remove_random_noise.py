@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import mir3.modules.tool.wav2spectrogram as wav2spec
+import mir3.modules.features.energy as feat_energy
+import bandwise_features as bf
 
 eps = np.finfo(float).eps
 
@@ -58,6 +60,20 @@ def remove_random_noise(spectrogram, plot=False, outputPngName=None, filter_comp
     nf_nxMx = np.clip(nf_nxMx, a_min=low, a_max=1.0)
     nf_nxMx2 = np.clip(nf_nxMx2, a_min=low, a_max=1.0)
 
+    spectrogram.data = nf_nxMx
+
+    a = bf.LinearBand(low=int(spectrogram.metadata.min_freq),
+                      high=int(spectrogram.metadata.max_freq),
+                      step=2000)
+    energy = feat_energy.Energy()
+    for b in a.bands():
+        lowbin = spectrogram.freq_bin(b[0])
+        highbin = spectrogram.freq_bin(b[1])
+        en = inDb(energy.calc_track_band(spectrogram, lowbin, highbin).data)
+        print b[0], b[1], np.mean(en), np.std(en)
+
+    print
+
     if plot:
 
         # plt.figure(0)
@@ -86,8 +102,6 @@ def remove_random_noise(spectrogram, plot=False, outputPngName=None, filter_comp
 
     plt.close()
 
-    spectrogram.data = nf_nxMx
-
 
 def remove_random_noise_from_wav(filename, plot=False, outputPngName=None, filter_compensation='log10', passes=1):
 
@@ -107,7 +121,7 @@ if __name__ == "__main__":
     #filename = "/home/juliano/birds/BAND_TAILED_NIGHTHAWK/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN11254.wav"
     #filename = "/home/juliano/birds/BAND_TAILED_NIGHTHAWK/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN15299.wav"
     #filename = "/home/juliano/birds/BAND_TAILED_NIGHTHAWK/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN25674.wav"
-    #filename = "/home/juliano/base_teste_rafael_94_especies/BAY_WREN/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN19798.wav"
+    filename = "./links/MARSH_TAPACULO.0.wav"
     #filename = "/home/juliano/base_teste_rafael_94_especies/BAY_WREN/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN29607.wav"
     #filename = "/home/juliano/base_teste_rafael_94_especies/BAY_WREN/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN29358.wav"
     #filename = "/home/juliano/base_teste_rafael_94_especies/BAY_WREN/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN17844.wav"
@@ -126,7 +140,10 @@ if __name__ == "__main__":
 
     #(fs, x) = UF.wavread("/home/juliano/Music/genres_wav/rock.00000.wav")
 
-    remove_random_noise_from_wav(filename, True, 'foo.png', filter_compensation='log10', passes=3)
+    #remove_random_noise_from_wav(filename, True, 'foo.png', filter_compensation='log10', passes=1)
+    remove_random_noise_from_wav(filename, True, None, filter_compensation='log10', passes=1)
+    remove_random_noise_from_wav(filename, True, None, filter_compensation='log10', passes=2)
+    remove_random_noise_from_wav(filename, True, None, filter_compensation='log10', passes=3)
 
 
 

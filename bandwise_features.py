@@ -28,18 +28,29 @@ class FrequencyBand:
 
 class LinearBand(FrequencyBand):
 
-    def __init__(self, low=0, high=22050, step=1000):
+    def __init__(self, low=0, high=22050, step=1000, nbands=None):
         self.low = low
         self.high = high
         self.step = step
         self.i = low
+        self.nbands = nbands
 
     def bands(self):
-        for i in range(self.low, self.high, self.step):
-            end = i + self.step
-            if end > self.high:
-                end = i + (self.step - (end - self.high))
-            yield (i, end)
+        if self.nbands is not None:
+            len = int(self.high / float(self.nbands))
+            bands = []
+            for i in range(self.nbands-1):
+                bands.append((i*len, (i * len) + (len-1)))
+            i+=1
+            bands.append((i*len, self.high))
+            for i in bands:
+                yield i
+        else:
+            for i in range(self.low, self.high, self.step):
+                end = i + self.step
+                if end > self.high:
+                    end = i + (self.step - (end - self.high))
+                yield (i, end)
 
 
 class OneBand(FrequencyBand):
@@ -62,23 +73,35 @@ def hz_to_mel(hz):
 
 class MelBand(FrequencyBand):
 
-    def __init__(self, low=0, high=22050, step = 300):
+    def __init__(self, low=0, high=22050, step = 300, nbands=None):
         self.low = low
         self.high = high
         self.step = step
         self.low_mel = hz_to_mel(low)
         self.high_mel = hz_to_mel(high)
+        self.nbands = nbands
 
         #print "low hz = %d, low mel = %d, high hz = %d, high mel = %d" % (self.low, self.low_mel, self.high, self.high_mel)
 
 
     def bands(self):
-        for i in range(np.int(self.low_mel), np.int(self.high_mel), self.step):
-            beg = int(np.floor(mel_to_hz(i)))
-            end = int(np.floor(mel_to_hz(i + self.step)))-1
-            if end > self.high:
-                end = self.high
-            yield (beg, end)
+
+        if self.nbands is not None:
+            len = int(self.high_mel / float(self.nbands))
+            bands = []
+            for i in range(self.nbands-1):
+                bands.append((i*len, (i * len) + (len-1)))
+            i+=1
+            bands.append((i*len, self.high_mel))
+            for i in bands:
+                yield (int(np.floor(mel_to_hz(i[0]))), int(np.floor(mel_to_hz(i[1]))))
+        else:
+            for i in range(np.int(self.low_mel), np.int(self.high_mel), self.step):
+                beg = int(np.floor(mel_to_hz(i)))
+                end = int(np.floor(mel_to_hz(i + self.step)))-1
+                if end > self.high:
+                    end = self.high
+                yield (beg, end)
 
 
 
@@ -242,7 +265,10 @@ if __name__ == "__main__":
     # plt.show()
     a = LinearBand(low=int(feats.spectrogram.metadata.min_freq),
                    high=int(feats.spectrogram.metadata.max_freq),
-                   step=1000)
+                   nbands=10)
+
+    for i in a.bands():
+        print i
 
     b = MelBand(low=int(feats.spectrogram.metadata.min_freq),
                    high=int(feats.spectrogram.metadata.max_freq),

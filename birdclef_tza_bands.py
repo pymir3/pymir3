@@ -24,10 +24,11 @@ class BandJob:
     :type lnf_passes: int
     """
 
-    def __init__(self, filename, band_iterator='mel', band_step=500, lnf_use=False, lnf_compensation='log10', lnf_passes=1):
+    def __init__(self, filename, band_iterator='mel', band_step=500, band_nbands=None, lnf_use=False, lnf_compensation='log10', lnf_passes=1):
         self.filename = filename
         self.band_iterator = band_iterator
         self.band_step = band_step
+        self.band_nbands = band_nbands
         self.lnf_use = lnf_use
         self.lnf_compensation = lnf_compensation
         self.lnf_passes = lnf_passes
@@ -38,14 +39,17 @@ class BandExperiment:
     def __init__(self, wav_path, output_file,
                  band_iterator='mel',
                  band_step=500,
+                 band_nbands=None,
                  lnf_use=False,
                  lnf_compensation='log10',
                  lnf_passes=1,
                  mean=True, variance=True, slope=False, limits=False, csv=False, normalize=True):
+
         self.wav_path=wav_path
         self.output_file=output_file
         self.band_iterator=band_iterator
         self.band_step=band_step
+        self.band_nbands=band_nbands
         self.lnf_use=lnf_use
         self.lnf_compensation=lnf_compensation
         self.lnf_passes=lnf_passes
@@ -66,7 +70,7 @@ def tza_bands_parallel(experiment, n_processes = 1):
     files = sorted(glob.glob(experiment.wav_path + "*.wav"))
     jobs = []
     for f in files:
-        jobs.append(BandJob(f, experiment.band_iterator, experiment.band_step,
+        jobs.append(BandJob(f, experiment.band_iterator, experiment.band_step, experiment.band_nbands,
                             lnf_use=experiment.lnf_use,
                             lnf_compensation=experiment.lnf_compensation,
                             lnf_passes=experiment.lnf_passes))
@@ -110,11 +114,13 @@ def tza_bands(job):
     if job.band_iterator == 'linear':
         a = BF.LinearBand(low=int(feats.spectrogram.metadata.min_freq),
                           high=int(feats.spectrogram.metadata.max_freq),
-                          step=job.band_step)
+                          step=job.band_step,
+                          nbands=job.band_nbands)
     if job.band_iterator == 'mel':
         a = BF.MelBand(low=int(feats.spectrogram.metadata.min_freq),
                           high=int(feats.spectrogram.metadata.max_freq),
-                          step=job.band_step)
+                          step=job.band_step,
+                          nbands=job.band_nbands)
 
     logger.debug("Extracting features for %s", job.filename)
     T0 = time.time()
@@ -126,5 +132,44 @@ def tza_bands(job):
     return feats.joined_features
 
 if __name__ == "__main__":
-    exp = BandExperiment("./links/", "birdclef_tza_mel_bands_1000.fm", band_iterator='mel', band_step=500)
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_bands_500.fm", band_iterator='linear', band_step=500)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_bands_1000.fm", band_iterator='linear', band_step=1000)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_bands_2000.fm", band_iterator='linear', band_step=2000)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_bands_100.fm", band_iterator='mel', band_step=100)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_bands_300.fm", band_iterator='mel', band_step=300)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_bands_500.fm", band_iterator='mel', band_step=500)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_bands_1000.fm", band_iterator='mel', band_step=1000)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_one_band.fm", band_iterator='one')
+    # tza_bands_parallel(exp, n_processes=4)
+
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_10b.fm", band_iterator='linear', band_nbands=10)
+    # tza_bands_parallel(exp, n_processes=4)
+
+    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_30b.fm", band_iterator='linear', band_nbands=30)
+    tza_bands_parallel(exp, n_processes=4)
+
+    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_50b.fm", band_iterator='linear', band_nbands=50)
+    tza_bands_parallel(exp, n_processes=4)
+
+    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_10b.fm", band_iterator='mel', band_nbands=10)
+    tza_bands_parallel(exp, n_processes=4)
+
+    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_30b.fm", band_iterator='mel', band_nbands=30)
+    tza_bands_parallel(exp, n_processes=4)
+
+    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_50b.fm", band_iterator='mel', band_nbands=50)
     tza_bands_parallel(exp, n_processes=4)

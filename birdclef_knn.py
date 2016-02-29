@@ -15,30 +15,28 @@ if __name__ == "__main__":
 
     do_anova = True
     do_pca = True
+# genres_tza_linear_bands_1000.csv  genres_tza_linear_bands_500.csv  genres_tza_mel_bands_100.csv  genres_tza_mel_bands_500.csv
+# genres_tza_linear_bands_2000.csv  genres_tza_mel_bands_1000.csv    genres_tza_mel_bands_300.csv  genres_tza_one_band.csv
 
-    ### linear bands
-    #csv = np.genfromtxt("genres_tza_bands.csv", dtype='string' ,skip_header=1, delimiter=',')
-
-    #csv = np.genfromtxt("genres_tza_bands_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
-
-    ### mel bands
-    #csv = np.genfromtxt("genres_tza_mel_bands.csv", dtype='string' ,skip_header=1, delimiter=',')
-    #csv = np.genfromtxt("genres_tza_mel_bands_100.csv", dtype='string' ,skip_header=1, delimiter=',')
-    #csv = np.genfromtxt("birdclef_tza_mel_bands_100.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("birdclef_tza_mel_bands_300.csv", dtype='string' ,skip_header=1, delimiter=',')
-    #csv = np.genfromtxt("birdclef_tza_mel_bands_500.csv", dtype='string' ,skip_header=1, delimiter=',')
-    #csv = np.genfromtxt("birdclef_tza_mel_bands_300_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
-    #csv = np.genfromtxt("genres_tza_mel_bands_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
-    #csv = np.genfromtxt("genres_tza_mel_bands_100_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
-
-    ### one band
-    #csv = np.genfromtxt("genres_tza_one_band.csv", dtype='string' ,skip_header=1, delimiter=
-    #csv = np.genfromtxt("genres_tza_one_band_lessnoise_log10.csv", dtype='string' ,skip_header=1, delimiter=',')
-
+    #csv = np.genfromtxt("csv/genres/genres_tza_one_band.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_linear_bands_500.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_linear_bands_1000.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_linear_bands_2000.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_100.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_300.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_500.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_1000.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_linear_10b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_linear_30b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_linear_50b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_mel_10b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_mel_30b.csv", dtype='string' ,skip_header=1, delimiter=',')
 
     features = np.asfarray(csv.T[:-1].T)
     labels =  csv.T[-1:].T
     labels.shape = (labels.shape[0])
+
+    print "number of features:", features.shape[1]
 
     #classifiers
     knn = neighbors.KNeighborsClassifier(n_neighbors=1)
