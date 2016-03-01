@@ -18,19 +18,20 @@ if __name__ == "__main__":
 # genres_tza_linear_bands_1000.csv  genres_tza_linear_bands_500.csv  genres_tza_mel_bands_100.csv  genres_tza_mel_bands_500.csv
 # genres_tza_linear_bands_2000.csv  genres_tza_mel_bands_1000.csv    genres_tza_mel_bands_300.csv  genres_tza_one_band.csv
 
-    #csv = np.genfromtxt("csv/genres/genres_tza_one_band.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_linear_bands_500.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_linear_bands_1000.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_linear_bands_2000.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_100.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_300.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_500.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_1000.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_linear_10b.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_linear_30b.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_linear_50b.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_mel_10b.csv", dtype='string' ,skip_header=1, delimiter=',')
-    csv = np.genfromtxt("csv/genres/genres_tza_mel_30b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    csv = np.genfromtxt("csv/genres/genres_tza_one_band.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_linear_bands_500.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_linear_bands_1000.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_linear_bands_2000.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_100.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_300.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_500.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_mel_bands_1000.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_linear_10b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_linear_30b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_linear_50b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_mel_10b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_mel_30b.csv", dtype='string' ,skip_header=1, delimiter=',')
+    #csv = np.genfromtxt("csv/genres/genres_tza_mel_50b.csv", dtype='string' ,skip_header=1, delimiter=',')
 
     features = np.asfarray(csv.T[:-1].T)
     labels =  csv.T[-1:].T
@@ -58,9 +59,16 @@ if __name__ == "__main__":
         transform = SelectPercentile(f_classif)
         clf = Pipeline([('anova', transform), ('svc', svm.SVC(kernel='rbf', C=300))])
         clf.set_params(anova__percentile=70)
-        scores = cross_validation.cross_val_score(clf, features, labels)
+        percentiles = (np.arange(11) * 10)[1:]
 
-        print("anova + SVM Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std()))
+        estimator = GridSearchCV(clf,
+                                 dict(anova__percentile=percentiles))
+        estimator.fit(features, labels)
+        best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
+        clf.set_params(anova__percentile=best_percentile)
+        scores = cross_validation.cross_val_score(clf, features, labels, cv=10)
+
+        print("anova (percentile = %d) + SVM Accuracy: %0.2f (+/- %0.2f)" % (best_percentile, scores.mean(), scores.std()))
 
 
     if do_pca:
@@ -75,7 +83,7 @@ if __name__ == "__main__":
 
         best_ncomponents = estimator.best_estimator_.named_steps['pca'].n_components
         clf.set_params(pca__n_components=best_ncomponents)
-        scores = cross_validation.cross_val_score(clf, features, labels)
+        scores = cross_validation.cross_val_score(clf, features, labels, cv=10)
 
         print("PCA (n_components = %d)  + SVM Accuracy: %0.2f (+/- %0.2f)" % (best_ncomponents, scores.mean(), scores.std()))
 
