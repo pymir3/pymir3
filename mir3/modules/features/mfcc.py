@@ -22,18 +22,20 @@ class Mfcc(mir3.module.Module):
                             help="""output track file""")
 
 
-
-    def run(self, args):
-        s = spectrogram.Spectrogram().load(args.infile)
-
+    def calc_track(self, s, n):
         t = track.FeatureTrack()
-        t.data = feats.mfcc(s, args.number)
+        t.data = feats.mfcc(s, n)
 
         t.metadata.sampling_configuration = s.metadata.sampling_configuration
         feature = ""
-        for i in range(args.number):
+        for i in range(n):
             feature = feature + "MFCC_"+ str(i) + " "
         t.metadata.feature = feature
         t.metadata.filename = s.metadata.input.name
+        return t
+
+    def run(self, args):
+        s = spectrogram.Spectrogram().load(args.infile)
+        t = self.calc_track(s, args.number)
         t.save(args.outfile)
 
