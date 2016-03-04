@@ -27,7 +27,8 @@ class Flux(mir3.module.Module):
         t = track.FeatureTrack()
         t.data = feats.flux(spectrum.data[min_freq_bin:max_freq_bin])
         t.metadata.sampling_configuration = spectrum.metadata.sampling_configuration
-        t.metadata.feature = "Flux"
+        t.metadata.feature = "Flux_" + str(min_freq_bin) + "_" +\
+            str(max_freq_bin)
         t.metadata.filename = spectrum.metadata.input.name
 
         return t
