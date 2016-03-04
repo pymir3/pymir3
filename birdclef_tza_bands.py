@@ -37,7 +37,8 @@ class BandJob:
 
 class BandExperiment:
 
-    def __init__(self, wav_path, output_file,
+    def __init__(self, mirex_list_file, mirex_scratch_folder,
+                 output_file,
                  band_iterator='mel',
                  band_step=500,
                  band_nbands=None,
@@ -46,7 +47,8 @@ class BandExperiment:
                  lnf_passes=1,
                  mean=True, variance=True, slope=False, limits=False, csv=False, normalize=True):
 
-        self.wav_path=wav_path
+        self.mirex_list_file=mirex_list_file
+        self.mirex_scratch_folder=mirex_scratch_folder
         self.output_file=output_file
         self.band_iterator=band_iterator
         self.band_step=band_step
@@ -160,13 +162,16 @@ class BandExperiment:
 #
 #     return feats.band_features
 
+
 def tza_bands_parallel(experiment, n_processes = 1):
     """
     :type experiment: BandExperiment
     :type n_processes: int
     """
 
-    files = sorted(glob.glob(experiment.wav_path + "*.wav"))
+    with open(experiment.mirex_list_file) as f:
+        files = f.read().splitlines()
+
     jobs = []
     for f in files:
         jobs.append(BandJob(f, experiment.band_iterator, experiment.band_step, experiment.band_nbands,
@@ -199,7 +204,7 @@ def tza_bands_parallel(experiment, n_processes = 1):
                     csv=experiment.csv,
                     normalize=experiment.normalize)
 
-    f = open(experiment.output_file, "wb")
+    f = open(experiment.mirex_scratch_folder + "/" + experiment.output_file, "wb")
 
     m.save(f)
 
@@ -247,8 +252,13 @@ def tza_bands(job):
     feats.join_bands(crop=True)
     return feats.joined_features
 
-def MIREX_ExtractFeatures(args):
-    pass
+
+def MIREX_ExtractFeatures(scratch_folder, feature_extraction_list, **kwargs):
+    exp = BandExperiment(feature_extraction_list, scratch_folder,
+                         output_file=kwargs['output_file'],
+                         band_iterator=kwargs['band_iterator'],
+                         band_nbands=kwargs['band_nbands'])
+    tza_bands_parallel(exp, n_processes=4)
 
 if __name__ == "__main__":
     # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_bands_500.fm", band_iterator='linear', band_step=500)
@@ -295,26 +305,28 @@ if __name__ == "__main__":
 
     ####WITHTEXTURES############
 
+    MIREX_ExtractFeatures("fm/genres", "genres_file_list.txt", output_file="teste.fm", band_iterator='mel', band_nbands=10)
+
     # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_one_band_tex.fm", band_iterator='one')
     # tza_bands_parallel(exp, n_processes=4)
 
-    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_10b_tex.fm", band_iterator='linear', band_nbands=10)
-    tza_bands_parallel(exp, n_processes=4)
-
-    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_30b_tex.fm", band_iterator='linear', band_nbands=30)
-    tza_bands_parallel(exp, n_processes=4)
-
-    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_50b_tex.fm", band_iterator='linear', band_nbands=50)
-    tza_bands_parallel(exp, n_processes=4)
-
-    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_10b_tex.fm", band_iterator='mel', band_nbands=10)
-    tza_bands_parallel(exp, n_processes=4)
-
-    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_30b_tex.fm", band_iterator='mel', band_nbands=30)
-    tza_bands_parallel(exp, n_processes=4)
-
-    exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_50b_tex.fm", band_iterator='mel', band_nbands=50)
-    tza_bands_parallel(exp, n_processes=4)
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_10b_tex.fm", band_iterator='linear', band_nbands=10)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_30b_tex.fm", band_iterator='linear', band_nbands=30)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_50b_tex.fm", band_iterator='linear', band_nbands=50)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_10b_tex.fm", band_iterator='mel', band_nbands=10)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_30b_tex.fm", band_iterator='mel', band_nbands=30)
+    # tza_bands_parallel(exp, n_processes=4)
+    #
+    # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_mel_50b_tex.fm", band_iterator='mel', band_nbands=50)
+    # tza_bands_parallel(exp, n_processes=4)
 
     #exp = BandExperiment("./lesslinks/", "sepbands", band_iterator='mel', band_nbands=10)
     #tza_sep_bands_parallel(exp, n_processes=4)
