@@ -124,6 +124,7 @@ class BandwiseFeatures:
         self.window = window
         self.window_step = window_step
         self.db_spec = db_spec
+        self.features_per_band = 0
 
 
         #load the auio file and compute its spectrum
@@ -194,7 +195,7 @@ class BandwiseFeatures:
             lowenergy_feature.metadata.feature += ("_" + str(b[0]))
             features.append(lowenergy_feature)
 
-            #TODO: MFCCs e (caracteristicas no dominio do tempo? -- claro, sem separacao em bandas)
+            self.features_per_band = len(features)
 
             self.band_features = np.hstack((self.band_features, features))
 

@@ -6,14 +6,14 @@ if __name__ == "__main__":
 
     wavdir = "./links/"
     wavs = sorted(glob.glob(wavdir + "*.wav"))
-    pngdir = "./pngs/2passes/"
+    pngdir = "./pngs/"
     #print wavs
 
     for f in wavs:
         nome, ext = os.path.splitext(f)
         pngfile = pngdir + nome.split("/")[-1] + ".png"
         print f, "->", pngfile
-        rrn.remove_random_noise_from_wav(f, False, pngfile, 'log10', passes=2)
+        rrn.remove_random_noise_from_wav(f, False, pngfile, 'log10', passes=1)
 
     # thedir = "/home/juliano/base_teste_rafael_94_especies"
     # linkdir = "./links/"

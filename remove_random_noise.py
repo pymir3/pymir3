@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mir3.modules.tool.wav2spectrogram as wav2spec
 import mir3.modules.features.energy as feat_energy
+import mir3.modules.features.flux as feat_flux
+import mir3.modules.features.centroid as feat_centroid
+import mir3.modules.features.rolloff as feat_rolloff
 import bandwise_features as bf
 
 eps = np.finfo(float).eps
@@ -30,6 +33,7 @@ def remove_random_noise(spectrogram, plot=False, outputPngName=None, filter_comp
 
     if plot:
         plt.figure(1)
+
         plt.subplot(311)
         plt.pcolormesh(frmTime, binFreq, inDb(nxMx))
         plt.colormaps()
@@ -51,28 +55,98 @@ def remove_random_noise(spectrogram, plot=False, outputPngName=None, filter_comp
 
             for k in range(passes):
                 nf_nxMx[i] -= abs(means[i] + ((1 - (np.log10(i + eps) / maxlog)) * stdevs[i]))
-                nf_nxMx2[i] -= abs(means[i] + ((1 * (np.log10(i + eps) / maxlog)) * stdevs[i]))
 
     if filter_compensation == 'linear':
         for i in range(len(means)):
             nf_nxMx[i] -= abs(means[i] + ( (1 - (i / len(means)-1)) * stdevs[i]))
 
     nf_nxMx = np.clip(nf_nxMx, a_min=low, a_max=1.0)
-    nf_nxMx2 = np.clip(nf_nxMx2, a_min=low, a_max=1.0)
+    nf_nxMx2 = np.copy(nf_nxMx)
 
     spectrogram.data = nf_nxMx
 
-    a = bf.LinearBand(low=int(spectrogram.metadata.min_freq),
-                      high=int(spectrogram.metadata.max_freq),
-                      step=2000)
-    energy = feat_energy.Energy()
-    for b in a.bands():
-        lowbin = spectrogram.freq_bin(b[0])
-        highbin = spectrogram.freq_bin(b[1])
-        en = inDb(energy.calc_track_band(spectrogram, lowbin, highbin).data)
-        print b[0], b[1], np.mean(en), np.std(en)
+    if outputPngName is not None:
 
-    print
+        a = bf.LinearBand(low=int(spectrogram.metadata.min_freq),
+                  high=int(spectrogram.metadata.max_freq),
+                  nbands=20)
+
+        energy = feat_energy.Energy()
+        flux = feat_flux.Flux()
+        rolloff = feat_rolloff.Rolloff()
+        #centroid = feat_centroid.Centroid()
+        lowen = []
+        for b in a.bands():
+            lowbin = spectrogram.freq_bin(b[0])
+            highbin = spectrogram.freq_bin(b[1])
+            en = inDb(energy.calc_track_band(spectrogram, lowbin, highbin).data)
+            #print b[0], b[1], np.mean(en), np.std(en)
+            #nf_nxMx[spectrogram.freq_bin(b[0])] = 1
+            if np.mean(en) < -120:
+                lowen.append((1, b, np.mean(en), np.std(en)))
+            else:
+                lowen.append((0, b, np.mean(en), np.std(en)))
+
+        for i in lowen:
+            print i
+        print
+
+        lowen = lowen[:11]
+        #sorted(lowen, key = lambda b: b[2])
+        lowen = sorted(lowen, key = lambda b: b[2], reverse=False)
+
+        for i in lowen:
+            print i
+
+        bird = np.array([])
+        birdlines = 0
+
+        lowen = sorted(lowen[:1], key=lambda b: b[1][0])
+
+        print
+
+        for i in lowen:
+            print "aaa", i
+
+        max = lowen[0]
+        min = lowen[0]
+
+        for i in lowen:
+            if i[1][1] > max[1][1]:
+                max = i
+            if i[1][0] < max[1][0]:
+                min = i
+
+        print "low", min[1][0], "high", max[1][1]
+
+        for i in range(int(spectrogram.freq_bin(min[1][0])), int(spectrogram.freq_bin(max[1][1]))):
+            bird = np.append(bird, nf_nxMx[i])
+            birdlines+=1
+            nf_nxMx2[i] = 1
+
+
+        # for k in range(len(lowen)):
+        #     #print k, lowen[k]
+        #     #if lowen[k][0] == 1:
+        #     if lowen[k][0] == lowen[k][0]:
+        #         if lowen[k][1][0] < 10000:
+        #             for i in range(int(spectrogram.freq_bin(lowen[k][1][0])), int(spectrogram.freq_bin(lowen[k][1][1]))):
+        #                 bird = np.append(bird, nf_nxMx[i])
+        #                 birdlines+=1
+        #                 nf_nxMx2[i] = 1
+
+        print
+
+        output = np.copy(nf_nxMx)
+
+        bird.shape = (birdlines, nf_nxMx.shape[1])
+
+        for i in range(20):
+            bird = np.vstack((np.ones(nf_nxMx.shape[1]), bird))
+
+        output = np.vstack((output, bird))
+
+        plt.imsave(outputPngName, inDb(output)[::-1])
 
     if plot:
 
@@ -80,21 +154,15 @@ def remove_random_noise(spectrogram, plot=False, outputPngName=None, filter_comp
         # plt.plot(subs)
         # plt.figure(1)
 
-        plt.subplot(312)
+        sbplt = plt.subplot(312)
         plt.pcolormesh(frmTime,
         binFreq,
         inDb(nf_nxMx))
 
-        plt.subplot(313)
+        sbplt = plt.subplot(313)
         plt.pcolormesh(frmTime,
         binFreq,
         inDb(nf_nxMx2))
-
-    if outputPngName is not None:
-        f = plt.figure(2)
-        plt.pcolormesh(frmTime, binFreq,inDb(nf_nxMx))
-        plt.axis('off')
-        plt.savefig(outputPngName, bbox_inches='tight', pad_inches=0, dpi=300)
 
     if plot:
         plt.figure(1)
@@ -121,7 +189,7 @@ if __name__ == "__main__":
     #filename = "/home/juliano/birds/BAND_TAILED_NIGHTHAWK/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN11254.wav"
     #filename = "/home/juliano/birds/BAND_TAILED_NIGHTHAWK/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN15299.wav"
     #filename = "/home/juliano/birds/BAND_TAILED_NIGHTHAWK/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN25674.wav"
-    filename = "./links/MARSH_TAPACULO.0.wav"
+    filename = "./links/BAND_TAILED_NIGHTHAWK.3.wav"
     #filename = "/home/juliano/base_teste_rafael_94_especies/BAY_WREN/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN29607.wav"
     #filename = "/home/juliano/base_teste_rafael_94_especies/BAY_WREN/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN29358.wav"
     #filename = "/home/juliano/base_teste_rafael_94_especies/BAY_WREN/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN17844.wav"
@@ -141,9 +209,9 @@ if __name__ == "__main__":
     #(fs, x) = UF.wavread("/home/juliano/Music/genres_wav/rock.00000.wav")
 
     #remove_random_noise_from_wav(filename, True, 'foo.png', filter_compensation='log10', passes=1)
-    remove_random_noise_from_wav(filename, True, None, filter_compensation='log10', passes=1)
-    remove_random_noise_from_wav(filename, True, None, filter_compensation='log10', passes=2)
-    remove_random_noise_from_wav(filename, True, None, filter_compensation='log10', passes=3)
+    remove_random_noise_from_wav(filename, True, 'foo2.png', filter_compensation='log10', passes=1)
+    # remove_random_noise_from_wav(filename, True, None, filter_compensation='log10', passes=2)
+    # remove_random_noise_from_wav(filename, True, None, filter_compensation='log10', passes=3)
 
 
 
