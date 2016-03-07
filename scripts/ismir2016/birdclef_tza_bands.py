@@ -206,9 +206,11 @@ def tza_bands_parallel(experiment, n_processes = 1):
 
     f = open(experiment.mirex_scratch_folder + "/" + experiment.output_file, "wb")
 
-    m.save(f)
+    m.save(f, restore_state=True)
 
     f.close()
+
+    return m
 
 def tza_calc_textures(args):
     tw = texture_window.ToTextureWindow()
@@ -258,7 +260,7 @@ def MIREX_ExtractFeatures(scratch_folder, feature_extraction_list, **kwargs):
                          output_file=kwargs['output_file'],
                          band_iterator=kwargs['band_iterator'],
                          band_nbands=kwargs['band_nbands'])
-    tza_bands_parallel(exp, n_processes=4)
+    return tza_bands_parallel(exp, n_processes=4)
 
 if __name__ == "__main__":
     # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_bands_500.fm", band_iterator='linear', band_step=500)
