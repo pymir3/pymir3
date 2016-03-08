@@ -34,20 +34,6 @@ def imprimir_datasets(dataset_dir):
         print "\t", i.split("/")[-1]
 
 
-def output_experiment(saidas, d, classification_summary, exp_prefix):
-    cr_cm = open(saidas + "/" + d.split(".")[0] + exp_prefix + "_cr_cm.txt", "w")
-
-    for key in sorted(classification_summary.results.keys()):
-        cr_cm.write("\n")
-        cr_cm.write("results for %s\n" % (key))
-        cr_cm.write(classification_report(classification_summary.results[key]['labels'], classification_summary.results[key]['predicted']))
-        cm = confusion_matrix(classification_summary.results[key]['labels'], classification_summary.results[key]['predicted'])
-        cr_cm.write("\nconfusion matrix:\n")
-        ttc.print_cm(cm, classification_summary.label_names, file=cr_cm)
-
-    classification_summary.to_csv(saidas + "/" + d.split(".")[0] + exp_prefix + ".csv")
-    cr_cm.close()
-
 if __name__ == "__main__":
 
     argv = sys.argv[1:]
@@ -126,7 +112,7 @@ if __name__ == "__main__":
                                                band_nbands='1')
 
             classification_summary = ttc.train_and_classify(feature_matrix=fm, sample_labels=labels)
-            output_experiment(saidas, p, classification_summary, exp_prefix)
+            ttc.output_experiment(saidas, p, classification_summary, exp_prefix)
             gc.collect()
 
         if exp == 'bands':
@@ -145,7 +131,7 @@ if __name__ == "__main__":
                                                    band_nbands=b)
                     gc.collect()
                     classification_summary = ttc.train_and_classify(feature_matrix=fm, sample_labels=labels)
-                    output_experiment(saidas, p, classification_summary, exp_prefix)
+                    ttc.output_experiment(saidas, p, classification_summary, exp_prefix)
                     gc.collect()
 
 

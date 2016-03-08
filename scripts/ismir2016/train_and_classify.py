@@ -307,12 +307,25 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
 
     return summary
 
+def output_experiment(saidas, dataset_list_filename, classification_summary, file_prefix):
+    cr_cm = open(saidas + "/" + dataset_list_filename.split(".")[0] + file_prefix + "_cr_cm.txt", "w")
+
+    for key in sorted(classification_summary.results.keys()):
+        cr_cm.write("\n")
+        cr_cm.write("results for %s\n" % (key))
+        cr_cm.write(classification_report(classification_summary.results[key]['labels'], classification_summary.results[key]['predicted']))
+        cm = confusion_matrix(classification_summary.results[key]['labels'], classification_summary.results[key]['predicted'])
+        cr_cm.write("\nconfusion matrix:\n")
+        print_cm(cm, classification_summary.label_names, file=cr_cm)
+
+    classification_summary.to_csv(saidas + "/" + dataset_list_filename.split(".")[0] + file_prefix + ".csv")
+    cr_cm.close()
+
 if __name__ == "__main__":
 
-    do_anova = True
-    do_pca = True
+    classification_summary = train_and_classify("csv/genres/genres_tza_one_band_tex.csv")
+    #output_experiment(".", "ballroom.txt", classification_summary, "bands_30")
 
-    train_and_classify("csv/genres/genres_tza_one_band_tex.csv")
 
 
 

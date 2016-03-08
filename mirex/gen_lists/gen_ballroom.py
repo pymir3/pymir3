@@ -3,7 +3,7 @@ import sys
 
 if __name__ == "__main__":
 
-    dataset_dir = "/home/juliano/mir_datasets/ballroom/BallroomData"
+    dataset_dir = "/home/juliano/Music/ballroom/BallroomData"
 
     #generate file list for ballroom
     with open(dataset_dir + "/allBallroomFiles") as f:
