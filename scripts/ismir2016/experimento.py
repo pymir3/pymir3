@@ -143,6 +143,7 @@ if __name__ == "__main__":
                                                    output_file=outfile,
                                                    band_iterator=it,
                                                    band_nbands=b)
+                    gc.collect()
                     classification_summary = ttc.train_and_classify(feature_matrix=fm, sample_labels=labels)
                     output_experiment(saidas, p, classification_summary, exp_prefix)
                     gc.collect()
