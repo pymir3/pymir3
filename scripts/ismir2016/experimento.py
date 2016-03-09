@@ -21,6 +21,10 @@ def print_help():
     print '\t -p <lista_datasets> -- Indica quais datasets devem ser processados. Caso não seja passado, todos os datasets'
     print '\t\t cujas listas forem indicadas no argumento -d serão processados. Os nomes dos arquivos dos datasets no diretório'
     print '\t\t são considerados. Separe os datasets por vírgula. Exemplo: -p gtzan.txt,ballroom.txt'
+    print '\t -b <lista_n_bandas> -- Indica a lista de número de bandas a testar. Só é considerado quando'
+    print '\t\t o experimento é \'bands\'. Exemplo: -b 5,10,20,30'
+    print '\t -i <lista_iteradores_bandas> -- Indica a lista de quais iteradores de banda usar. Só é considerado quando'
+    print '\t\t o experimento é \'bands\'. Pode ser \'linear\' ou \'mel\' Exemplo: -i linear,mel'
 
 def imprimir_datasets(dataset_dir):
     datasets = glob.glob(dataset_dir + "/*")
@@ -42,9 +46,11 @@ if __name__ == "__main__":
     saidas = ''
     processar = []
     exp = ""
+    bandas = [5,10,20,30]
+    its = ['linear', 'mel']
 
     try:
-      opts, args = getopt.getopt(argv,"hd:o:p:e:",["datasets=","saidas=","processar=","experimento="])
+      opts, args = getopt.getopt(argv,"hd:o:p:e:b:i:",["datasets=","saidas=","processar=","experimento=","bandas=", "iteradores="])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -61,6 +67,10 @@ if __name__ == "__main__":
             processar = arg.split(",")
         elif opt in ("-e", "--experimento"):
             exp = arg
+        elif opt in ("-b", "--bandas"):
+            bandas = [int(x) for x in arg.split(",")]
+        elif opt in ("-i", "--iteradores"):
+            its = arg.split(",")
 
     if datasets == '':
         print_help()
@@ -72,6 +82,8 @@ if __name__ == "__main__":
 
     print "caminho dos datasets: ", datasets
     print "caminho das saidas: ", saidas
+    print "n_bandas", bandas
+    print "its", its
 
     if processar == []:
         for d in sorted(glob.glob(datasets + "/*")):
@@ -116,8 +128,8 @@ if __name__ == "__main__":
             gc.collect()
 
         if exp == 'bands':
-            n_bands = [5, 10, 20, 30]
-            band_it = ['linear','mel']
+            n_bands = bandas
+            band_it = its
             for it in band_it:
                 for b in n_bands:
 

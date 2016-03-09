@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf8 -*-
-import numpy as np
 import sys
+sys.path.append("../../")
+import mir3.data.feature_matrix as fm
+import numpy as np
 from sklearn import cross_validation
 from sklearn import neighbors
 from sklearn import svm
@@ -66,7 +68,7 @@ class ClassificationSummary:
         self.results = dict()
         self.label_names = label_names
 
-    def add_result(self, pipeline_name, cr, accuracy, accuracy_stdev, labels, predicted, best_params):
+    def add_result(self, pipeline_name, cr, accuracy, accuracy_stdev, labels, predicted, best_params, sorted_features):
         lines = cr.split("\n")
         data = filter(None,lines[-2].split(" "))
         self.results[pipeline_name] = dict()
@@ -78,17 +80,20 @@ class ClassificationSummary:
         self.results[pipeline_name]['labels'] = labels
         self.results[pipeline_name]['predicted'] = predicted
         self.results[pipeline_name]['best_params'] = str(best_params).replace(",", "//")
+        self.results[pipeline_name]['sorted_features'] = str([x for x in sorted_features]).replace(",", "//")
 
     def to_csv(self, filename):
         outfile = open(filename, 'w')
-        outfile.write("pipeline,best_params,accuracy,precision,recall,f1-score\n")
+        outfile.write("pipeline,best_params,accuracy,precision,recall,f1-score,sorted_features\n")
         for i in sorted(self.results.keys()):
             outfile.write(str(self.results[i]['pipeline']) + "," +
                           str(self.results[i]['best_params']) + "," +
                           str(self.results[i]['accuracy']) + "," +
                           str(self.results[i]['precision']) + "," +
                           str(self.results[i]['recall'])+ "," +
-                          str(self.results[i]['f1-score']) + "\n")
+                          str(self.results[i]['f1-score']) + "," +
+                          str(self.results[i]['sorted_features']) +
+                          "\n")
         outfile.close()
 
 
@@ -111,6 +116,8 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     if feature_matrix:
 
         features = feature_matrix.data
+
+        features_names = np.array(feature_matrix.metadata.feature.split(" "))
 
         if sample_labels is None:
             sys.exit("É necessário informar o dicionário de labels quando a matriz de features é usada como entrada.")
@@ -140,7 +147,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(nb, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("NB", cr, scores.mean(), scores.std(), labels, predicted, "none")
+    summary.add_result("NB", cr, scores.mean(), scores.std(), labels, predicted, "none", "n/a")
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -156,7 +163,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("KNN", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
+    summary.add_result("KNN", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "n/a")
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -174,7 +181,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("SVM", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
+    summary.add_result("SVM", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "n/a")
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -192,11 +199,15 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
 
+    anova_scores =  estimator.best_estimator_.named_steps['anova'].scores_
+    sorted_anova_scores = np.argsort(anova_scores)
+    sorted_anova_features = features_names[sorted_anova_scores]
+
     print("anova (percentile = %d) + NB Accuracy: %0.2f (+/- %0.2f)" % (best_percentile, scores.mean(), scores.std()))
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("NB+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
+    summary.add_result("NB+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, sorted_anova_features)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -215,7 +226,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("NB+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
+    summary.add_result("NB+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "PCA_COMPONENTS")
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -232,11 +243,15 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
 
+    anova_scores =  estimator.best_estimator_.named_steps['anova'].scores_
+    sorted_anova_scores = np.argsort(anova_scores)
+    sorted_anova_features = features_names[sorted_anova_scores]
+
     print("anova (percentile = %d) + KNN Accuracy: %0.2f (+/- %0.2f)" % (best_percentile, scores.mean(), scores.std()))
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("KNN+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
+    summary.add_result("KNN+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, sorted_anova_features)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -253,11 +268,15 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     best_n_components = estimator.best_estimator_.named_steps['pca'].n_components
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
 
+    # print "####\n####\n####\n"
+    # print estimator.best_estimator_.named_steps['pca'].components_
+    # print "####\n####\n####\n"
+
     print("pca (n_components = %d) + KNN Accuracy: %0.2f (+/- %0.2f)" % (best_n_components, scores.mean(), scores.std()))
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("KNN+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
+    summary.add_result("KNN+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "PCA_COMPONENTS")
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -276,11 +295,15 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
 
+    anova_scores =  estimator.best_estimator_.named_steps['anova'].scores_
+    sorted_anova_scores = np.argsort(anova_scores)
+    sorted_anova_features = features_names[sorted_anova_scores]
+
     print("anova (percentile = %d) + SVM Accuracy: %0.2f (+/- %0.2f)" % (best_percentile, scores.mean(), scores.std()))
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("SVM+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
+    summary.add_result("SVM+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, sorted_anova_features)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -303,7 +326,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("SVM+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
+    summary.add_result("SVM+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "PCA_COMPONENTS")
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
