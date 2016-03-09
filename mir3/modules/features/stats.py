@@ -39,46 +39,35 @@ class Stats(mir3.module.Module):
                             to 0 mean and unit variance (default:
                             %(default)s)""")
 
-    def run(self, args):
-        o = track.FeatureTrack()
+    def stats(self, feature_tracks, mean=False, variance=False, slope=False, limits=False, csv=False, normalize=False):
 
         final_output = None
         final_filenames = []
 
-        for a in args.infiles:
-            o = o.load(a)
+        for o in feature_tracks:
 
             #print o.metadata.feature
 
             a = numpy.array(o.metadata.feature.split())
             i = a.argsort()
 
-            #print a
-            #print o.data.mean(axis=0)
-
-            #print i
-            #print a[i]
-            #print o.data.mean(axis=0)[i], "\n"
-
- #           print o.data.shape
-
             final_filenames.append(o.metadata.filename)
             if o.data.ndim == 1:
                 o.data.shape = (o.data.size, 1)
 
             out = numpy.array([])
-            if args.mean is True:
+            if mean is True:
                 out = numpy.hstack((out,
                              o.data.mean(axis=0)[i]))
 
 #            print out.shape
 
-            if args.variance is True:
+            if variance is True:
                 out = numpy.hstack((out,
                              o.data.var(axis=0)[i]))
 
 #            print out.shape
-            if args.slope is True:
+            if slope is True:
                 variance = o.data.var(axis=0)[i]
                 lindata = numpy.zeros(variance.shape)
                 for i in xrange(o.data.shape[1]):
@@ -87,7 +76,7 @@ class Stats(mir3.module.Module):
 
                 out = numpy.hstack((out,lindata))
 
-            if args.limits is True:
+            if limits is True:
                 out = numpy.hstack((out,
                              o.data.max(axis=0)[i]))
                 out = numpy.hstack((out,
@@ -97,10 +86,9 @@ class Stats(mir3.module.Module):
                 out = numpy.hstack((out,
                              o.data.argmin(axis=0)[i]/float(o.data.shape[0])))
 
-
                 out.shape = (1, out.size)
 
-            if args.csv is True:
+            if csv is True:
                 for i in xrange(len(out)-1):
                     sys.stdout.write(str(out[i]))
                     sys.stdout.write(",")
@@ -116,16 +104,16 @@ class Stats(mir3.module.Module):
         my_features = o.metadata.feature.split()
         my_features.sort()
         new_features = ""
-        if args.mean is True:
+        if mean is True:
             for feat in my_features:
                 new_features = new_features + " " + "mean_" + feat
-        if args.variance is True:
+        if variance is True:
             for feat in my_features:
                 new_features = new_features + " " + "var_" + feat
-        if args.slope is True:
+        if slope is True:
             for feat in my_features:
                 new_features = new_features + " " + "slope_" + feat
-        if args.limits is True:
+        if limits is True:
             for feat in my_features:
                 new_features = new_features + " " + "max_" + feat
             for feat in my_features:
@@ -138,7 +126,7 @@ class Stats(mir3.module.Module):
         p = feature_matrix.FeatureMatrix()
         p.data = final_output.copy()
 
-        if args.normalize:
+        if normalize:
             std_p = p.data.std(axis=0)
             p.data = (p.data - p.data.mean(axis=0))/\
                     numpy.maximum(10**(-6), std_p)
@@ -146,4 +134,18 @@ class Stats(mir3.module.Module):
         p.metadata.sampling_configuration = o.metadata.sampling_configuration
         p.metadata.feature = new_features
         p.metadata.filename = final_filenames
+
+        return p
+
+    def run(self, args):
+        print "Calculating stats..."
+        feature_tracks = []
+
+        for a in args.infiles:
+            f = track.FeatureTrack()
+            f = f.load(a)
+            feature_tracks.append(f)
+
+        p = self.stats(feature_tracks, args.mean, args.variance, args.slope, args.limits, args.csv, args.normalize)
+
         p.save(args.outfile)

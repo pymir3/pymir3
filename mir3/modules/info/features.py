@@ -23,7 +23,6 @@ class Features(mir3.module.Module):
 
     def run(self, args):
         a = feature_matrix.FeatureMatrix().load(args.infile)
-
         if args.labels is True:
             print "Stored ", len(a.metadata.filename), " files"
             for f in a.metadata.filename:
@@ -38,7 +37,7 @@ class Features(mir3.module.Module):
         feature_names = a.metadata.feature.split()
         feature_names.sort()
         if args.features is True:
-            if len(feature_names) is not a.data.shape[1]:
+            if len(feature_names) != a.data.shape[1]:
                 print "Feature names are inconsistent with data!"
                 print feature_names
                 print len(feature_names)

@@ -15,27 +15,36 @@ class Join(mir3.module.Module):
         parser.add_argument('output', type=argparse.FileType('wb'),
                             help="""track file""")
 
-    def run(self, args):
-        print "Joining features"
+    def join(self, feature_tracks):
         data = []
         features = []
 
-        t = track.FeatureTrack()
-        for a in args.input:
-            t = t.load(a)
+        for t in feature_tracks:
             if t.data.ndim == 1:
                 t.data.shape = (t.data.size,1)
             data.append(t.data)
             features.append(t.metadata.feature)
-            print a.name, t.metadata.feature, t.data.shape
+            #print a.name, t.metadata.feature, t.data.shape
 
         o = track.FeatureTrack()
 
         o.data = numpy.hstack(data)
-
         o.metadata.feature = ' '.join(features)
         o.metadata.filename = t.metadata.filename
-
         o.metadata.sampling_configuration = t.metadata.sampling_configuration
+
+        return o
+
+    def run(self, args):
+        print "Joining features"
+        features = []
+
+        for a in args.input:
+            t = track.FeatureTrack()
+            t = t.load(a)
+            features.append(t)
+            print a.name, t.metadata.feature, t.data.shape
+
+        o = self.join(features)
 
         o.save(args.output)
