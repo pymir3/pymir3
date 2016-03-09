@@ -66,7 +66,7 @@ class ClassificationSummary:
         self.results = dict()
         self.label_names = label_names
 
-    def add_result(self, pipeline_name, cr, accuracy, accuracy_stdev, labels, predicted):
+    def add_result(self, pipeline_name, cr, accuracy, accuracy_stdev, labels, predicted, best_params):
         lines = cr.split("\n")
         data = filter(None,lines[-2].split(" "))
         self.results[pipeline_name] = dict()
@@ -77,12 +77,14 @@ class ClassificationSummary:
         self.results[pipeline_name]['f1-score'] = data[5]
         self.results[pipeline_name]['labels'] = labels
         self.results[pipeline_name]['predicted'] = predicted
+        self.results[pipeline_name]['best_params'] = str(best_params).replace(",", "//")
 
     def to_csv(self, filename):
         outfile = open(filename, 'w')
-        outfile.write("pipeline,accuracy,precision,recall,f1-score\n")
+        outfile.write("pipeline,best_params,accuracy,precision,recall,f1-score\n")
         for i in sorted(self.results.keys()):
             outfile.write(str(self.results[i]['pipeline']) + "," +
+                          str(self.results[i]['best_params']) + "," +
                           str(self.results[i]['accuracy']) + "," +
                           str(self.results[i]['precision']) + "," +
                           str(self.results[i]['recall'])+ "," +
@@ -138,7 +140,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(nb, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("NB", cr, scores.mean(), scores.std(), labels, predicted)
+    summary.add_result("NB", cr, scores.mean(), scores.std(), labels, predicted, "none")
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -154,7 +156,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("KNN", cr, scores.mean(), scores.std(), labels, predicted)
+    summary.add_result("KNN", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -172,7 +174,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("SVM", cr, scores.mean(), scores.std(), labels, predicted)
+    summary.add_result("SVM", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -194,7 +196,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("NB+Anova", cr, scores.mean(), scores.std(), labels, predicted)
+    summary.add_result("NB+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -213,7 +215,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("NB+PCA", cr, scores.mean(), scores.std(), labels, predicted)
+    summary.add_result("NB+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -234,7 +236,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("KNN+Anova", cr, scores.mean(), scores.std(), labels, predicted)
+    summary.add_result("KNN+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -255,7 +257,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("KNN+PCA", cr, scores.mean(), scores.std(), labels, predicted)
+    summary.add_result("KNN+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -278,7 +280,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("SVM+Anova", cr, scores.mean(), scores.std(), labels, predicted)
+    summary.add_result("SVM+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -301,7 +303,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
-    summary.add_result("SVM+PCA", cr, scores.mean(), scores.std(), labels, predicted)
+    summary.add_result("SVM+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_)
     cm = confusion_matrix(labels, predicted)
     print_cm(cm, label_names)
 
@@ -324,7 +326,7 @@ def output_experiment(saidas, dataset_list_filename, classification_summary, fil
 if __name__ == "__main__":
 
     classification_summary = train_and_classify("csv/genres/genres_tza_one_band_tex.csv")
-    #output_experiment(".", "ballroom.txt", classification_summary, "bands_30")
+    output_experiment(".", "gtzan_small2.txt", classification_summary, "tzanetakis")
 
 
 

@@ -58,7 +58,7 @@ if __name__ == "__main__":
             tmp = arg.strip()
             saidas = tmp if tmp[-1] != "/" else arg[:-1]
         elif opt in ("-p", "--processar"):
-            processar = sorted(arg.split(","))
+            processar = arg.split(",")
         elif opt in ("-e", "--experimento"):
             exp = arg
 
