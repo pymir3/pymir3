@@ -10,7 +10,11 @@ import mir3.module
 from sklearn.cross_validation import train_test_split, StratifiedKFold
 from sklearn import mixture
 from sklearn import svm
-from sklearn import neural_network
+try:
+    from sklearn import neural_network
+except:
+    pass
+
 from sklearn import preprocessing
 from sklearn import pipeline
 
