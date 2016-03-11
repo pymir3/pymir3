@@ -1,8 +1,6 @@
 import numpy as np
 import scipy.io.wavfile
 import copy
-import mir3.lib.mir.features as mir
-import mir3.modules.features.filterbank as fbank
 import mir3.modules.tool.wav2spectrogram as wav2spec
 import mir3.data.spectrogram as spec
 import mir3.data.feature_track as track
