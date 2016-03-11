@@ -21,7 +21,42 @@ if __name__ == "__main__":
             pipeline = (''.join(str(elem) + "_" for elem in pipeline)).replace(".csv_", "")
             csvs[pipeline] = csv
         stats = csv[0][:]
+        pipelines = csv[1:,[0]]
         for i in range(1,len(stats)):
+
+            if stats[i] == 'sorted_features':
+                print dataset
+                for j in sorted(csvs.keys()):
+                    print "\t" + j
+                    p = -1
+                    for l in (csvs[j])[1:,[i]]:
+                        data = str(l[0])
+                        data = data.replace("[","")
+                        data = data.replace("]","")
+                        data = data.replace("/","")
+                        data = data.replace("'","")
+                        p+=1
+                        if data[0] == 'P' or data[0] == 'n':
+                            continue
+                        # print "\t\t", pipelines[p][0]
+                        # print "\t\t\t", data.split(" ")
+
+                        graph = open( "graphs/" + dataset + "_" + j + "_anova_frequencies.txt", "w")
+                        feat_seq = 0;
+                        for feat in data.split(" "):
+                            if feat.find("MFCC") != -1:
+                                continue
+                            else:
+                                s = feat.split("_")
+                                if len(s) <=4:
+                                    continue
+                                print s
+                                graph.write(s[0][0] + "_" + s[2][0] + "_" + s[3] + ", " + str(feat_seq) + ", " + s[-1] + "\n" )
+                                feat_seq+=1
+                        graph.close()
+
+                continue
+
             dataset_results.write("\n" + stats[i] + "\n\n")
 
             dataset_results.write("configuration,")

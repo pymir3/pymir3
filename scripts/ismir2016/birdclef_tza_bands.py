@@ -216,7 +216,11 @@ def tza_calc_textures(args):
     tw = texture_window.ToTextureWindow()
     feature = args[0]
     logger.debug("calculating textures for %s", feature.metadata.filename)
-    return tw.to_texture(feature, args[1])
+    T0 = time.time()
+    results = tw.to_texture(feature, args[1])
+    T1 = time.time()
+    logger.debug("texture calculation took %f seconds", T1-T0)
+    return results
 
 def tza_bands(job):
     """
@@ -247,7 +251,7 @@ def tza_bands(job):
 
     logger.debug("Extracting features for %s", job.filename)
     T0 = time.time()
-    feats.calculate_features_per_band(a)
+    feats.calculate_features_per_band(a, discard_bin_zero=True)
     T1 = time.time()
     logger.debug("Feature extraction took %f seconds", T1 - T0)
 
@@ -255,12 +259,12 @@ def tza_bands(job):
     return feats.joined_features
 
 
-def MIREX_ExtractFeatures(scratch_folder, feature_extraction_list, **kwargs):
+def MIREX_ExtractFeatures(scratch_folder, feature_extraction_list, n_processes,**kwargs):
     exp = BandExperiment(feature_extraction_list, scratch_folder,
                          output_file=kwargs['output_file'],
                          band_iterator=kwargs['band_iterator'],
                          band_nbands=kwargs['band_nbands'])
-    return tza_bands_parallel(exp, n_processes=4)
+    return tza_bands_parallel(exp, n_processes=n_processes)
 
 if __name__ == "__main__":
     # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_linear_bands_500.fm", band_iterator='linear', band_step=500)
@@ -307,7 +311,7 @@ if __name__ == "__main__":
 
     ####WITHTEXTURES############
 
-    MIREX_ExtractFeatures("fm/genres", "genres_file_list.txt", output_file="teste.fm", band_iterator='mel', band_nbands=10)
+    MIREX_ExtractFeatures("fm/genres", "mirex/file_lists/gtzan_small2.txt", 4, output_file="teste.fm", band_iterator='mel', band_nbands=10)
 
     # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_one_band_tex.fm", band_iterator='one')
     # tza_bands_parallel(exp, n_processes=4)

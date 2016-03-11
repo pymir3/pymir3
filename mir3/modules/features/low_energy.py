@@ -30,7 +30,7 @@ class LowEnergy(mir3.module.Module):
         t = track.FeatureTrack()
         t.data = feats.low_energy(spectrum.data[min_freq_bin:max_freq_bin], texture_length)
         t.metadata.sampling_configuration = spectrum.metadata.sampling_configuration
-        t.metadata.feature = "LowEnergy" + str(min_freq_bin) + "_" +\
+        t.metadata.feature = "LowEnergy_" + str(min_freq_bin) + "_" +\
             str(max_freq_bin)
 
         t.metadata.filename = spectrum.metadata.input.name

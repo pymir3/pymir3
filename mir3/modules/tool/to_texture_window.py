@@ -65,7 +65,39 @@ class ToTextureWindow(mir3.module.Module):
             ret = numpy.hstack((ret, a.T))
             #print "E agora, assim:", ret.shape
 
-        #ret.shape = (it, ret.shape[0] / it) if dT.ndim != 1 else (ret.shape[0])
+        # for i in range(it):
+        #     buff = []
+        #     lastsum = 0
+        #     a = numpy.array(())
+        #     a.shape = (2,0)
+        #     window_track.metadata.feature += "tx_mean_" + feats[i] + "tx_var_" + feats[i]
+        #
+        #     for cur in range(0, texture_size):
+        #         buff.append(dT[cur] if dT.ndim == 1 else dT[i, cur])
+        #         lastsum += dT[cur] if dT.ndim == 1 else dT[i, cur]
+        #
+        #     mean = lastsum / texture_size
+        #     accum = 0
+        #     for k in range(0, texture_size):
+        #         accum += (buff[k] - mean)**2
+        #     var = (accum / texture_size)
+        #     temp = numpy.vstack((mean,var))
+        #     a = numpy.hstack((a,temp))
+        #
+        #     for cur in range(texture_size, total_aw):
+        #         buff.append(dT[cur] if dT.ndim == 1 else dT[i, cur])
+        #         lastsum += -buff[cur-texture_size] + buff[cur]
+        #         mean = lastsum / texture_size
+        #         accum = 0
+        #         for k in range(cur - texture_size+1, cur):
+        #             accum += (buff[k] - mean)**2
+        #         var = (accum / texture_size)
+        #         temp = numpy.vstack((mean,var))
+        #         a = numpy.hstack((a,temp))
+        #
+        #     if ret.shape == (0,0):
+        #         ret.shape = (a.shape[1], 0)
+        #     ret = numpy.hstack((ret, a.T))
 
         window_track.data = ret
         return window_track

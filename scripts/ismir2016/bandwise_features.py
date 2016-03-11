@@ -151,7 +151,7 @@ class BandwiseFeatures:
     def spec_to_db(self):
         self.spectrogram.data = 20 * np.log10(self.spectrogram.data + np.finfo(np.float).eps)
 
-    def calculate_features_per_band(self, frequency_band):
+    def calculate_features_per_band(self, frequency_band, discard_bin_zero=False):
         """
         :param frequency_band: FrequencyBand
         :return: list[FeatureTrack]
@@ -166,6 +166,9 @@ class BandwiseFeatures:
 
         for b in frequency_band.bands():
             lowbin = self.spectrogram.freq_bin(b[0])
+            if lowbin == 0:
+                if discard_bin_zero:
+                    lowbin = 1
             highbin = self.spectrogram.freq_bin(b[1])
             #print "calculating features for band in bin range: ", lowbin, highbin
 

@@ -97,7 +97,7 @@ class ClassificationSummary:
         outfile.close()
 
 
-def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, cv_folds=10):
+def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, cv_folds=10, n_processes=4):
 
     folds = cv_folds
 
@@ -156,7 +156,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     n_neighbors = [1,3]
     estimator = GridSearchCV(knn,
                              dict(n_neighbors=n_neighbors),
-                             n_jobs=4)
+                             n_jobs=n_processes)
     estimator.fit(features, labels)
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
     print("KNN Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std()))
@@ -174,7 +174,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     estimator = GridSearchCV(svmc,
                              dict(C=Cs,
                                   gamma=gammas),
-                             n_jobs=4)
+                             n_jobs=n_processes)
     estimator.fit(features, labels)
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
     print("SVM Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std()))
@@ -194,7 +194,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     percentiles = (np.arange(11) * 10)[1:]
     estimator = GridSearchCV(clf,
                              dict(anova__percentile=percentiles),
-                             n_jobs=4)
+                             n_jobs=n_processes)
     estimator.fit(features, labels)
     best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
@@ -217,7 +217,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     n_components = np.floor(np.linspace(1, features.shape[1], 10)).astype(int)
     estimator = GridSearchCV(clf,
                              dict(pca__n_components=n_components),
-                             n_jobs=4)
+                             n_jobs=n_processes)
     estimator.fit(features, labels)
     best_n_components = estimator.best_estimator_.named_steps['pca'].n_components
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
@@ -238,7 +238,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     estimator = GridSearchCV(clf,
                              dict(anova__percentile=percentiles,
                                   knn__n_neighbors=n_neighbors),
-                             n_jobs=4)
+                             n_jobs=n_processes)
     estimator.fit(features, labels)
     best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
@@ -263,7 +263,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     estimator = GridSearchCV(clf,
                              dict(pca__n_components=n_components,
                                   knn__n_neighbors=n_neighbors),
-                             n_jobs=4)
+                             n_jobs=n_processes)
     estimator.fit(features, labels)
     best_n_components = estimator.best_estimator_.named_steps['pca'].n_components
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
@@ -290,7 +290,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
                              dict(anova__percentile=percentiles,
                                   svm__gamma=gammas,
                                   svm__C=Cs),
-                             n_jobs=4)
+                             n_jobs=n_processes)
     estimator.fit(features, labels)
     best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
@@ -317,7 +317,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
                              dict(pca__n_components=n_components,
                                   svm__gamma=gammas,
                                   svm__C=Cs),
-                             n_jobs=4)
+                             n_jobs=n_processes)
     estimator.fit(features, labels)
     best_n_components = estimator.best_estimator_.named_steps['pca'].n_components
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)

@@ -25,6 +25,7 @@ def print_help():
     print '\t\t o experimento é \'bands\'. Exemplo: -b 5,10,20,30'
     print '\t -i <lista_iteradores_bandas> -- Indica a lista de quais iteradores de banda usar. Só é considerado quando'
     print '\t\t o experimento é \'bands\'. Pode ser \'linear\' ou \'mel\' Exemplo: -i linear,mel'
+    print '\t -n <n_nucleos_cpu> -- Indica quantos nucleos da CPU utilizar nos testes. (padrão: 4)'
 
 def imprimir_datasets(dataset_dir):
     datasets = glob.glob(dataset_dir + "/*")
@@ -48,9 +49,10 @@ if __name__ == "__main__":
     exp = ""
     bandas = [5,10,20,30]
     its = ['linear', 'mel']
+    nucleos = 4
 
     try:
-      opts, args = getopt.getopt(argv,"hd:o:p:e:b:i:",["datasets=","saidas=","processar=","experimento=","bandas=", "iteradores="])
+      opts, args = getopt.getopt(argv,"hd:o:p:e:b:i:n:",["datasets=","saidas=","processar=","experimento=","bandas=", "iteradores=", "nucleos="])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -71,6 +73,8 @@ if __name__ == "__main__":
             bandas = [int(x) for x in arg.split(",")]
         elif opt in ("-i", "--iteradores"):
             its = arg.split(",")
+        elif opt in ("-n", "--nucleos"):
+            nucleos = int(arg)
 
     if datasets == '':
         print_help()
@@ -119,9 +123,10 @@ if __name__ == "__main__":
 
             outfile = p.split(".")[0] + exp_prefix + ".fm"
             fm = btb.MIREX_ExtractFeatures(saidas, datasets + "/" + p,
-                                               output_file=outfile,
-                                               band_iterator='one',
-                                               band_nbands='1')
+                                           nucleos,
+                                           output_file=outfile,
+                                           band_iterator='one',
+                                           band_nbands='1')
 
             classification_summary = ttc.train_and_classify(feature_matrix=fm, sample_labels=labels)
             ttc.output_experiment(saidas, p, classification_summary, exp_prefix)
@@ -138,9 +143,10 @@ if __name__ == "__main__":
                     exp_prefix = "_" + it + "_bands_" + str(b) + "b"
                     outfile = p.split(".")[0] + exp_prefix + ".fm"
                     fm = btb.MIREX_ExtractFeatures(saidas, datasets + "/" + p,
-                                                   output_file=outfile,
-                                                   band_iterator=it,
-                                                   band_nbands=b)
+                                           nucleos,
+                                           output_file=outfile,
+                                           band_iterator=it,
+                                           band_nbands=b)
                     gc.collect()
                     classification_summary = ttc.train_and_classify(feature_matrix=fm, sample_labels=labels)
                     ttc.output_experiment(saidas, p, classification_summary, exp_prefix)
