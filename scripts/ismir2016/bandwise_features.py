@@ -168,7 +168,7 @@ class BandwiseFeatures:
                 if discard_bin_zero:
                     lowbin = 1
             highbin = self.spectrogram.freq_bin(b[1])
-            #print "calculating features for band in bin range: ", lowbin, highbin
+            print "calculating features for band in bin range: ", lowbin, highbin
 
             features = []
 
@@ -269,16 +269,20 @@ if __name__ == "__main__":
                    high=int(feats.spectrogram.metadata.max_freq),
                    nbands=10)
 
-    for i in a.bands():
-        print i
-
     b = MelBand(low=int(feats.spectrogram.metadata.min_freq),
                    high=int(feats.spectrogram.metadata.max_freq),
-                   step=300)
+                   nbands=10)
     import time
 
+    b = OneBand(low=int(feats.spectrogram.metadata.min_freq),
+                   high=int(feats.spectrogram.metadata.max_freq))
+
+    for k in a.bands():
+        print k
+
+
     T0 = time.time()
-    feats.calculate_features_per_band(b)
+    feats.calculate_features_per_band(b, True)
     T1 = time.time()
     print "Feature extraction took ", T1-T0, " seconds"
 

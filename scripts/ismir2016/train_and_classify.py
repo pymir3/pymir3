@@ -197,14 +197,14 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
                              n_jobs=n_processes)
     estimator.fit(features, labels)
     best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
-    scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
+    scores = cross_validation.cross_val_score(estimator.best_estimator_, features, labels, cv=folds)
 
     anova_scores =  estimator.best_estimator_.named_steps['anova'].scores_
     sorted_anova_scores = np.argsort(anova_scores)
     sorted_anova_features = features_names[sorted_anova_scores]
 
     print("anova (percentile = %d) + NB Accuracy: %0.2f (+/- %0.2f)" % (best_percentile, scores.mean(), scores.std()))
-    predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
+    predicted = cross_validation.cross_val_predict(estimator.best_estimator_, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
     summary.add_result("NB+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, sorted_anova_features)
@@ -220,10 +220,10 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
                              n_jobs=n_processes)
     estimator.fit(features, labels)
     best_n_components = estimator.best_estimator_.named_steps['pca'].n_components
-    scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
+    scores = cross_validation.cross_val_score(estimator.best_estimator_, features, labels, cv=folds)
 
     print("pca (n_components = %d) + NB Accuracy: %0.2f (+/- %0.2f)" % (best_n_components, scores.mean(), scores.std()))
-    predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
+    predicted = cross_validation.cross_val_predict(estimator.best_estimator_, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
     summary.add_result("NB+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "PCA_COMPONENTS")
@@ -241,14 +241,14 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
                              n_jobs=n_processes)
     estimator.fit(features, labels)
     best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
-    scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
+    scores = cross_validation.cross_val_score(estimator.best_estimator_, features, labels, cv=folds)
 
     anova_scores =  estimator.best_estimator_.named_steps['anova'].scores_
     sorted_anova_scores = np.argsort(anova_scores)
     sorted_anova_features = features_names[sorted_anova_scores]
 
     print("anova (percentile = %d) + KNN Accuracy: %0.2f (+/- %0.2f)" % (best_percentile, scores.mean(), scores.std()))
-    predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
+    predicted = cross_validation.cross_val_predict(estimator.best_estimator_, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
     summary.add_result("KNN+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, sorted_anova_features)
@@ -266,14 +266,14 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
                              n_jobs=n_processes)
     estimator.fit(features, labels)
     best_n_components = estimator.best_estimator_.named_steps['pca'].n_components
-    scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
+    scores = cross_validation.cross_val_score(estimator.best_estimator_, features, labels, cv=folds)
 
     # print "####\n####\n####\n"
     # print estimator.best_estimator_.named_steps['pca'].components_
     # print "####\n####\n####\n"
 
     print("pca (n_components = %d) + KNN Accuracy: %0.2f (+/- %0.2f)" % (best_n_components, scores.mean(), scores.std()))
-    predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
+    predicted = cross_validation.cross_val_predict(estimator.best_estimator_, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
     summary.add_result("KNN+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "PCA_COMPONENTS")
@@ -293,14 +293,14 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
                              n_jobs=n_processes)
     estimator.fit(features, labels)
     best_percentile = estimator.best_estimator_.named_steps['anova'].percentile
-    scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
+    scores = cross_validation.cross_val_score(estimator.best_estimator_, features, labels, cv=folds)
 
     anova_scores =  estimator.best_estimator_.named_steps['anova'].scores_
     sorted_anova_scores = np.argsort(anova_scores)
     sorted_anova_features = features_names[sorted_anova_scores]
 
     print("anova (percentile = %d) + SVM Accuracy: %0.2f (+/- %0.2f)" % (best_percentile, scores.mean(), scores.std()))
-    predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
+    predicted = cross_validation.cross_val_predict(estimator.best_estimator_, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
     summary.add_result("SVM+Anova", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, sorted_anova_features)
@@ -320,10 +320,10 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
                              n_jobs=n_processes)
     estimator.fit(features, labels)
     best_n_components = estimator.best_estimator_.named_steps['pca'].n_components
-    scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
+    scores = cross_validation.cross_val_score(estimator.best_estimator_, features, labels, cv=folds)
 
     print("pca (n_components = %d) + SVM Accuracy: %0.2f (+/- %0.2f)" % (best_n_components, scores.mean(), scores.std()))
-    predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
+    predicted = cross_validation.cross_val_predict(estimator.best_estimator_, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
     summary.add_result("SVM+PCA", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "PCA_COMPONENTS")
