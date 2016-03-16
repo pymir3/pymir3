@@ -168,7 +168,7 @@ class BandwiseFeatures:
                 if discard_bin_zero:
                     lowbin = 1
             highbin = self.spectrogram.freq_bin(b[1])
-            print "calculating features for band in bin range: ", lowbin, highbin
+            #print "calculating features for band in bin range: ", lowbin, highbin
 
             features = []
 
