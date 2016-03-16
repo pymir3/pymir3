@@ -160,7 +160,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     estimator.fit(features, labels)
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
     print("KNN Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std()))
-    predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
+    predicted = cross_validation.cross_val_predict(estimator.best_estimator_, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
     summary.add_result("KNN", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "n/a")
@@ -178,7 +178,7 @@ def train_and_classify(csv_file=None, feature_matrix=None, sample_labels=None, c
     estimator.fit(features, labels)
     scores = cross_validation.cross_val_score(estimator, features, labels, cv=folds)
     print("SVM Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std()))
-    predicted = cross_validation.cross_val_predict(estimator, features, labels, cv=folds)
+    predicted = cross_validation.cross_val_predict(estimator.best_estimator_, features, labels, cv=folds)
     cr = classification_report(labels, predicted)
     print cr
     summary.add_result("SVM", cr, scores.mean(), scores.std(), labels, predicted, estimator.best_params_, "n/a")
