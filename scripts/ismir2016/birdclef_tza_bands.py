@@ -25,11 +25,12 @@ class BandJob:
     :type lnf_passes: int
     """
 
-    def __init__(self, filename, band_iterator='mel', band_step=500, band_nbands=None, lnf_use=False, lnf_compensation='log10', lnf_passes=1):
+    def __init__(self, filename, band_iterator='mel', band_step=500, band_nbands=None, also_one_band=False, lnf_use=False, lnf_compensation='log10', lnf_passes=1):
         self.filename = filename
         self.band_iterator = band_iterator
         self.band_step = band_step
         self.band_nbands = band_nbands
+        self.also_one_band=also_one_band
         self.lnf_use = lnf_use
         self.lnf_compensation = lnf_compensation
         self.lnf_passes = lnf_passes
@@ -42,6 +43,7 @@ class BandExperiment:
                  band_iterator='mel',
                  band_step=500,
                  band_nbands=None,
+                 also_one_band=False,
                  lnf_use=False,
                  lnf_compensation='log10',
                  lnf_passes=1,
@@ -53,6 +55,7 @@ class BandExperiment:
         self.band_iterator=band_iterator
         self.band_step=band_step
         self.band_nbands=band_nbands
+        self.also_one_band=also_one_band
         self.lnf_use=lnf_use
         self.lnf_compensation=lnf_compensation
         self.lnf_passes=lnf_passes
@@ -168,13 +171,14 @@ def tza_bands_parallel(experiment, n_processes = 1):
     :type experiment: BandExperiment
     :type n_processes: int
     """
+    jobs = []
 
     with open(experiment.mirex_list_file) as f:
         files = f.read().splitlines()
 
-    jobs = []
     for f in files:
         jobs.append(BandJob(f, experiment.band_iterator, experiment.band_step, experiment.band_nbands,
+                            also_one_band=experiment.also_one_band,
                             lnf_use=experiment.lnf_use,
                             lnf_compensation=experiment.lnf_compensation,
                             lnf_passes=experiment.lnf_passes))
@@ -251,7 +255,7 @@ def tza_bands(job):
 
     logger.debug("Extracting features for %s", job.filename)
     T0 = time.time()
-    feats.calculate_features_per_band(a, discard_bin_zero=True)
+    feats.calculate_features_per_band(a, also_one_band=job.also_one_band, discard_bin_zero=True)
     T1 = time.time()
     logger.debug("Feature extraction took %f seconds", T1 - T0)
 
@@ -260,10 +264,20 @@ def tza_bands(job):
 
 
 def MIREX_ExtractFeatures(scratch_folder, feature_extraction_list, n_processes,**kwargs):
+    also_one_band = False
+    if kwargs.has_key("also_one_band"):
+        if kwargs['also_one_band'] == True:
+            also_one_band = True
     exp = BandExperiment(feature_extraction_list, scratch_folder,
                          output_file=kwargs['output_file'],
                          band_iterator=kwargs['band_iterator'],
-                         band_nbands=kwargs['band_nbands'])
+                         band_nbands=kwargs['band_nbands'],
+                         also_one_band=also_one_band)
+
+    if also_one_band:
+        print 'also running fullband'
+
+
     return tza_bands_parallel(exp, n_processes=n_processes)
 
 if __name__ == "__main__":
@@ -311,7 +325,7 @@ if __name__ == "__main__":
 
     ####WITHTEXTURES############
 
-    MIREX_ExtractFeatures("fm/genres", "mirex/file_lists/gtzan_small2.txt", 4, output_file="teste.fm", band_iterator='mel', band_nbands=10)
+    MIREX_ExtractFeatures("fm/genres", "mirex/file_lists/gtzan_small2.txt", 4, also_one_band=True, output_file="teste.fm", band_iterator='mel', band_nbands=10)
 
     # exp = BandExperiment("/home/juliano/Music/genres_wav/", "fm/genres/genres_tza_one_band_tex.fm", band_iterator='one')
     # tza_bands_parallel(exp, n_processes=4)

@@ -6,7 +6,6 @@ import gc
 import glob
 import train_and_classify as ttc
 import birdclef_tza_bands as btb
-from sklearn.metrics import classification_report, confusion_matrix
 
 def print_help():
     print 'uso: %s -d <diretorio_dataset_filelists> -o <diretorio_saidas> -p <lista_datasets> -e <experimento>' % (sys.argv[0])
@@ -26,6 +25,7 @@ def print_help():
     print '\t -i <lista_iteradores_bandas> -- Indica a lista de quais iteradores de banda usar. Só é considerado quando'
     print '\t\t o experimento é \'bands\'. Pode ser \'linear\' ou \'mel\' Exemplo: -i linear,mel'
     print '\t -n <n_nucleos_cpu> -- Indica quantos nucleos da CPU utilizar nos testes. (padrão: 4)'
+    print '\t -f -- Indica que também devem ser usadas features de espectro completo (fullband)'
 
 def imprimir_datasets(dataset_dir):
     datasets = glob.glob(dataset_dir + "/*")
@@ -50,9 +50,10 @@ if __name__ == "__main__":
     bandas = [5,10,20,30]
     its = ['linear', 'mel']
     nucleos = 4
+    full_band = False
 
     try:
-      opts, args = getopt.getopt(argv,"hd:o:p:e:b:i:n:",["datasets=","saidas=","processar=","experimento=","bandas=", "iteradores=", "nucleos="])
+      opts, args = getopt.getopt(argv,"hd:o:p:e:b:i:n:f",["datasets=","saidas=","processar=","experimento=","bandas=", "iteradores=", "nucleos=", "fullband="])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -75,6 +76,8 @@ if __name__ == "__main__":
             its = arg.split(",")
         elif opt in ("-n", "--nucleos"):
             nucleos = int(arg)
+        elif opt in ("-f", "--fullband"):
+            full_band = True
 
     if datasets == '':
         print_help()
@@ -88,6 +91,7 @@ if __name__ == "__main__":
     print "caminho das saidas: ", saidas
     print "n_bandas", bandas
     print "its", its
+    print "full_band:", full_band
 
     if processar == []:
         for d in sorted(glob.glob(datasets + "/*")):
@@ -126,7 +130,8 @@ if __name__ == "__main__":
                                            nucleos,
                                            output_file=outfile,
                                            band_iterator='one',
-                                           band_nbands='1')
+                                           band_nbands='1',
+                                           also_one_band=full_band)
 
             classification_summary = ttc.train_and_classify(feature_matrix=fm, sample_labels=labels)
             ttc.output_experiment(saidas, p, classification_summary, exp_prefix)
@@ -146,7 +151,8 @@ if __name__ == "__main__":
                                            nucleos,
                                            output_file=outfile,
                                            band_iterator=it,
-                                           band_nbands=b)
+                                           band_nbands=b,
+                                           also_one_band=full_band)
                     gc.collect()
                     classification_summary = ttc.train_and_classify(feature_matrix=fm, sample_labels=labels)
                     ttc.output_experiment(saidas, p, classification_summary, exp_prefix)

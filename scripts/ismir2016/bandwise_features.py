@@ -132,9 +132,16 @@ class BandwiseFeatures:
                                                               window_length=window_len)
 
         #keeping the time-domain data for computing time-domain features
-        rate, audio_data = scipy.io.wavfile.read(infile)
+        #rate, audio_data = scipy.io.wavfile.read(infile)
+
+        rate, audio_data = wav2spec.Wav2Spectrogram().load_audio(infile)
         audio_data = audio_data.astype(np.float)
-        audio_data /= np.max(np.abs(audio_data)) # Normalization to -1/+1 range
+
+        #mean 0, var 1
+        audio_data -= np.mean(audio_data)
+        audio_data /= np.var(audio_data)**(0.5)
+
+        #audio_data /= np.max(np.abs(audio_data)) # Normalization to -1/+1 range
         self.audio_data = np.copy(audio_data)
         self.samplingrate = rate
         audio_file.close()
@@ -149,9 +156,11 @@ class BandwiseFeatures:
     def spec_to_db(self):
         self.spectrogram.data = 20 * np.log10(self.spectrogram.data + np.finfo(np.float).eps)
 
-    def calculate_features_per_band(self, frequency_band, discard_bin_zero=False):
+    def calculate_features_per_band(self, frequency_band, also_one_band=False, discard_bin_zero=False):
         """
         :param frequency_band: FrequencyBand
+        :param also_one_band: boolean
+        :param discard_bin_zero: boolean
         :return: list[FeatureTrack]
         """
 
@@ -162,7 +171,12 @@ class BandwiseFeatures:
         rolloff = feat_rolloff.Rolloff()
         lowenergy = feat_lowenergy.LowEnergy()
 
-        for b in frequency_band.bands():
+        bands = [b for b in frequency_band.bands()]
+
+        if also_one_band:
+            bands.append((int(frequency_band.low), int(frequency_band.high)))
+
+        for b in bands:
             lowbin = self.spectrogram.freq_bin(b[0])
             if lowbin == 0:
                 if discard_bin_zero:
@@ -173,27 +187,27 @@ class BandwiseFeatures:
             features = []
 
             flatness_feature = flatness.calc_track_band(self.spectrogram, lowbin, highbin)
-            flatness_feature.metadata.feature += ("_" + str(b[0]))
+            flatness_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
             features.append(flatness_feature)
 
             energy_feature = energy.calc_track_band(self.spectrogram, lowbin, highbin)
-            energy_feature.metadata.feature += ("_" + str(b[0]))
+            energy_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
             features.append(energy_feature)
 
             flux_feature = flux.calc_track_band(self.spectrogram, lowbin, highbin)
-            flux_feature.metadata.feature += ("_" + str(b[0]))
+            flux_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
             features.append(flux_feature)
 
             centroid_feature = centroid.calc_track_band(self.spectrogram, lowbin, highbin)
-            centroid_feature.metadata.feature += ("_" + str(b[0]))
+            centroid_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
             features.append(centroid_feature)
 
             rolloff_feature = rolloff.calc_track_band(self.spectrogram, lowbin, highbin)
-            rolloff_feature.metadata.feature += ("_" + str(b[0]))
+            rolloff_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
             features.append(rolloff_feature)
 
             lowenergy_feature = lowenergy.calc_track_band(self.spectrogram, 10, lowbin, highbin)
-            lowenergy_feature.metadata.feature += ("_" + str(b[0]))
+            lowenergy_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
             features.append(lowenergy_feature)
 
             self.features_per_band = len(features)
