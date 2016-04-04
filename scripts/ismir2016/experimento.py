@@ -122,10 +122,12 @@ if __name__ == "__main__":
 
         print "EXTRAINDO FEATURES DE %s" % (p.split(".")[0])
 
+        fullband_prefix = "_f" if full_band else ""
+
         if exp == 'tzan':
             exp_prefix = "_tzanetakis"
 
-            outfile = p.split(".")[0] + exp_prefix + ".fm"
+            outfile = p.split(".")[0] + exp_prefix + fullband_prefix + ".fm"
             fm = btb.MIREX_ExtractFeatures(saidas, datasets + "/" + p,
                                            nucleos,
                                            output_file=outfile,
@@ -146,7 +148,7 @@ if __name__ == "__main__":
                     print "iterador: %s, número de bandas: %d" % (it, b)
 
                     exp_prefix = "_" + it + "_bands_" + str(b) + "b"
-                    outfile = p.split(".")[0] + exp_prefix + ".fm"
+                    outfile = p.split(".")[0] + exp_prefix + fullband_prefix + ".fm"
                     fm = btb.MIREX_ExtractFeatures(saidas, datasets + "/" + p,
                                            nucleos,
                                            output_file=outfile,
