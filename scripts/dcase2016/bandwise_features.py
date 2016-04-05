@@ -1,3 +1,5 @@
+import sys
+sys.path.append("../../")
 import numpy as np
 import scipy.io.wavfile
 import copy
@@ -272,11 +274,16 @@ if __name__ == "__main__":
     #    print i
 
     #feats = BandwiseFeatures('/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN26407.wav')
-    feats = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav')
+    feats = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav', dft_len=2048, window_len=1763, window_step=882, db_spec=True)
+    feats2 = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav', dft_len=2048, window_len=1024, window_step=256, db_spec=True)
 
     print feats.spectrogram.data.shape
+    plt.figure(0)
     # plt.pcolormesh(feats.spectrogram.data)
+    # plt.figure(1)
+    # plt.pcolormesh(feats2.spectrogram.data)
     # plt.show()
+    # exit(0)
     # plt.plot(feats.audio_data)
     # plt.show()
     a = LinearBand(low=int(feats.spectrogram.metadata.min_freq),
