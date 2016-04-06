@@ -47,7 +47,7 @@ class BandExperiment:
                  lnf_use=False,
                  lnf_compensation='log10',
                  lnf_passes=1,
-                 mean=True, variance=True, slope=False, limits=False, csv=False, normalize=True):
+                 mean=True, variance=True, delta=True, slope=False, limits=False, csv=False, normalize=True):
 
         self.mirex_list_file=mirex_list_file
         self.mirex_scratch_folder=mirex_scratch_folder
@@ -60,6 +60,7 @@ class BandExperiment:
         self.lnf_compensation=lnf_compensation
         self.lnf_passes=lnf_passes
         self.mean=mean
+        self.delta=delta
         self.variance=variance
         self.slope=slope
         self.limits=limits
@@ -202,6 +203,7 @@ def tza_bands_parallel(experiment, n_processes = 1):
     stats = feat_stats.Stats()
     m = stats.stats(textures,
                     mean=experiment.mean,
+                    delta=experiment.delta,
                     variance=experiment.variance,
                     slope=experiment.slope,
                     limits=experiment.limits,
@@ -276,7 +278,6 @@ def MIREX_ExtractFeatures(scratch_folder, feature_extraction_list, n_processes,*
 
     if also_one_band:
         print 'also running fullband'
-
 
     return tza_bands_parallel(exp, n_processes=n_processes)
 
