@@ -232,11 +232,11 @@ def tza_bands(job):
     """
 
     if job.lnf_use:
-        feats = BF.BandwiseFeatures(job.filename, db_spec=False)
+        feats = BF.BandwiseFeatures(job.filename, dft_len=2048, window_len=1024, window_step=256, db_spec=False)
         rrn.remove_random_noise(feats.spectrogram, filter_compensation=job.lnf_compensation, passes=job.lnf_passes)
         feats.spec_to_db()
     else:
-        feats = BF.BandwiseFeatures(job.filename)
+        feats = BF.BandwiseFeatures(job.filename, dft_len=2048, window_len=1024, window_step=256)
 
     if job.band_iterator == 'one':
         a = BF.OneBand(low=int(feats.spectrogram.metadata.min_freq),

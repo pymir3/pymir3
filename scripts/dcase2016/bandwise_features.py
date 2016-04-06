@@ -275,7 +275,7 @@ if __name__ == "__main__":
 
     #feats = BandwiseFeatures('/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN26407.wav')
     feats = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav', dft_len=2048, window_len=1763, window_step=882, db_spec=True)
-    feats2 = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav', dft_len=2048, window_len=1024, window_step=256, db_spec=True)
+    #feats2 = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav', dft_len=2048, window_len=1024, window_step=256, db_spec=True)
 
     print feats.spectrogram.data.shape
     plt.figure(0)
@@ -292,11 +292,11 @@ if __name__ == "__main__":
 
     b = MelBand(low=int(feats.spectrogram.metadata.min_freq),
                    high=int(feats.spectrogram.metadata.max_freq),
-                   nbands=10)
+                   nbands=20)
     import time
 
-    b = OneBand(low=int(feats.spectrogram.metadata.min_freq),
-                   high=int(feats.spectrogram.metadata.max_freq))
+    # b = OneBand(low=int(feats.spectrogram.metadata.min_freq),
+    #                high=int(feats.spectrogram.metadata.max_freq))
 
     for k in a.bands():
         print k
@@ -310,8 +310,9 @@ if __name__ == "__main__":
     print feats.join_bands(crop=True).data.shape
 
     stats = feat_stats.Stats()
-    m = stats.stats([feats.joined_features], mean=True, variance=True, slope=False,limits=False, csv=False, normalize=False)
+    m = stats.stats([feats.joined_features], mean=True, variance=True, delta=True, slope=False,limits=False, csv=False, normalize=False)
 
+    print m.data.shape
     print m.data
 
     #print feats.band_features[0]
