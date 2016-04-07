@@ -111,7 +111,7 @@ class Stats(mir3.module.Module):
                             to 0 mean and unit variance (default:
                             %(default)s)""")
 
-    def stats(self, feature_tracks, mean=False, variance=False, delta=False, slope=False, limits=False, csv=False, normalize=False):
+    def stats(self, feature_tracks, mean=False, variance=False, delta=False, acceleration=False, slope=False, limits=False, csv=False, normalize=False):
 
         final_output = None
         final_filenames = []
@@ -133,6 +133,13 @@ class Stats(mir3.module.Module):
                 #print "o.data shape", o.data.shape
                 #print "out shape ", out.shape
                 d = numpy.mean(delta_stat(o.data, order=1, axis=0), axis=0)[i]
+                #print "d shape ", d.shape
+                out = numpy.hstack((out, d ))
+
+            if acceleration is True:
+                #print "o.data shape", o.data.shape
+                #print "out shape ", out.shape
+                d = numpy.mean(delta_stat(o.data, order=2, axis=0), axis=0)[i]
                 #print "d shape ", d.shape
                 out = numpy.hstack((out, d ))
 
@@ -188,6 +195,9 @@ class Stats(mir3.module.Module):
         if delta is True:
             for feat in my_features:
                 new_features = new_features + " " + "delta_" + feat
+        if acceleration is True:
+            for feat in my_features:
+                new_features = new_features + " " + "accel_" + feat
         if mean is True:
             for feat in my_features:
                 new_features = new_features + " " + "mean_" + feat
