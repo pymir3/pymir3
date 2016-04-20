@@ -24,12 +24,10 @@ git clone -b release https://github.com/pymir3/pymir3.git
 2) CD to the pymir3 directory and execute setup.py:
 
 cd pymir3
-<<<<<<< HEAD
 
 sudo python setup.py install
 =======
-sudo pip install --upgrade .
->>>>>>> release
+sudo pip install --upgrade
 
 3) To test, try switching to another directory and executing:
 
