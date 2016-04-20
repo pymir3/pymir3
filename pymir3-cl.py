@@ -9,7 +9,7 @@ def get_parser():
     parser = argparse.ArgumentParser(description="""Minion to run PyMIR3's
                                      tasks""")
 
-    dirname = os.path.dirname(os.path.realpath(__file__))+'/mir3/modules'
+    dirname = os.path.dirname(mir3.subparser.__file__)+'/modules'
     module_name = 'mir3.modules'
     mir3.subparser.Subparser(parser, dirname, module_name)
     return parser
