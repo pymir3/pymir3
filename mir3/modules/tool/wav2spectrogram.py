@@ -388,7 +388,7 @@ class Wav2Spectrogram(mir3.module.Module):
 
     def convert(self, wav_file, window_length=2048, dft_length=2048,
                 window_step=1024,
-                spectrum_type='magnitude', save_metadata=True):
+                spectrum_type='magnitude', save_metadata=True, wav_rate=None, wav_data=None):
 
         """Converts a WAV file to a spectrogram.
 
@@ -411,13 +411,21 @@ class Wav2Spectrogram(mir3.module.Module):
         s.metadata.sampling_configuration.window_step   = window_step
         s.metadata.sampling_configuration.spectrum_type = spectrum_type
 
+        if wav_data is None:
+            from_data = False
+        else:
+            from_data = True
 
         if save_metadata:
             s.metadata.input = md.FileMetadata(wav_file)
 
         # Calculates data
 
-        rate, data = self.load_audio(wav_file)
+        if not from_data:
+            rate, data = self.load_audio(wav_file)
+        else:
+            rate = wav_rate
+            data = wav_data
 
         #data /= numpy.max(numpy.abs(data)) # Normalization to -1/+1 range
 

@@ -1,0 +1,22 @@
+general:
+  scratch_directory: "./scratch"
+  feature_extraction_filelist: "./gtzan.txt"
+  dft:
+    len: 2048
+    window_size: 1024
+    window_step: 512
+
+steps:
+  extract_features: True
+
+#Feature extraction parameters
+feature_extraction:
+  output_buffer_size: 100
+  extractor: 'bandwise'
+  worker_extractors: 4
+
+bandwise_extraction:
+  scale: 'mel'
+  number_of_bands: 20
+  also_one_band: False
+  discard_bin_zero: True

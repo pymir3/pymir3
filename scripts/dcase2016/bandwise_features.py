@@ -3,6 +3,7 @@ sys.path.append("../../")
 import numpy as np
 import scipy.io.wavfile
 import copy
+import gc
 import mir3.modules.tool.wav2spectrogram as wav2spec
 import mir3.data.spectrogram as spec
 import mir3.data.feature_track as track
@@ -128,25 +129,26 @@ class BandwiseFeatures:
 
 
         #load the auio file and compute its spectrum
-        audio_file = open(infile, 'rb')
-        self.spectrogram = wav2spec.Wav2Spectrogram().convert(audio_file, dft_length=dft_len,\
-                                                              window_step=window_step,\
-                                                              window_length=window_len)
-
-        #keeping the time-domain data for computing time-domain features
-        #rate, audio_data = scipy.io.wavfile.read(infile)
+        #audio_file = open(infile, 'rb')
 
         rate, audio_data = wav2spec.Wav2Spectrogram().load_audio(infile)
         audio_data = audio_data.astype(np.float)
+        audio_file = open(infile, 'rb')
+        self.spectrogram = wav2spec.Wav2Spectrogram().convert(audio_file, dft_length=dft_len,\
+                                                              window_step=window_step,\
+                                                              window_length=window_len,
+                                                              wav_rate=rate,
+                                                              wav_data=audio_data)
 
         #mean 0, var 1
         audio_data -= np.mean(audio_data)
         audio_data /= np.var(audio_data)**(0.5)
 
         #audio_data /= np.max(np.abs(audio_data)) # Normalization to -1/+1 range
-        self.audio_data = np.copy(audio_data)
+
+        # keeping the time-domain data for computing time-domain features
+        self.audio_data = audio_data
         self.samplingrate = rate
-        audio_file.close()
 
         if db_spec:
             self.spectrogram.data = 20 * np.log10(self.spectrogram.data + np.finfo(np.float).eps)
@@ -239,6 +241,8 @@ class BandwiseFeatures:
 
         self.band_features = np.hstack((self.band_features, t))
 
+        gc.collect()
+
     def join_bands(self, crop=False):
 
         if self.cropped is not None:
@@ -308,6 +312,8 @@ if __name__ == "__main__":
     print "Feature extraction took ", T1-T0, " seconds"
 
     print feats.join_bands(crop=True).data.shape
+
+    print "lalalallal", feats.joined_features.metadata.feature
 
     stats = feat_stats.Stats()
     m = stats.stats([feats.joined_features], mean=True, variance=True, delta=True, slope=False,limits=False, csv=False, normalize=False)
