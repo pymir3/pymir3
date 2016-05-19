@@ -1,6 +1,7 @@
 general:
   scratch_directory: "./scratch"
   feature_extraction_filelist: "./gtzan.txt"
+  metadata_file: "./meta.txt"
   dft:
     len: 2048
     window_size: 1024
@@ -8,6 +9,10 @@ general:
 
 steps:
   extract_features: True
+  aggregate_features: True
+  train: True
+  test: True
+  evaluate: True
 
 #Feature extraction parameters
 feature_extraction:
