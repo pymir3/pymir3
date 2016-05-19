@@ -25,3 +25,8 @@ bandwise_extraction:
   number_of_bands: 20
   also_one_band: False
   discard_bin_zero: True
+
+#Feature aggregation parameters
+feature_aggregation:
+  aggregator: "simple"
+  aggregated_output: "./dataset.features"

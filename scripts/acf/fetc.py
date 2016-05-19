@@ -22,6 +22,9 @@ def run_fetc():
         fe = FeatureExtractor.create(params=exp)
         fe.run()
 
+    if exp['steps']['aggregate_features']:
+        pass
+
 
 if __name__ == "__main__":
     run_fetc()

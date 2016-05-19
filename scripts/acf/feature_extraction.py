@@ -3,7 +3,6 @@ import importlib
 import gc
 import time
 from multiprocess import Pool
-import os
 import acf_utils
 
 class FeatureExtractor:
@@ -37,26 +36,7 @@ class FeatureExtractor:
 
         """
 
-        #get the module filename from the parameter dictionary. The module file is expected to be named fe_[extractor],
-        #where extractor is the value of params['feature_extraction']['extractor']. For example, the bandwise
-        #feature extractor is called fe_bandwise.py
-        fe_name = (params['feature_extraction']['extractor'])
-
-        try:
-            fe_module = importlib.import_module("fe_" + fe_name)
-        except ImportError:
-            print "module fe_%s not found! Check the spelling of the extractor key in the experiment file." % (fe_name)
-            exit(1)
-
-        #instantiate the desired FeatureExtractor subclass. Notice that the subclass must be called
-        #the same as the file, except for the fe_ prefix. Check fe_bandwise.py for an example.
-        fe_name = (params['feature_extraction']['extractor']).capitalize()
-        fe = eval("fe_module." + fe_name + "Extractor")()
-
-        #save the experiment file parameters so they can be used by the derived classes.
-        fe.params = params
-
-        return fe
+        return acf_utils.behavior_factory(params, 'feature_extraction', 'extractor', "fe_")
 
     def extract(self, filename):
         """
