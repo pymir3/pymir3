@@ -2,6 +2,7 @@ import argparse
 import copy
 import numpy
 import scipy.stats
+import scipy.signal
 import sys
 
 import mir3.data.feature_matrix as feature_matrix

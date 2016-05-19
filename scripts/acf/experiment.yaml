@@ -8,7 +8,7 @@ general:
     window_step: 512
 
 steps:
-  extract_features: True
+  extract_features: False
   aggregate_features: True
   train: True
   test: True
@@ -29,4 +29,14 @@ bandwise_extraction:
 #Feature aggregation parameters
 feature_aggregation:
   aggregator: "simple"
-  aggregated_output: "./dataset.features"
+  aggregated_output: "dataset.features"
+
+simple_aggregation:
+  mean: True
+  variance: True
+  acceleration: True
+  delta: True
+  normalize: True
+  slope: False
+  limits: False
+  csv: False
