@@ -1,6 +1,7 @@
 general:
   scratch_directory: "./scratch"
   feature_extraction_filelist: "./gtzan.txt"
+  train_filelist: "./gtzan_train.txt"
   metadata_file: "./meta.txt"
   dft:
     len: 2048
@@ -11,8 +12,8 @@ general:
   zero_pad_resampling: True
 
 steps:
-  extract_features: True
-  aggregate_features: True
+  extract_features: False
+  aggregate_features: False
   train: True
   test: True
   evaluate: True
@@ -43,3 +44,7 @@ simple_aggregation:
   slope: False
   limits: False
   csv: False
+
+model_training:
+  model_trainer: "svm_reg"
+  output_model: "svm_reg.model"

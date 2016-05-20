@@ -23,6 +23,15 @@ def extract_filename(filepath, ext=None):
     return filename
 
 
+def underline_tocamel(s):
+    parts = s.split("_")
+    out = ""
+    for i in parts:
+        out += i[0].upper()
+        out += i[1:]
+
+    return out
+
 def behavior_factory(exp_param, step_key, behavior_key, step_prefix):
 
     # get the module filename from the parameter dictionary. The module file is expected to be named step_prefix_[behavior],
@@ -39,11 +48,15 @@ def behavior_factory(exp_param, step_key, behavior_key, step_prefix):
 
     # instantiate the desired StepBehavior subclass. Notice that the subclass must be called
     # the same as the file, except for the step_prefix prefix. Check fe_bandwise.py for an example.
-    mod_name = (exp_param[step_key][behavior_key]).capitalize()
-    behavior = eval("module." + mod_name + behavior_key.capitalize())()
+    mod_name = underline_tocamel((exp_param[step_key][behavior_key]))
+
+    behavior = eval("module." + mod_name + underline_tocamel(behavior_key))()
 
     # save the experiment file parameters so they can be used by the derived classes.
     behavior.params = exp_param
     behavior.name = mod_name
 
     return behavior
+
+if __name__ == "__main__":
+    underline_tocamel("SVM_reg")

@@ -5,6 +5,7 @@ import sys
 import yaml
 from feature_extraction import FeatureExtractor
 from feature_aggregation import FeatureAggregator
+from model_training import ModelTrainer
 
 #ETC stands for Feature Extraction, Train and Classify
 #The idea is to make this the frontend for all ETC activities :)
@@ -26,6 +27,16 @@ def run_fetc():
     if exp['steps']['aggregate_features']:
         fa = FeatureAggregator.create(params=exp)
         fa.run()
+
+    if exp['steps']['train']:
+        t = ModelTrainer.create(params=exp)
+        t.run()
+
+    if exp['steps']['test']:
+        pass
+
+    if exp['steps']['evaluate']:
+        pass
 
 
 if __name__ == "__main__":
