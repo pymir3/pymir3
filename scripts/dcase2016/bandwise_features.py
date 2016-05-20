@@ -118,7 +118,8 @@ class BandwiseFeatures:
     :type spectrogram mir3.data.Spectrogram
     """
 
-    def __init__(self, infile, dft_len=2048, window='hanning', window_len=2048, window_step=1024, db_spec = True):
+    def __init__(self, infile, dft_len=2048, window='hanning', window_len=2048, window_step=1024, db_spec = True,
+                                            fs = 44100, mono = True, zero_pad_resampling=False ):
         self.infile = infile
         self.dft_len = dft_len
         self.window_len = window_len
@@ -131,7 +132,8 @@ class BandwiseFeatures:
         #load the auio file and compute its spectrum
         #audio_file = open(infile, 'rb')
 
-        rate, audio_data = wav2spec.Wav2Spectrogram().load_audio(infile)
+        rate, audio_data = wav2spec.Wav2Spectrogram().load_audio(infile, fs=fs, mono=mono,
+                                                                 zero_pad_resampling=zero_pad_resampling)
         audio_data = audio_data.astype(np.float)
         audio_file = open(infile, 'rb')
         self.spectrogram = wav2spec.Wav2Spectrogram().convert(audio_file, dft_length=dft_len,\

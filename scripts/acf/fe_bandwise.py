@@ -56,11 +56,20 @@ class BandwiseExtractor(FeatureExtractor):
         dft_len = self.params['general']['dft']['len']
         dft_window_size = self.params['general']['dft']['window_size']
         dft_window_step = self.params['general']['dft']['window_step']
+        desired_sample_rate = self.params['general']['sample_rate']
+        to_mono = self.params['general']['mono']
+        zero_pad_resampling = self.params['general']['zero_pad_resampling']
 
         T0 = time.time()
         logger.debug("Extracting features for %s", filename)
 
-        feats = BF.BandwiseFeatures(filename, dft_len=dft_len, window_len=dft_window_size, window_step=dft_window_step)
+        feats = BF.BandwiseFeatures(filename,
+                                    dft_len=dft_len,
+                                    window_len=dft_window_size,
+                                    window_step=dft_window_step,
+                                    fs=desired_sample_rate,
+                                    mono=to_mono,
+                                    zero_pad_resampling=zero_pad_resampling)
 
         if scale == 'one':
             a = BF.OneBand(low=int(feats.spectrogram.metadata.min_freq),

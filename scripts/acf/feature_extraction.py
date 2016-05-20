@@ -5,6 +5,7 @@ import time
 from multiprocess import Pool
 import acf_utils
 
+
 class FeatureExtractor:
     """
     This is a base class used to extract audio features from a list of files.
@@ -68,6 +69,8 @@ class FeatureExtractor:
 
         """
 
+        print("Running feature extraction behavior: %s" % self.name)
+
         # todo: use metadata file to add labels to track metadata (if available)
         # deve garantir a label no metadados pra facilitar a vida, ao invés de usar o nome do arquivo (acho que não precisa)
 
@@ -102,3 +105,5 @@ class FeatureExtractor:
 
         pool.close()
         pool.join()
+
+        print ('Feature extraction done!')

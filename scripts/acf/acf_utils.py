@@ -44,5 +44,6 @@ def behavior_factory(exp_param, step_key, behavior_key, step_prefix):
 
     # save the experiment file parameters so they can be used by the derived classes.
     behavior.params = exp_param
+    behavior.name = mod_name
 
     return behavior

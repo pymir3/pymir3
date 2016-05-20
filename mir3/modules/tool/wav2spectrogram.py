@@ -312,7 +312,7 @@ class Wav2Spectrogram(mir3.module.Module):
 
         return stft_matrix
 
-    def load_audio(self, filename, mono=True, fs=44100):
+    def load_audio(self, filename, mono=True, fs=44100, zero_pad_resampling=False):
         """Load audio file into numpy array
         Supports 24-bit wav-format, and flac audio through librosa.
         Parameters
@@ -379,6 +379,13 @@ class Wav2Spectrogram(mir3.module.Module):
 
         # Resample
         if fs != sample_rate:
+            #zero pad to nearest power of two to improve resampling performance
+            if zero_pad_resampling:
+                n = len(audio_data)
+                y = int(numpy.floor(numpy.log2(n)))
+                nextpow2 = numpy.power(2, y + 1)
+                audio_data = numpy.pad(audio_data, ((nextpow2 - n), (0)), mode='constant')
+
             audio_data = scipy.signal.resample(audio_data, len(audio_data) * (float(fs) / sample_rate) )
             sample_rate = fs
 

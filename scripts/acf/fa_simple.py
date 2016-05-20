@@ -8,12 +8,40 @@ from feature_aggregation import FeatureAggregator
 
 
 class SimpleAggregator(FeatureAggregator):
+    """
+    This feature aggregator is simply a front-end to the pymir3 stats module.
+    """
 
     def __init__(self):
+        """
+        Nothing special here.
+        """
         pass
 
     def aggregate(self, feature_files):
+        """
+        This aggregator is a front-end to the pymir3 stats module. The statistics that must be computed
+        are found in the simple_aggregation key in the experiment file.
 
+        :param feature_files: a list of FeatureTrack filenames
+        :type feature_files: list[str]
+        :return:
+        :rtype: None
+
+        .. note::
+            These keys are expected to be set in the experiment file:
+                * ['simple_aggregation']['mean']
+                * ['simple_aggregation']['delta']
+                * ['simple_aggregation']['variance']
+                * ['simple_aggregation']['acceleration']
+                * ['simple_aggregation']['slope']
+                * ['simple_aggregation']['limits']
+                * ['simple_aggregation']['csv']
+                * ['simple_aggregation']['normalize']
+                * ['general']['scratch_directory']
+                * ['feature_aggregation']['aggregated_output']
+
+        """
         features = []
 
         for i in feature_files:

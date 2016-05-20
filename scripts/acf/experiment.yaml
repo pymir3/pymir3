@@ -6,9 +6,12 @@ general:
     len: 2048
     window_size: 1024
     window_step: 512
+  sample_rate: 22050 #usar isso!!!!!!!! resampling é muito lento..
+  mono: True
+  zero_pad_resampling: True
 
 steps:
-  extract_features: False
+  extract_features: True
   aggregate_features: True
   train: True
   test: True
@@ -29,7 +32,7 @@ bandwise_extraction:
 #Feature aggregation parameters
 feature_aggregation:
   aggregator: "simple"
-  aggregated_output: "dataset.features"
+  aggregated_output: "gtzan.feature_matrix"
 
 simple_aggregation:
   mean: True
