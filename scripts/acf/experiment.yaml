@@ -1,19 +1,19 @@
 general:
   scratch_directory: "./scratch"
-  feature_extraction_filelist: "./gtzan.txt"
-  train_filelist: "./gtzan_train.txt"
-  metadata_file: "./meta.txt"
+  feature_extraction_filelist: "./dt1_meta.txt"
+  train_filelist: "./dt1_f1_train.txt"
+  #metadata_file: "./meta.txt"
   dft:
     len: 2048
     window_size: 1024
     window_step: 512
-  sample_rate: 22050 #usar isso!!!!!!!! resampling é muito lento..
+  sample_rate: 44100 #usar isso!!!!!!!! resampling é muito lento..
   mono: True
   zero_pad_resampling: True
 
 steps:
   extract_features: False
-  aggregate_features: False
+  aggregate_features: True
   train: True
   test: True
   evaluate: True
@@ -33,18 +33,29 @@ bandwise_extraction:
 #Feature aggregation parameters
 feature_aggregation:
   aggregator: "simple"
-  aggregated_output: "gtzan.feature_matrix"
+  aggregated_output: "dt1.feature_matrix"
 
 simple_aggregation:
   mean: True
   variance: True
-  acceleration: True
-  delta: True
+  acceleration: False
+  delta: False
   normalize: True
   slope: False
   limits: False
   csv: False
 
+#Model training parameters
 model_training:
   model_trainer: "svm_reg"
-  output_model: "svm_reg.model"
+  output_model: "dt1.svm_reg.model"
+
+svm_reg:
+  num_workers: 4
+  Cs: [0.1, 1, 10, 100, 1000, 10000, 100000]
+  gammas: [0.001, 0.0001, 0.00001, 0.000001]
+  probability: False
+
+#Model testing parameters
+model_testing:
+  model_tester: "simple"

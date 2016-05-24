@@ -1,15 +1,26 @@
 import acf_utils
 import sys
 import numpy
+import gc
 
 sys.path.append("../../")
 
 import mir3.data.feature_matrix as feature_matrix
 
 class ModelTrainerInput:
+
     def __init__(self, features, labels):
+        """
+        :param features:
+        :type features: numpy.array
+        :param labels:
+        :type labels: list[str]
+        """
         self.features = features
         self.labels = labels
+
+    # def __str__(self):
+    #     return str(self.features) + str(self.features.shape) + str(self.labels)
 
 class ModelTrainer:
 
@@ -47,14 +58,17 @@ class ModelTrainer:
             features.append(feat)
 
         features = numpy.array(features)
+
         files = None
 
         input = ModelTrainerInput(features, labels)
 
+        gc.collect()
+
         self.train(input)
 
 
-    def train(self, input):
+    def train(self, train_data):
         raise NotImplementedError
         pass
 

@@ -4,7 +4,7 @@ import gc
 import time
 from multiprocess import Pool
 import acf_utils
-
+import copy
 
 class FeatureExtractor:
     """
@@ -78,6 +78,12 @@ class FeatureExtractor:
             files = f.read().splitlines()
 
         # todo: usar um multiprocessing.manager pra realizar o compatilhamento do buffer (ao invés de fazer por chunks, como abaixo)
+
+        metas = copy.copy(files)
+        files = []
+        for i in metas:
+            files.append(i.split("\t")[0])
+        metas = []
 
         num_files = len(files)
         output_buffer_size = self.params['feature_extraction']['output_buffer_size']

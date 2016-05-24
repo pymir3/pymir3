@@ -63,6 +63,8 @@ class BandwiseExtractor(FeatureExtractor):
         T0 = time.time()
         logger.debug("Extracting features for %s", filename)
 
+        #todo: handle file not found errors!
+
         feats = BF.BandwiseFeatures(filename,
                                     dft_len=dft_len,
                                     window_len=dft_window_size,
