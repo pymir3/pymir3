@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-
 import os
 import sys
 import yaml
 from feature_extraction import FeatureExtractor
 from feature_aggregation import FeatureAggregator
 from model_training import ModelTrainer
+from model_testing import ModelTester
 
 #ETC stands for Feature Extraction, Train and Classify
 #The idea is to make this the frontend for all ETC activities :)
@@ -33,7 +33,9 @@ def run_fetc():
         t.run()
 
     if exp['steps']['test']:
-        pass
+        t = ModelTester.create(params=exp)
+        t.run()
+
 
     if exp['steps']['evaluate']:
         pass

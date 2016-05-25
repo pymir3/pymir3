@@ -33,6 +33,8 @@ class ModelTrainer:
 
     def run(self):
 
+        print "training model from train filelist: %s" % (self.params['general']['train_filelist'])
+
         m = feature_matrix.FeatureMatrix()
         mf = open(self.params['general']['scratch_directory'] + "/" + self.params['feature_aggregation']['aggregated_output'])
         m = m.load(mf)

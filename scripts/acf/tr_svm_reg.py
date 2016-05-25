@@ -20,7 +20,7 @@ class SvmRegModelTrainer(ModelTrainer):
         svmc = SVC(kernel='rbf', probability=probability)
         Cs = self.params['svm_reg']['Cs']
         gammas = self.params['svm_reg']['gammas']
-        out_filename = self.params['model_training']['output_model']
+        out_filename = self.params['general']['scratch_directory'] + "/" + self.params['model_training']['output_model']
 
         print "training model with SVM and grid search (%d combinations)..." % (len(Cs) * len(gammas))
         print "training set size: %d, # of features: %d" % (len(train_data.labels), train_data.features.shape[1])
