@@ -136,17 +136,20 @@ class BandwiseFeatures:
                                                                  zero_pad_resampling=zero_pad_resampling)
         audio_data = audio_data.astype(np.float)
         audio_file = open(infile, 'rb')
+
+        # mean 0, var 1
+        audio_data -= np.mean(audio_data)
+        audio_data /= np.var(audio_data) ** (0.5)
+
+        # audio_data /= np.max(np.abs(audio_data)) # Normalization to -1/+1 range
+
         self.spectrogram = wav2spec.Wav2Spectrogram().convert(audio_file, dft_length=dft_len,\
                                                               window_step=window_step,\
                                                               window_length=window_len,
                                                               wav_rate=rate,
                                                               wav_data=audio_data)
 
-        #mean 0, var 1
-        audio_data -= np.mean(audio_data)
-        audio_data /= np.var(audio_data)**(0.5)
 
-        #audio_data /= np.max(np.abs(audio_data)) # Normalization to -1/+1 range
 
         # keeping the time-domain data for computing time-domain features
         self.audio_data = audio_data
@@ -222,10 +225,10 @@ class BandwiseFeatures:
 
         #MFCC hack
         t = track.FeatureTrack()
-        t.data = mfcc.mfcc(self.spectrogram,13)
+        t.data = mfcc.mfcc(self.spectrogram,20)
         t.metadata.sampling_configuration = self.spectrogram.metadata.sampling_configuration
         feature = ""
-        for i in range(13):
+        for i in range(20):
             feature = feature + "MFCC_"+ str(i) + " "
         t.metadata.feature = feature
         t.metadata.filename = self.spectrogram.metadata.input.name

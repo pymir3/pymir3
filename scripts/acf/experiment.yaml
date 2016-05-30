@@ -1,8 +1,8 @@
 general:
   scratch_directory: "./scratch"
   feature_extraction_filelist: "./dt1_meta.txt"
-  train_filelist: "./file_lists/dt_f1/dt1_f4_train.txt"
-  test_filelist: "./file_lists/dt_f1/dt1_f4_evaluate.txt"
+  train_filelist: "./file_lists/dt1_2016/dt1_f1_train.txt"
+  test_filelist: "./file_lists/dt1_2016/dt1_f1_evaluate.txt"
   #metadata_file: "./meta.txt"
   dft:
     len: 2048
