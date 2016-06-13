@@ -21,7 +21,7 @@ class SimpleModelTester(ModelTester):
         predicted = model.predict(test_data.features)
 
         #output predict file
-        predict_filename = self.params['general']['scratch_directory'] + "/" + self.params['model_testing']['predict_file']
+        predict_filename = self.params['general']['predict_file']
         print "outputting predicted classes to file %s" % (predict_filename)
         predict_file = open(predict_filename, "w")
         for i in xrange(len(predicted)):
@@ -30,8 +30,8 @@ class SimpleModelTester(ModelTester):
         predict_file.close()
 
         if hasattr(model, "predict_proba"):
-            predicted_proba_filename = self.params['general']['scratch_directory'] + "/" + self.params['model_testing'][
-                'predict_proba_filelist'];
+            predicted_proba_filename = self.params['general']['scratch_directory'] + "/" +\
+                                       self.params['model_testing']['predict_proba_file'];
             print "outputting predicted probability to file %s" % (predicted_proba_filename)
             prob = model.predict_proba(test_data.features)
             predicted_from_prob = numpy.argmax(prob, axis=1) + 1

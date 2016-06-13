@@ -3,6 +3,9 @@ general:
   feature_extraction_filelist: "./dt1_meta.txt"
   train_filelist: "./file_lists/dt1_2016/dt1_f1_train.txt"
   test_filelist: "./file_lists/dt1_2016/dt1_f1_test.txt"
+  predict_file: "predict"
+  extract_accum_tag: ""
+  train_test_tag: ""
   dft:
     len: 2048
     window_size: 1024
@@ -13,10 +16,10 @@ general:
 
 steps:
   extract_features: False
-  aggregate_features: False
+  aggregate_features: True
   train: False
-  test: True
-  evaluate: True
+  test: False
+  evaluate: False
 
 #Feature extraction parameters
 feature_extraction:
@@ -33,7 +36,7 @@ bandwise_extraction:
 #Feature aggregation parameters
 feature_aggregation:
   aggregator: "simple"
-  aggregated_output: "dt1.feature_matrix"
+  aggregated_output: "feature_matrix"
 
 simple_aggregation:
   mean: True
@@ -48,16 +51,15 @@ simple_aggregation:
 #Model training parameters
 model_training:
   model_trainer: "svm_reg"
-  output_model: "dt1.svm_reg.model"
+  output_model: "svm_reg.model"
 
 svm_reg:
   num_workers: 4
   Cs: [0.1, 1, 10, 100, 1000, 10000, 100000]
   gammas: [0.001, 0.0001, 0.00001, 0.000001]
-  probability: True
+  probability: False
 
 #Model testing parameters
 model_testing:
   model_tester: "simple"
-  predict_file: "dt1.predict"
-  predict_proba_filelist: "dt1.predict.proba"
+  predict_proba_file: "predict.proba"
