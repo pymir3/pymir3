@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import gc
+
+from rpm._rpm import te
+
 import acf_utils
 import sys
 import numpy
@@ -9,8 +12,9 @@ sys.path.append("../../")
 import mir3.data.feature_matrix as feature_matrix
 
 class ModelTesterInput:
-    def __init__(self, features):
+    def __init__(self, features, filenames):
         self.features = features
+        self.filenames = filenames
 
 
 class ModelTester:
@@ -39,14 +43,12 @@ class ModelTester:
         for i in xrange(len(m.metadata.filename)):
             files[m.metadata.filename[i]] = i
 
-        labels = []
         features = []
+        test_filenames = []
 
         for i in xrange(len(linhas)):
             filename = linhas[i].split("\t")[0].strip()
-
-            label = linhas[i].split("\t")[1].strip()
-            labels.append(label)
+            test_filenames.append(filename)
 
             feat = m.data[files[filename]]
             features.append(feat)
@@ -55,11 +57,11 @@ class ModelTester:
 
         files = None
 
-        input = ModelTesterInput(features)
+        input = ModelTesterInput(features, test_filenames)
 
         gc.collect()
 
-        self.test(input, labels)
+        self.test(input)
 
-    def test(self, test_data, labels):
+    def test(self, test_data):
         raise NotImplementedError

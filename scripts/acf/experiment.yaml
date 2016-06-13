@@ -2,8 +2,7 @@ general:
   scratch_directory: "./scratch"
   feature_extraction_filelist: "./dt1_meta.txt"
   train_filelist: "./file_lists/dt1_2016/dt1_f1_train.txt"
-  test_filelist: "./file_lists/dt1_2016/dt1_f1_evaluate.txt"
-  #metadata_file: "./meta.txt"
+  test_filelist: "./file_lists/dt1_2016/dt1_f1_test.txt"
   dft:
     len: 2048
     window_size: 1024
@@ -15,7 +14,7 @@ general:
 steps:
   extract_features: False
   aggregate_features: False
-  train: True
+  train: False
   test: True
   evaluate: True
 
@@ -60,4 +59,5 @@ svm_reg:
 #Model testing parameters
 model_testing:
   model_tester: "simple"
+  predict_file: "dt1.predict"
   predict_proba_filelist: "dt1.predict.proba"
