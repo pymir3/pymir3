@@ -16,7 +16,10 @@ class Diff(mir3.module.Module):
 
     def run(self, args):
         o = track.FeatureTrack().load(args.infile)
+        o = self.calc_track(o)
+        o.save(args.outfile)
 
+    def calc_track(self, o):
         if o.data.ndim == 1:
             o.data.shape = (o.data.size, 1)
 
@@ -32,4 +35,4 @@ class Diff(mir3.module.Module):
             new_features = new_features + " " + "diff_" + feat
         o.metadata.feature = new_features
 
-        o.save(args.outfile)
+        return o
