@@ -45,23 +45,20 @@ if __name__ == "__main__":
                             continue
                         # print "\t\t", pipelines[p][0]
                         # print "\t\t\t", data.split(" ")
-                        graph = open( "graphs/" + dataset + "_" + pipelines[p][0].split("+")[0] + "_" + j + "_anova_frequencies.txt", "w")
+
+                        graph = open( "graphs/" + dataset + "_" + j + "_anova_frequencies.txt", "w")
                         feat_seq = 0;
                         bf = []
                         for feat in data.split(" "):
-                            s = feat.split("_")
-                            #print s
-                            if len(s) <= 1:
-                            	continue
-                            if len(s) <=4:
-                                graph.write(s[0][0] + "_" + s[2][0] + "_" + "ZeroCrossings, 0, 0, 0, 0"+ "\n" )
+                            if feat.find("MFCC") != -1:
+                                continue
                             else:
-                            	if s[3] == "MFCC":
-									graph.write(s[0][0] + "_" + s[2][0] + "_" + s[3] + ", " + s[3] + ", " + str(feat_seq) + ", " + s[4] + ", " + s[4] + "\n" )
-                            	else:
-                            		graph.write(s[0][0] + "_" + s[2][0] + "_" + s[3] + ", " + s[3] + ", " + str(feat_seq) + ", " + s[-2] + ", " + s[-1] + "\n" )
-                            bf.append(s)
-                            feat_seq+=1
+                                s = feat.split("_")
+                                if len(s) <=4:
+                                    continue
+                                graph.write(s[0][0] + "_" + s[2][0] + "_" + s[3] + ", " + s[3] + ", " + str(feat_seq) + ", " + s[-1] + "\n" )
+                                bf.append(s)
+                                feat_seq+=1
                         graph.close()
                         # feats = [s[0][0] + "_" + s[2][0] + "_" + s[3] for s in bf]
                         # freqs = [max(5,int(s[-1])) for s in bf]

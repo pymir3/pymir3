@@ -47,7 +47,7 @@ class BandExperiment:
                  lnf_use=False,
                  lnf_compensation='log10',
                  lnf_passes=1,
-                 mean=True, variance=True, slope=False, limits=False, csv=False, normalize=True):
+                 mean=True, variance=True, delta=True, acceleration=True, slope=False, limits=False, csv=False, normalize=True):
 
         self.mirex_list_file=mirex_list_file
         self.mirex_scratch_folder=mirex_scratch_folder
@@ -60,6 +60,8 @@ class BandExperiment:
         self.lnf_compensation=lnf_compensation
         self.lnf_passes=lnf_passes
         self.mean=mean
+        self.delta=delta
+        self.acceleration=acceleration
         self.variance=variance
         self.slope=slope
         self.limits=limits
@@ -202,7 +204,9 @@ def tza_bands_parallel(experiment, n_processes = 1):
     stats = feat_stats.Stats()
     m = stats.stats(textures,
                     mean=experiment.mean,
+                    delta=experiment.delta,
                     variance=experiment.variance,
+                    acceleration=experiment.acceleration,
                     slope=experiment.slope,
                     limits=experiment.limits,
                     csv=experiment.csv,
@@ -232,11 +236,11 @@ def tza_bands(job):
     """
 
     if job.lnf_use:
-        feats = BF.BandwiseFeatures(job.filename, db_spec=False)
+        feats = BF.BandwiseFeatures(job.filename, dft_len=2048, window_len=1024, window_step=256, db_spec=False)
         rrn.remove_random_noise(feats.spectrogram, filter_compensation=job.lnf_compensation, passes=job.lnf_passes)
         feats.spec_to_db()
     else:
-        feats = BF.BandwiseFeatures(job.filename)
+        feats = BF.BandwiseFeatures(job.filename, dft_len=2048, window_len=1024, window_step=256)
 
     if job.band_iterator == 'one':
         a = BF.OneBand(low=int(feats.spectrogram.metadata.min_freq),
@@ -276,7 +280,6 @@ def MIREX_ExtractFeatures(scratch_folder, feature_extraction_list, n_processes,*
 
     if also_one_band:
         print 'also running fullband'
-
 
     return tza_bands_parallel(exp, n_processes=n_processes)
 

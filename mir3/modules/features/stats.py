@@ -2,11 +2,81 @@ import argparse
 import copy
 import numpy
 import scipy.stats
+import scipy.signal
 import sys
 
 import mir3.data.feature_matrix as feature_matrix
 import mir3.data.feature_track as track
 import mir3.module
+
+
+def delta_stat(data, width=9, order=1, axis=-1, trim=True):
+    r'''Compute delta features: local estimate of the derivative
+    of the input data along the selected axis.
+
+
+    Parameters
+    ----------
+    data      : np.ndarray
+        the input data matrix (eg, spectrogram)
+
+    width     : int >= 3, odd [scalar]
+        Number of frames over which to compute the delta feature
+
+    order     : int > 0 [scalar]
+        the order of the difference operator.
+        1 for first derivative, 2 for second, etc.
+
+    axis      : int [scalar]
+        the axis along which to compute deltas.
+        Default is -1 (columns).
+
+    trim      : bool
+        set to `True` to trim the output matrix to the original size.
+
+    Returns
+    -------
+    delta_data   : np.ndarray [shape=(d, t) or (d, t + window)]
+        delta matrix of `data`.
+
+    FROM librosa.
+
+    http://www1.icsi.berkeley.edu/Speech/faq/deltas.html
+
+    '''
+
+    data = numpy.atleast_1d(data)
+
+    if width < 3 or numpy.mod(width, 2) != 1:
+        print('width must be an odd integer >= 3')
+        exit(1)
+
+    if order <= 0 or not isinstance(order, int):
+        print('order must be a positive integer')
+        exit(1)
+
+    half_length = 1 + int(width // 2)
+    window = numpy.arange(half_length - 1., -half_length, -1.)
+
+    # Normalize the window so we're scale-invariant
+    window /= numpy.sum(numpy.abs(window)**2)
+
+    # Pad out the data by repeating the border values (delta=0)
+    padding = [(0, 0)] * data.ndim
+    width = int(width)
+    padding[axis] = (width, width)
+    delta_x = numpy.pad(data, padding, mode='edge')
+
+    for _ in range(order):
+        delta_x = scipy.signal.lfilter(window, 1, delta_x, axis=axis)
+
+    # Cut back to the original shape of the input data
+    if trim:
+        idx = [slice(None)] * delta_x.ndim
+        idx[axis] = slice(- half_length - data.shape[axis], - half_length)
+        delta_x = delta_x[idx]
+
+    return delta_x
 
 class Stats(mir3.module.Module):
     def get_help(self):
@@ -18,6 +88,9 @@ class Stats(mir3.module.Module):
         parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""output file""")
 
+        parser.add_argument('-d', '--delta', action='store_true', default=False,
+                            help="""output delta (default:
+                            %(default)s)""")
         parser.add_argument('-m','--mean', action='store_true', default=False,
                             help="""output mean (default:
                             %(default)s)""")
@@ -39,7 +112,7 @@ class Stats(mir3.module.Module):
                             to 0 mean and unit variance (default:
                             %(default)s)""")
 
-    def stats(self, feature_tracks, mean=False, variance=False, slope=False, limits=False, csv=False, normalize=False):
+    def stats(self, feature_tracks, mean=False, variance=False, delta=False, acceleration=False, slope=False, limits=False, csv=False, normalize=False):
 
         final_output = None
         final_filenames = []
@@ -56,6 +129,21 @@ class Stats(mir3.module.Module):
                 o.data.shape = (o.data.size, 1)
 
             out = numpy.array([])
+
+            if delta is True:
+                #print "o.data shape", o.data.shape
+                #print "out shape ", out.shape
+                d = numpy.mean(delta_stat(o.data, order=1, axis=0), axis=0)[i]
+                #print "d shape ", d.shape
+                out = numpy.hstack((out, d ))
+
+            if acceleration is True:
+                #print "o.data shape", o.data.shape
+                #print "out shape ", out.shape
+                d = numpy.mean(delta_stat(o.data, order=2, axis=0), axis=0)[i]
+                #print "d shape ", d.shape
+                out = numpy.hstack((out, d ))
+
             if mean is True:
                 out = numpy.hstack((out,
                              o.data.mean(axis=0)[i]))
@@ -104,6 +192,13 @@ class Stats(mir3.module.Module):
         my_features = o.metadata.feature.split()
         my_features.sort()
         new_features = ""
+
+        if delta is True:
+            for feat in my_features:
+                new_features = new_features + " " + "delta_" + feat
+        if acceleration is True:
+            for feat in my_features:
+                new_features = new_features + " " + "accel_" + feat
         if mean is True:
             for feat in my_features:
                 new_features = new_features + " " + "mean_" + feat
@@ -122,6 +217,8 @@ class Stats(mir3.module.Module):
                 new_features = new_features + " " + "min_" + feat
             for feat in my_features:
                 new_features = new_features + " " + "argmin_" + feat
+
+        #print new_features
 
         p = feature_matrix.FeatureMatrix()
         p.data = final_output.copy()

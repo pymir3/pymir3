@@ -1,6 +1,9 @@
+import sys
+sys.path.append("../../")
 import numpy as np
 import scipy.io.wavfile
 import copy
+import gc
 import mir3.modules.tool.wav2spectrogram as wav2spec
 import mir3.data.spectrogram as spec
 import mir3.data.feature_track as track
@@ -115,7 +118,8 @@ class BandwiseFeatures:
     :type spectrogram mir3.data.Spectrogram
     """
 
-    def __init__(self, infile, dft_len=2048, window='hanning', window_len=2048, window_step=1024, db_spec = True):
+    def __init__(self, infile, dft_len=2048, window='hanning', window_len=2048, window_step=1024, db_spec = True,
+                                            fs = 44100, mono = True, zero_pad_resampling=False ):
         self.infile = infile
         self.dft_len = dft_len
         self.window_len = window_len
@@ -126,25 +130,30 @@ class BandwiseFeatures:
 
 
         #load the auio file and compute its spectrum
+        #audio_file = open(infile, 'rb')
+
+        rate, audio_data = wav2spec.Wav2Spectrogram().load_audio(infile, fs=fs, mono=mono,
+                                                                 zero_pad_resampling=zero_pad_resampling)
+        audio_data = audio_data.astype(np.float)
         audio_file = open(infile, 'rb')
+
+        # mean 0, var 1
+        audio_data -= np.mean(audio_data)
+        audio_data /= np.var(audio_data) ** (0.5)
+
+        # audio_data /= np.max(np.abs(audio_data)) # Normalization to -1/+1 range
+
         self.spectrogram = wav2spec.Wav2Spectrogram().convert(audio_file, dft_length=dft_len,\
                                                               window_step=window_step,\
-                                                              window_length=window_len)
+                                                              window_length=window_len,
+                                                              wav_rate=rate,
+                                                              wav_data=audio_data)
 
-        #keeping the time-domain data for computing time-domain features
-        #rate, audio_data = scipy.io.wavfile.read(infile)
 
-        rate, audio_data = wav2spec.Wav2Spectrogram().load_audio(infile)
-        audio_data = audio_data.astype(np.float)
 
-        #mean 0, var 1
-        audio_data -= np.mean(audio_data)
-        audio_data /= np.var(audio_data)**(0.5)
-
-        #audio_data /= np.max(np.abs(audio_data)) # Normalization to -1/+1 range
-        self.audio_data = np.copy(audio_data)
+        # keeping the time-domain data for computing time-domain features
+        self.audio_data = audio_data
         self.samplingrate = rate
-        audio_file.close()
 
         if db_spec:
             self.spectrogram.data = 20 * np.log10(self.spectrogram.data + np.finfo(np.float).eps)
@@ -216,10 +225,10 @@ class BandwiseFeatures:
 
         #MFCC hack
         t = track.FeatureTrack()
-        t.data = mfcc.mfcc(self.spectrogram,13)
+        t.data = mfcc.mfcc(self.spectrogram,20)
         t.metadata.sampling_configuration = self.spectrogram.metadata.sampling_configuration
         feature = ""
-        for i in range(13):
+        for i in range(20):
             feature = feature + "MFCC_"+ str(i) + " "
         t.metadata.feature = feature
         t.metadata.filename = self.spectrogram.metadata.input.name
@@ -236,6 +245,8 @@ class BandwiseFeatures:
         t.metadata.filename = self.spectrogram.metadata.input.name
 
         self.band_features = np.hstack((self.band_features, t))
+
+        gc.collect()
 
     def join_bands(self, crop=False):
 
@@ -272,11 +283,16 @@ if __name__ == "__main__":
     #    print i
 
     #feats = BandwiseFeatures('/home/juliano/base_teste_rafael_94_especies/BUFF_NECKED_IBIS/LIFECLEF2015_BIRDAMAZON_XC_WAV_RN26407.wav')
-    feats = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav')
+    feats = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav', dft_len=2048, window_len=1763, window_step=882, db_spec=True)
+    #feats2 = BandwiseFeatures('/home/juliano/Music/genres_wav/rock.00000.wav', dft_len=2048, window_len=1024, window_step=256, db_spec=True)
 
     print feats.spectrogram.data.shape
+    plt.figure(0)
     # plt.pcolormesh(feats.spectrogram.data)
+    # plt.figure(1)
+    # plt.pcolormesh(feats2.spectrogram.data)
     # plt.show()
+    # exit(0)
     # plt.plot(feats.audio_data)
     # plt.show()
     a = LinearBand(low=int(feats.spectrogram.metadata.min_freq),
@@ -285,11 +301,11 @@ if __name__ == "__main__":
 
     b = MelBand(low=int(feats.spectrogram.metadata.min_freq),
                    high=int(feats.spectrogram.metadata.max_freq),
-                   nbands=10)
+                   nbands=20)
     import time
 
-    b = OneBand(low=int(feats.spectrogram.metadata.min_freq),
-                   high=int(feats.spectrogram.metadata.max_freq))
+    # b = OneBand(low=int(feats.spectrogram.metadata.min_freq),
+    #                high=int(feats.spectrogram.metadata.max_freq))
 
     for k in a.bands():
         print k
@@ -302,9 +318,12 @@ if __name__ == "__main__":
 
     print feats.join_bands(crop=True).data.shape
 
-    stats = feat_stats.Stats()
-    m = stats.stats([feats.joined_features], mean=True, variance=True, slope=False,limits=False, csv=False, normalize=False)
+    print "lalalallal", feats.joined_features.metadata.feature
 
+    stats = feat_stats.Stats()
+    m = stats.stats([feats.joined_features], mean=True, variance=True, delta=True, slope=False,limits=False, csv=False, normalize=False)
+
+    print m.data.shape
     print m.data
 
     #print feats.band_features[0]

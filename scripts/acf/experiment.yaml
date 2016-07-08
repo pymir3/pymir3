@@ -1,0 +1,65 @@
+general:
+  scratch_directory: "./scratch"
+  feature_extraction_filelist: "./dt1_meta.txt"
+  train_filelist: "./file_lists/dt1_2016/dt1_f1_train.txt"
+  test_filelist: "./file_lists/dt1_2016/dt1_f1_test.txt"
+  predict_file: "predict"
+  extract_accum_tag: ""
+  train_test_tag: ""
+  dft:
+    len: 2048
+    window_size: 1024
+    window_step: 512
+  sample_rate: 44100 #usar isso!!!!!!!! resampling é muito lento..
+  mono: True
+  zero_pad_resampling: True
+
+steps:
+  extract_features: False
+  aggregate_features: True
+  train: False
+  test: False
+  evaluate: False
+
+#Feature extraction parameters
+feature_extraction:
+  output_buffer_size: 100
+  extractor: 'bandwise'
+  worker_extractors: 4
+
+bandwise_extraction:
+  scale: 'mel'
+  number_of_bands: 20
+  also_one_band: False
+  discard_bin_zero: True
+
+#Feature aggregation parameters
+feature_aggregation:
+  aggregator: "simple"
+  aggregated_output: "feature_matrix"
+
+simple_aggregation:
+  mean: True
+  variance: True
+  acceleration: False
+  delta: False
+  normalize: True
+  slope: False
+  limits: False
+  csv: False
+
+#Model training parameters
+model_training:
+  model_trainer: "svm_reg"
+  output_model: "svm_reg.model"
+
+svm_reg:
+  num_workers: 4
+  Cs: [0.1, 1, 10, 100, 1000, 10000, 100000]
+  gammas: [0.001, 0.0001, 0.00001, 0.000001]
+  probability: False
+
+#Model testing parameters
+model_testing:
+  model_tester: "simple"
+  predict_proba_file: "predict.proba"

@@ -27,7 +27,7 @@ class Flatness(mir3.module.Module):
         t = track.FeatureTrack()
         t.data = feats.flatness(spectrum.data[min_freq_bin:max_freq_bin])
         t.metadata.sampling_configuration = spectrum.metadata.sampling_configuration
-        t.metadata.feature = "Flatness" + str(min_freq_bin) + "_" +\
+        t.metadata.feature = "Flatness_" + str(min_freq_bin) + "_" +\
             str(max_freq_bin)
 
         t.metadata.filename = spectrum.metadata.input.name
