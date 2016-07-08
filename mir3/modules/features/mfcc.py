@@ -22,7 +22,7 @@ class Mfcc(mir3.module.Module):
                             help="""output track file""")
 
 
-    def calc_track(self, s, n):
+    def calc_track(self, s, n=20):
         t = track.FeatureTrack()
         t.data = feats.mfcc(s, n)
 
