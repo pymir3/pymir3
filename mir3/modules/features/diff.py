@@ -32,7 +32,9 @@ class Diff(mir3.module.Module):
         my_features = o.metadata.feature.split()
         new_features = ""
         for feat in my_features:
-            new_features = new_features + " " + "diff_" + feat
+            if (len(new_features) > 2) and (new_features[-1] != " "):
+                new_features += " "
+            new_features = new_features + "diff_" + feat
         o.metadata.feature = new_features
 
         return o
