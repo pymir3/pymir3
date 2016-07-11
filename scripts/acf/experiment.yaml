@@ -3,7 +3,8 @@ general:
   feature_extraction_filelist: "./dt1_meta.txt"
   train_filelist: "./file_lists/dt1_2016/dt1_f1_train.txt"
   test_filelist: "./file_lists/dt1_2016/dt1_f1_test.txt"
-  predict_file: "predict"
+  predict_file: "./scratch/predict"
+  label_file: "./file_lists/dt1_2016/dt1_labels.txt"
   extract_accum_tag: ""
   train_test_tag: ""
   dft:
@@ -16,10 +17,10 @@ general:
 
 steps:
   extract_features: False
-  aggregate_features: False
-  train: False
+  aggregate_features: True
+  train: True
   test: True
-  evaluate: False
+  evaluate: True
 
 #Feature extraction parameters
 feature_extraction:
@@ -41,8 +42,8 @@ feature_aggregation:
 simple_aggregation:
   mean: True
   variance: True
-  acceleration: False
-  delta: False
+  acceleration: True
+  delta: True
   normalize: True
   slope: False
   limits: False
@@ -50,8 +51,8 @@ simple_aggregation:
 
 #Model training parameters
 model_training:
-  model_trainer: "svm_reg"
-  output_model: "svm.model"
+  model_trainer: "gmm"
+  output_model: "gmm.model"
 
 svm_reg:
   num_workers: 4
@@ -70,3 +71,7 @@ gmm:
 model_testing:
   model_tester: "simple"
   predict_proba_file: ""
+
+#Evaluation parameters
+evaluation:
+  evaluator: "simple"

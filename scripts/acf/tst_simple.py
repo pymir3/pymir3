@@ -4,8 +4,6 @@ import time
 import numpy
 import dill
 
-from sklearn.metrics import confusion_matrix
-
 class SimpleModelTester(ModelTester):
 
     def __init__(self):
