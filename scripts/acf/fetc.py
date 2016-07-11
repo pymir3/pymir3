@@ -40,7 +40,7 @@ def parse_commandline(argv):
 
         ex_pos = argv.index('-extract')
         if len(argv) - ex_pos < 3:
-            print "wrong number of arguments for \'extract\'. usage: %s path_to_scratch_folder path_to_extract_filelist" % \
+            print "wrong number of arguments for \'extract\'. usage: %s -extract path_to_scratch_folder path_to_extract_filelist" % \
                   (argv[0])
             exit(1)
         ov.append(("general.scratch_directory", argv[ex_pos+1]))
@@ -56,7 +56,7 @@ def parse_commandline(argv):
 
         ex_pos = argv.index('-train')
         if len(argv) - ex_pos < 3:
-            print "wrong number of arguments for \'train\'. usage: %s path_to_scratch_folder path_to_train_filelist" % \
+            print "wrong number of arguments for \'train\'. usage: %s -train path_to_scratch_folder path_to_train_filelist" % \
                   (argv[0])
             exit(1)
         ov.append(("general.scratch_directory", argv[ex_pos+1]))
@@ -74,7 +74,7 @@ def parse_commandline(argv):
         ex_pos = argv.index('-test')
         #print ex_pos, len(argv)
         if len(argv) - ex_pos < 4:
-            print "wrong number of arguments for \'test\'. usage: %s path_to_scratch_folder path_to_test_filelist path_to_predict_file" % \
+            print "wrong number of arguments for \'test\'. usage: %s -test path_to_scratch_folder path_to_test_filelist path_to_predict_file" % \
                   (argv[0])
             exit(1)
         ov.append(("general.scratch_directory", argv[ex_pos + 1]))

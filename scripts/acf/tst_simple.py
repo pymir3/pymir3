@@ -30,8 +30,13 @@ class SimpleModelTester(ModelTester):
         predict_file.close()
 
         if hasattr(model, "predict_proba"):
-            predicted_proba_filename = self.params['general']['scratch_directory'] + "/" +\
-                                       self.params['model_testing']['predict_proba_file'];
+
+            if self.params['model_testing']['predict_proba_file'] != "":
+                predicted_proba_filename = self.params['general']['scratch_directory'] + "/" +\
+                                           self.params['model_testing']['predict_proba_file']
+            else:
+                predicted_proba_filename = predict_filename + ".proba"
+
             print "outputting predicted probability to file %s" % (predicted_proba_filename)
             prob = model.predict_proba(test_data.features)
             predicted_from_prob = numpy.argmax(prob, axis=1) + 1
