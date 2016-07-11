@@ -16,9 +16,9 @@ general:
 
 steps:
   extract_features: False
-  aggregate_features: True
+  aggregate_features: False
   train: False
-  test: False
+  test: True
   evaluate: False
 
 #Feature extraction parameters
@@ -29,8 +29,8 @@ feature_extraction:
 
 bandwise_extraction:
   scale: 'mel'
-  number_of_bands: 20
-  also_one_band: False
+  number_of_bands: 50
+  also_one_band: True
   discard_bin_zero: True
 
 #Feature aggregation parameters
@@ -51,7 +51,7 @@ simple_aggregation:
 #Model training parameters
 model_training:
   model_trainer: "svm_reg"
-  output_model: "svm_reg.model"
+  output_model: "svm.model"
 
 svm_reg:
   num_workers: 4
@@ -59,7 +59,14 @@ svm_reg:
   gammas: [0.001, 0.0001, 0.00001, 0.000001]
   probability: False
 
+gmm:
+  num_workers: 4
+  n_components: -1
+  n_init: 5
+  covariance_type: 'diag'
+  min_covar: 0.01
+
 #Model testing parameters
 model_testing:
   model_tester: "simple"
-  predict_proba_file: "predict.proba"
+  predict_proba_file: ""

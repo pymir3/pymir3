@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import gc
 
-from rpm._rpm import te
-
 import acf_utils
 import sys
 import numpy
