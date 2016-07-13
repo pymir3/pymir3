@@ -20,6 +20,9 @@ class Join(mir3.module.Module):
         features = []
 
         for t in feature_tracks:
+            if t is None:
+                continue
+
             if t.data.ndim == 1:
                 t.data.shape = (t.data.size,1)
             data.append(t.data)
