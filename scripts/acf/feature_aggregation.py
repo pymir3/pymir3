@@ -38,7 +38,7 @@ class FeatureAggregator():
         """
         print("Running feature aggregation behavior: %s" % self.name)
         #todo: only aggregate relevant files!
-        feature_filenames = sorted([i for i in glob.glob('scratch/*.features')])
+        feature_filenames = sorted([i for i in glob.glob(self.params['general']['scratch_directory'] + '/*.features')])
         self.aggregate(feature_filenames)
         feature_filenames = []
         gc.collect()

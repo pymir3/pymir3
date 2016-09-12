@@ -1,8 +1,8 @@
 general:
   scratch_directory: "./scratch"
   feature_extraction_filelist: "./dt1_meta.txt"
-  train_filelist: "./file_lists/dt1_2016/dt1_f1_train.txt"
-  test_filelist: "./file_lists/dt1_2016/dt1_f1_test.txt"
+  train_filelist: "./file_lists/dt1_2016/dt1_f4_train.txt"
+  test_filelist: "./file_lists/dt1_2016/dt1_f4_test.txt"
   predict_file: "./scratch/predict"
   label_file: "./file_lists/dt1_2016/dt1_labels.txt"
   extract_accum_tag: ""
@@ -17,7 +17,7 @@ general:
 
 steps:
   extract_features: False
-  aggregate_features: True
+  aggregate_features: False
   train: True
   test: True
   evaluate: True
@@ -31,7 +31,7 @@ feature_extraction:
 bandwise_extraction:
   scale: 'mel'
   number_of_bands: 50
-  also_one_band: True
+  also_one_band: False
   discard_bin_zero: True
 
 #Feature aggregation parameters
@@ -42,8 +42,8 @@ feature_aggregation:
 simple_aggregation:
   mean: True
   variance: True
-  acceleration: True
-  delta: True
+  acceleration: False
+  delta: False
   normalize: True
   slope: False
   limits: False
