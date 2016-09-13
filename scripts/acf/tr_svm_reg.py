@@ -4,6 +4,7 @@ from sklearn.svm import SVC
 from sklearn.pipeline import Pipeline
 from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_selection import f_classif as anova
+from sklearn.cross_validation import ShuffleSplit
 import time
 import dill
 import numpy as np
@@ -39,10 +40,13 @@ class SvmRegModelTrainer(ModelTrainer):
         transform = SelectPercentile(anova)
         clf = Pipeline([('anova', transform), ('svm', svmc)])
         percentiles = (np.arange(11) * 10)[1:]
+
+        cv = ShuffleSplit(len(train_data.labels), n_iter=10, test_size=0.2, random_state=0)
         estimator = GridSearchCV(clf,
                                  dict(anova__percentile=percentiles,
                                       svm__gamma=gammas,
                                       svm__C=Cs),
+                                 cv=cv,
                                  n_jobs=self.params['svm_reg']['num_workers'])
         estimator.fit(features, labels)
         T1 = time.time()
