@@ -16,7 +16,13 @@ class SimpleModelTester(ModelTester):
         model = dill.load(model_file)
         model_file.close()
 
-        predicted = model.predict(test_data.features)
+        scaler_file = open( ('%s.scaler' % model_filename))
+        scaler = dill.load(scaler_file)
+        scaler_file.close()
+
+        features = scaler.transform(test_data.features)
+
+        predicted = model.predict(features)
 
         #output predict file
         predict_filename = self.params['general']['predict_file']

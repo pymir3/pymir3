@@ -5,6 +5,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.feature_selection import SelectPercentile
 from sklearn.feature_selection import f_classif as anova
 from sklearn.cross_validation import ShuffleSplit
+from sklearn.preprocessing import StandardScaler
 import time
 import dill
 import numpy as np
@@ -38,7 +39,9 @@ class SvmRegModelTrainer(ModelTrainer):
         labels = train_data.labels
 
         transform = SelectPercentile(anova)
-        clf = Pipeline([('anova', transform), ('svm', svmc)])
+        scaler = StandardScaler()
+        clf = Pipeline([ ('standardizer', scaler ), ('anova', transform), ('svm', svmc)])
+
         percentiles = (np.arange(11) * 10)[1:]
 
         cv = ShuffleSplit(len(train_data.labels), n_iter=10, test_size=0.2, random_state=0)
@@ -61,4 +64,12 @@ class SvmRegModelTrainer(ModelTrainer):
         print "saved best model to %s" % (out_filename)
         outfile = open(out_filename, "w")
         dill.dump(estimator.best_estimator_, outfile, dill.HIGHEST_PROTOCOL )
+
+        scaler.fit(features)
+        outfile_scaler = open('%s.scaler' % out_filename, "w")
+        dill.dump(scaler, outfile_scaler, dill.HIGHEST_PROTOCOL)
+
+        #dill.dump( StandardScaler().fit(features) )
+
+
 
