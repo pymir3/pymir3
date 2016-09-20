@@ -51,6 +51,8 @@ class SvmRegModelTrainer(ModelTrainer):
                                       svm__C=Cs),
                                  cv=cv,
                                  n_jobs=self.params['svm_reg']['num_workers'])
+        scaler.fit(features)
+        features = scaler.transform(features)
         estimator.fit(features, labels)
         T1 = time.time()
 
@@ -65,7 +67,6 @@ class SvmRegModelTrainer(ModelTrainer):
         outfile = open(out_filename, "w")
         dill.dump(estimator.best_estimator_, outfile, dill.HIGHEST_PROTOCOL )
 
-        scaler.fit(features)
         outfile_scaler = open('%s.scaler' % out_filename, "w")
         dill.dump(scaler, outfile_scaler, dill.HIGHEST_PROTOCOL)
 

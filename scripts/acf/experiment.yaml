@@ -51,7 +51,7 @@ simple_aggregation:
 
 #Model training parameters
 model_training:
-  model_trainer: "gmm"
+  model_trainer: "svm_reg"
   output_model: "gmm.model"
 
 svm_reg:
