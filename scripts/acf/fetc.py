@@ -117,10 +117,29 @@ def parse_commandline(argv):
 
 
     def set_int(argv):
-        ex_pos = argv.index('-si')
-        a = argv[ex_pos+1]
-        a = a.split("=")
-        return (a[0], int(a[1]))
+        prev_si = 0
+        ov = []
+        for i in xrange(argv.count('-si')):
+            ex_pos = argv.index('-si', prev_si+1)
+            a = argv[ex_pos+1]
+            prev_si = ex_pos
+            a = a.split("=")
+            ov.append(((a[0], int(a[1]))))
+
+        return ov
+
+
+    def set_bool(argv):
+        prev_sb = 0
+        ov = []
+        for i in xrange(argv.count('-sb')):
+            ex_pos = argv.index('-sb', prev_sb + 1)
+            a = argv[ex_pos + 1]
+            prev_sb = ex_pos
+            a = a.split("=")
+            ov.append(((a[0], bool(a[1]))))
+
+        return ov
 
     ovw = []
 
@@ -139,8 +158,11 @@ def parse_commandline(argv):
     elif "-evaluate" in argv:
         ovw.extend(switch_evaluate(argv))
 
-    elif "-si" in argv:
+    if "-si" in argv:
         ovw.extend(set_int(argv))
+
+    if "-sb" in argv:
+        ovw.extend(set_bool(argv))
 
     return ovw
 
@@ -177,6 +199,8 @@ def run_fetc():
     overwrite_params(exp, ovw)
 
     update_parameters(exp)
+
+    #print exp
 
     if exp['steps']['extract_features']:
         fe = FeatureExtractor.create(params=exp)
