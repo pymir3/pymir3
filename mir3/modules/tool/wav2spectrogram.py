@@ -12,6 +12,7 @@ import mir3.data.spectrogram as spectrogram
 import mir3.module
 import tempfile
 import mad
+import gc
 
 MAX_MEM_BLOCK = 2**8 * 2**10
 
@@ -340,6 +341,9 @@ class Wav2Spectrogram(mir3.module.Module):
         wf.close()
         wavfile.close()
         
+        del(mf)
+        gc.collect()
+
         return open(wav_filename, "rb")
 
 
@@ -426,6 +430,7 @@ class Wav2Spectrogram(mir3.module.Module):
             sample_rate = fs
 
         audiofile.close()
+        audio_file.close()
 
         if file_extension == '.mp3':
             os.unlink(audiofile.name)
