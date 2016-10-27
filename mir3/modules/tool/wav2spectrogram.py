@@ -319,8 +319,11 @@ class Wav2Spectrogram(mir3.module.Module):
         The temporary file must be manually deleted after being used.
 
         """
+
+        print("Decoding MP3: %s" % mp3filename)
+
         mf = mad.MadFile(mp3filename)
-        (wavfile, wav_filename) = tempfile.mkstemp()
+        (wavfile, wav_filename) = tempfile.mkstemp(suffix=".wav")
         wavfile = os.fdopen(wavfile, "wb")
         wf = wave.open(wavfile)
         wf.setframerate(mf.samplerate())
@@ -337,10 +340,10 @@ class Wav2Spectrogram(mir3.module.Module):
         wf.close()
         wavfile.close()
         
-        return wav_filename
+        return open(wav_filename, "rb")
 
 
-    def load_audio(self, filename, mono=True, fs=44100, zero_pad_resampling=False):
+    def load_audio(self, audiofile, mono=True, fs=44100, zero_pad_resampling=False):
         """Load audio file into numpy array
         Supports 24-bit wav-format, and flac audio through librosa.
         Parameters
@@ -363,13 +366,15 @@ class Wav2Spectrogram(mir3.module.Module):
         from: https://github.com/TUT-ARG/DCASE2016-baseline-system-python/blob/master/src/files.py
         """
 
+        if isinstance(audiofile, basestring):
+            audiofile = open(audiofile, "rb")
 
-        file_base, file_extension = os.path.splitext(filename.name)
+        file_base, file_extension = os.path.splitext(audiofile.name)
             
         if file_extension == '.mp3':
-            filename = self.decode_mp3(filename)
+            audiofile = self.decode_mp3(audiofile.name)
     
-        audio_file = wave.open(filename)
+        audio_file = wave.open(audiofile)
 
         # Audio info
         sample_rate = audio_file.getframerate()
@@ -420,9 +425,10 @@ class Wav2Spectrogram(mir3.module.Module):
             audio_data = scipy.signal.resample(audio_data, len(audio_data) * (float(fs) / sample_rate) )
             sample_rate = fs
 
+        audiofile.close()
+
         if file_extension == '.mp3':
-            print filename
-            os.unlink(filename)
+            os.unlink(audiofile.name)
 
         return sample_rate, audio_data
 
