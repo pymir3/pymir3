@@ -10,6 +10,8 @@ import six
 import mir3.data.metadata as md
 import mir3.data.spectrogram as spectrogram
 import mir3.module
+import tempfile
+import mad
 
 MAX_MEM_BLOCK = 2**8 * 2**10
 
@@ -312,6 +314,32 @@ class Wav2Spectrogram(mir3.module.Module):
 
         return stft_matrix
 
+    def decode_mp3(self, mp3filename):
+        """Decodes an MP3 to a temporary WAV file and returns its full path.
+        The temporary file must be manually deleted after being used.
+
+        """
+        mf = mad.MadFile(mp3filename)
+        (wavfile, wav_filename) = tempfile.mkstemp()
+        wavfile = os.fdopen(wavfile, "wb")
+        wf = wave.open(wavfile)
+        wf.setframerate(mf.samplerate())
+        wf.setnchannels(1 if mf.mode() == mad.MODE_SINGLE_CHANNEL else 2)
+        #TODO: Figure out the sample width from the data. This only works for 16-bit output samples.
+        # 2 is the sample width of 16-bit audio
+        wf.setsampwidth(2)
+        frame = mf.read()
+
+        while frame is not None:
+            wf.writeframes(frame)
+            frame = mf.read()
+        
+        wf.close()
+        wavfile.close()
+        
+        return wav_filename
+
+
     def load_audio(self, filename, mono=True, fs=44100, zero_pad_resampling=False):
         """Load audio file into numpy array
         Supports 24-bit wav-format, and flac audio through librosa.
@@ -335,9 +363,12 @@ class Wav2Spectrogram(mir3.module.Module):
         from: https://github.com/TUT-ARG/DCASE2016-baseline-system-python/blob/master/src/files.py
         """
 
-        #I should include this check back at some point...
-        # file_base, file_extension = os.path.splitext(filename)
-        # if file_extension == '.wav':
+
+        file_base, file_extension = os.path.splitext(filename.name)
+            
+        if file_extension == '.mp3':
+            filename = self.decode_mp3(filename)
+    
         audio_file = wave.open(filename)
 
         # Audio info
@@ -389,6 +420,10 @@ class Wav2Spectrogram(mir3.module.Module):
             audio_data = scipy.signal.resample(audio_data, len(audio_data) * (float(fs) / sample_rate) )
             sample_rate = fs
 
+        if file_extension == '.mp3':
+            print filename
+            os.unlink(filename)
+
         return sample_rate, audio_data
 
         #return None, None
@@ -423,11 +458,13 @@ class Wav2Spectrogram(mir3.module.Module):
         else:
             from_data = True
 
+        if isinstance(wav_file, basestring):
+            wav_file = open(wav_file, "rb")
+
         if save_metadata:
             s.metadata.input = md.FileMetadata(wav_file)
 
         # Calculates data
-
         if not from_data:
             rate, data = self.load_audio(wav_file)
         else:
