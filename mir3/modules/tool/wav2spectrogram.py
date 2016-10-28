@@ -11,7 +11,7 @@ import mir3.data.metadata as md
 import mir3.data.spectrogram as spectrogram
 import mir3.module
 import tempfile
-import mad
+import subprocess
 import gc
 
 MAX_MEM_BLOCK = 2**8 * 2**10
@@ -323,26 +323,16 @@ class Wav2Spectrogram(mir3.module.Module):
 
         print("Decoding MP3: %s" % mp3filename)
 
-        mf = mad.MadFile(mp3filename)
         (wavfile, wav_filename) = tempfile.mkstemp(suffix=".wav")
-        wavfile = os.fdopen(wavfile, "wb")
-        wf = wave.open(wavfile)
-        wf.setframerate(mf.samplerate())
-        wf.setnchannels(1 if mf.mode() == mad.MODE_SINGLE_CHANNEL else 2)
-        #TODO: Figure out the sample width from the data. This only works for 16-bit output samples.
-        # 2 is the sample width of 16-bit audio
-        wf.setsampwidth(2)
-        frame = mf.read()
 
-        while frame is not None:
-            wf.writeframes(frame)
-            frame = mf.read()
-        
-        wf.close()
-        wavfile.close()
-        
-        del(mf)
-        gc.collect()
+        os.close(wavfile)
+
+        sox = ["sox", mp3filename, "-c", "1", wav_filename]
+
+        errcode = subprocess.call(sox) 
+
+        if errcode > 0:
+            print("error decoding %s to %s (sox returned code %d)" % (mp3filename, wav_filename, errcode) )
 
         return open(wav_filename, "rb")
 
@@ -376,7 +366,9 @@ class Wav2Spectrogram(mir3.module.Module):
         file_base, file_extension = os.path.splitext(audiofile.name)
             
         if file_extension == '.mp3':
-            audiofile = self.decode_mp3(audiofile.name)
+            audiofilename = audiofile.name
+            audiofile.close()
+            audiofile = self.decode_mp3(audiofilename)
     
         audio_file = wave.open(audiofile)
 
