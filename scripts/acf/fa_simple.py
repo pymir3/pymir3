@@ -2,9 +2,30 @@ import sys
 import pickle
 sys.path.append("../../")
 
+import mir3.modules.tool.to_texture_window as texture_window
 import mir3.data.feature_track as track
 import mir3.modules.features.stats as feat_stats
 from feature_aggregation import FeatureAggregator
+from multiprocess import Pool
+import time
+import traceback
+import gc
+
+def calc_textures(args):
+    try:
+
+        tw = texture_window.ToTextureWindow()
+        feature = args[0]
+        print("calculating textures for %s" % feature.metadata.filename)
+        T0 = time.time()
+        results = tw.to_texture(feature, args[1])
+        T1 = time.time()
+        print("texture calculation for %s took %f seconds" % (feature.metadata.filename, T1-T0))
+        return results
+
+    except Exception:
+            traceback.print_exc()
+            raise
 
 
 class SimpleAggregator(FeatureAggregator):
@@ -50,6 +71,29 @@ class SimpleAggregator(FeatureAggregator):
             t = t.load(f)
             features.append(t)
             f.close()
+
+        if self.params['simple_aggregation']['texture_windows']:
+            jobs = []
+            for f in features:
+                jobs.append((f, self.params['simple_aggregation']['texture_window_length']))
+
+            num_files = len(jobs)
+            output_buffer_size = self.params['simple_aggregation']['tw_buffer_size']
+
+            features = []
+
+            pool = Pool(processes=self.params['simple_aggregation']['tw_workers'])
+            for i in range(0, num_files, output_buffer_size):
+                print "Calculating texture windows %d through %d of %d" % (i + 1, min(i + output_buffer_size, num_files), num_files)
+                
+                result = pool.map(calc_textures, jobs[i:min(i + output_buffer_size, num_files)])
+                features.extend(result) 
+
+                del result
+                gc.collect()
+
+            pool.close()
+            pool.join()
 
         stats = feat_stats.Stats()
         m = stats.stats(features,
