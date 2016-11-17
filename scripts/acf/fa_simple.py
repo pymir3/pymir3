@@ -80,8 +80,8 @@ class SimpleAggregator(FeatureAggregator):
 
         if self.params['simple_aggregation']['texture_windows']:
 
-            for i in range(len(feature_files)):
-                feature_files[i] = feature_files[i] + "_tw"
+            #for i in range(len(feature_files)):
+            #    feature_files[i] = feature_files[i] + "_tw"
 
             jobs = []
             for f in features:
@@ -135,3 +135,6 @@ class SimpleAggregator(FeatureAggregator):
         m.save(out)
 
         out.close()
+
+#if not os.path.exists(clipped_folder):
+#        os.makedirs(clipped_folder)
