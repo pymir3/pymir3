@@ -78,7 +78,7 @@ if __name__ == "__main__":
             current_var = l.replace("!!!", "").replace(",", " ")
             
         lineno+=1
-    
+
     r = print_results(fold_results)
     results.append((current_exp, current_var, r ))
 

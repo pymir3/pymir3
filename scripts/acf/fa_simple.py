@@ -10,6 +10,7 @@ from multiprocess import Pool
 import time
 import traceback
 import gc
+from pprint import pprint
 
 def calc_textures(args):
     try:
@@ -27,6 +28,17 @@ def calc_textures(args):
             traceback.print_exc()
             raise
 
+def load_feature_files(feature_files):
+    features = []
+
+    for i in feature_files:
+        t = track.FeatureTrack()
+        f = open(i, "r")
+        t = t.load(f)
+        features.append(t)
+        f.close()
+
+    return features
 
 class SimpleAggregator(FeatureAggregator):
     """
@@ -63,16 +75,14 @@ class SimpleAggregator(FeatureAggregator):
                 * ['feature_aggregation']['aggregated_output']
 
         """
-        features = []
 
-        for i in feature_files:
-            t = track.FeatureTrack()
-            f = open(i, "r")
-            t = t.load(f)
-            features.append(t)
-            f.close()
+        features = load_feature_files(feature_files)
 
         if self.params['simple_aggregation']['texture_windows']:
+
+            for i in range(len(feature_files)):
+                feature_files[i] = feature_files[i] + "_tw"
+
             jobs = []
             for f in features:
                 jobs.append((f, self.params['simple_aggregation']['texture_window_length']))
@@ -80,20 +90,33 @@ class SimpleAggregator(FeatureAggregator):
             num_files = len(jobs)
             output_buffer_size = self.params['simple_aggregation']['tw_buffer_size']
 
-            features = []
-
             pool = Pool(processes=self.params['simple_aggregation']['tw_workers'])
+
+            out_idx = 0
+
             for i in range(0, num_files, output_buffer_size):
                 print "Calculating texture windows %d through %d of %d" % (i + 1, min(i + output_buffer_size, num_files), num_files)
                 
                 result = pool.map(calc_textures, jobs[i:min(i + output_buffer_size, num_files)])
-                features.extend(result) 
+                
+                for track in result:
+                    filename = feature_files[out_idx]
+                    print "writing features to file %s..." % (filename)
+                    feature_file = open(filename, "w")
+                    track.save(feature_file)
+                    feature_file.close()
+                    del track
+                    out_idx+=1
 
                 del result
                 gc.collect()
 
             pool.close()
             pool.join()
+            features = None
+
+        if features == None:
+            features = load_feature_files(feature_files)
 
         stats = feat_stats.Stats()
         m = stats.stats(features,
