@@ -11,6 +11,9 @@ from evaluation import Evaluator
 #ETC stands for Feature Extraction, Train and Classify
 #The idea is to make this the frontend for all ETC activities :)
 
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
+
 def update_parameters(params):
 
     etag = params['general']['extract_accum_tag']
@@ -137,7 +140,7 @@ def parse_commandline(argv):
             a = argv[ex_pos + 1]
             prev_sb = ex_pos
             a = a.split("=")
-            ov.append(((a[0], bool(a[1]))))
+            ov.append(((a[0], str2bool(a[1]))))
 
         return ov
 
