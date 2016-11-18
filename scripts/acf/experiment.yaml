@@ -41,7 +41,7 @@ feature_aggregation:
 
 simple_aggregation:
   texture_windows: True
-  texture_window_length: 40
+  texture_window_length: 80
   tw_buffer_size: 100
   tw_workers: 4
   mean: True
@@ -59,6 +59,7 @@ model_training:
   output_model: "svm.model"
 
 svm_reg:
+  balanced_class_weights: True
   num_workers: 4
   Cs: [0.1, 1, 10, 100, 1000, 10000, 100000]
   gammas: [0.001, 0.0001, 0.00001, 0.000001]

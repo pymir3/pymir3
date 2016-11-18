@@ -23,7 +23,12 @@ class SvmRegModelTrainer(ModelTrainer):
         """
 
         probability = self.params['svm_reg']['probability']
-        svmc = SVC(kernel='rbf', probability=probability)
+
+        if self.params['svm_reg']['balanced_class_weights']:
+            svmc = SVC(kernel='rbf', probability=probability, class_weight='balanced')
+        else:
+            svmc = SVC(kernel='rbf', probability=probability)
+
         Cs = self.params['svm_reg']['Cs']
         gammas = self.params['svm_reg']['gammas']
         out_filename = self.params['general']['scratch_directory'] + "/" + self.params['model_training']['output_model']
