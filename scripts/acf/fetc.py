@@ -144,6 +144,18 @@ def parse_commandline(argv):
 
         return ov
 
+    def set_str(argv):
+        prev_ss = 0
+        ov = []
+        for i in xrange(argv.count('-ss')):
+            ex_pos = argv.index('-ss', prev_ss+1)
+            a = argv[ex_pos+1]
+            prev_ss = ex_pos
+            a = a.split("=")
+            ov.append(((a[0], str(a[1]))))
+
+        return ov
+
     ovw = []
 
     if "-extract" in argv:
@@ -166,6 +178,9 @@ def parse_commandline(argv):
 
     if "-sb" in argv:
         ovw.extend(set_bool(argv))
+
+    if "-ss" in argv:
+        ovw.extend(set_str(argv))
 
     return ovw
 

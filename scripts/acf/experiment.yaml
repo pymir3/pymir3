@@ -29,7 +29,7 @@ feature_extraction:
   worker_extractors: 4
 
 bandwise_extraction:
-  scale: 'one'
+  scale: 'mel'
   number_of_bands: 30
   also_one_band: True
   discard_bin_zero: True
@@ -61,7 +61,7 @@ model_training:
 svm_reg:
   balanced_class_weights: True
   num_workers: 4
-  Cs: [0.1, 1, 10, 100, 1000, 10000, 100000]
+  Cs: [1, 10, 100, 1000, 10000]
   gammas: [0.001, 0.0001, 0.00001, 0.000001]
   probability: False
 
