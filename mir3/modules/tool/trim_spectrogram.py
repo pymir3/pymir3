@@ -85,6 +85,6 @@ class TrimSpectrogram(mir3.module.Module):
                                             min_time=min_time,
                                             max_time=max_time)
         if save_metadata:
-            s.metadata.input = md.ObjectMetadata(s)
+            new_s.metadata.input = md.ObjectMetadata(s)
 
         return new_s
