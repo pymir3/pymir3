@@ -109,9 +109,9 @@ class Spectrogram(do.DataObject):
         if time == float('inf'):
             return self.data.shape[1]-1
 
-        time_scale = 1000.0*self.metadata.sampling_configuration.ofs
+        time_scale = self.metadata.sampling_configuration.ofs
 
-        # Rounds using floor
+        # Rounds using conversion to int
         time_bin = int((time - self.metadata.min_time) * time_scale)
 
         if time_bin < 0:

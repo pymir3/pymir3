@@ -460,7 +460,8 @@ class Wav2Spectrogram(mir3.module.Module):
         window = scipy.signal.hamming(dft_length, sym=False)
 
         #magnitude spectrum is the absolute value (real part) of the complex spectrum
-        magnitude_spectrum = numpy.abs(self.stft(data, n_fft=dft_length, hop_length=window_length, win_length=window_length,
+        magnitude_spectrum = numpy.abs(self.stft(data, n_fft=dft_length,
+            hop_length=window_step, win_length=window_length,
                         window=window, center=True))
 
         if s.metadata.sampling_configuration.spectrum_type == 'sqrt':
