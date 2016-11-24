@@ -26,7 +26,7 @@ class ToTextureWindow(mir3.module.Module):
 
         window_track = ft.FeatureTrack()
         window_track.metadata.sampling_configuration = analysis_track.metadata.sampling_configuration
-        feats = analysis_track.metadata.feature.split(" ")
+        feats = analysis_track.metadata.feature.strip().split(" ")
 
         window_track.metadata.feature = ""
         #ta certo manter esse nome?
@@ -43,12 +43,16 @@ class ToTextureWindow(mir3.module.Module):
         dT = analysis_track.data.T
         it = 1 if dT.ndim == 1 else dT.shape[0]
 
+        #print feats, len(feats)
+
         ts = ""
         ts2 = ""
         for f in feats:
             ts += " tx_mean_" + f
             ts2 += " tx_var_" + f
-        ts = ts + ts2
+        ts = (ts + ts2).strip()
+
+        #print ts, len(ts.split(" "))
 
         window_track.metadata.feature = ts
 
@@ -63,7 +67,7 @@ class ToTextureWindow(mir3.module.Module):
 
         saida = numpy.zeros((analysis_track.data.shape[0], analysis_track.data.shape[1]*2))
 
-        #print saida.shape
+        #print "shape da saida:", saida.shape
 
         #window_track.metadata.feature += " tx_mean_" + feats[i] +\
         #                                         " tx_var_" + feats[i]

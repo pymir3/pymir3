@@ -22,7 +22,13 @@ def calc_textures(args):
         results = tw.to_texture(feature, args[1])
         T1 = time.time()
         print("texture calculation for %s took %f seconds" % (feature.metadata.filename, T1-T0))
-        return results
+
+        feature_file = open(args[2], "w")
+        results.save(feature_file)
+        feature_file.close()
+        del results
+
+        return None
 
     except Exception:
             traceback.print_exc()
@@ -84,32 +90,36 @@ class SimpleAggregator(FeatureAggregator):
             #    feature_files[i] = feature_files[i] + "_tw"
 
             jobs = []
+            out_idx = 0
             for f in features:
-                jobs.append((f, self.params['simple_aggregation']['texture_window_length']))
+                jobs.append((f, self.params['simple_aggregation']['texture_window_length'], feature_files[out_idx] ))
+                out_idx+=1
 
             num_files = len(jobs)
             output_buffer_size = self.params['simple_aggregation']['tw_buffer_size']
 
             pool = Pool(processes=self.params['simple_aggregation']['tw_workers'])
 
-            out_idx = 0
+            pool.map(calc_textures, jobs)
 
-            for i in range(0, num_files, output_buffer_size):
-                print "Calculating texture windows %d through %d of %d" % (i + 1, min(i + output_buffer_size, num_files), num_files)
-                
-                result = pool.map(calc_textures, jobs[i:min(i + output_buffer_size, num_files)])
-                
-                for track in result:
-                    filename = feature_files[out_idx]
-                    print "writing features to file %s..." % (filename)
-                    feature_file = open(filename, "w")
-                    track.save(feature_file)
-                    feature_file.close()
-                    del track
-                    out_idx+=1
+            # out_idx = 0
 
-                del result
-                gc.collect()
+            # for i in range(0, num_files, output_buffer_size):
+            #     print "Calculating texture windows %d through %d of %d" % (i + 1, min(i + output_buffer_size, num_files), num_files)
+                
+            #     result = pool.map(calc_textures, jobs[i:min(i + output_buffer_size, num_files)])
+                
+            #     for track in result:
+            #         filename = feature_files[out_idx]
+            #         print "writing features to file %s..." % (filename)
+            #         feature_file = open(filename, "w")
+            #         track.save(feature_file)
+            #         feature_file.close()
+            #         del track
+            #         out_idx+=1
+
+            #     del result
+            #     gc.collect()
 
             pool.close()
             pool.join()
