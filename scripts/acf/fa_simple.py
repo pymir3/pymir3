@@ -27,7 +27,8 @@ def calc_textures(args):
         results.save(feature_file)
         feature_file.close()
         del results
-
+        gc.collect()
+        
         return None
 
     except Exception:
