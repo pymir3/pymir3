@@ -43,7 +43,7 @@ def read_parameters(param_file):
 def parse_commandline(argv):
     def switch_extract(argv):
         ov = [("steps.extract_features", True),
-                ("steps.aggregate_features", True),
+                ("steps.aggregate_features", False),
                 ("steps.train", False),
                 ("steps.test", False),
                 ("steps.evaluate", False)]
