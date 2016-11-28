@@ -2,6 +2,7 @@ from setuptools import setup, find_packages
 setup(
     name = "pymir3",
     version = "1.0",
+    #package_dir = {'': 'mir3'}
     packages = find_packages(),
     scripts = ['pymir3-cl.py'],
 
@@ -15,6 +16,9 @@ setup(
         # And include any *.msg files found in the 'hello' package, too:
     #    'hello': ['*.msg'],
     #},
+
+    exclude_package_data = {'': ['.gitignore', '.git/*']},
+
 
     # metadata for upload to PyPI
     author = "Tiago F. Tavares, Conrado Miranda",

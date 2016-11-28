@@ -26,7 +26,7 @@ class ToTextureWindow(mir3.module.Module):
 
         window_track = ft.FeatureTrack()
         window_track.metadata.sampling_configuration = analysis_track.metadata.sampling_configuration
-        feats = analysis_track.metadata.feature.strip().split(" ")
+        feats = analysis_track.metadata.feature.strip().split()
 
         window_track.metadata.feature = ""
         #ta certo manter esse nome?
@@ -62,7 +62,7 @@ class ToTextureWindow(mir3.module.Module):
         #print dT.shape, dT[0], N
 
         n = 0
-        S = numpy.array([0.0] * it) 
+        S = numpy.array([0.0] * it)
         m = numpy.array([0.0] * it)
 
         saida = numpy.zeros((analysis_track.data.shape[0], analysis_track.data.shape[1]*2))
@@ -91,8 +91,8 @@ class ToTextureWindow(mir3.module.Module):
         y = numpy.concatenate((m, S/n), axis=0)
         saida[n] = y
 
-        #     print n 
-        #     print "average: ", numpy.average(dT[:,:n], axis=1), m 
+        #     print n
+        #     print "average: ", numpy.average(dT[:,:n], axis=1), m
         #     print "S:", S
         #     print "variance: ", S/n, numpy.var(dT[:,:n], axis=1)
 
@@ -100,7 +100,7 @@ class ToTextureWindow(mir3.module.Module):
 
 
         for i in range(w, N):
-            
+
             m = n_m
 
             n_m = m + (dT[:,i]-m)/n - (dT[:,i-w]-m)/n
@@ -109,7 +109,7 @@ class ToTextureWindow(mir3.module.Module):
 
             # print i
             # print "average: ",  numpy.average(dT[:,i-w+1:i+1], axis=1), n_m
-            # print "S:", S 
+            # print "S:", S
             # print "variance: ", S/(n), numpy.var(dT[:,i-w+1:i+1], axis=1)
 
             y = numpy.concatenate((m, S/n), axis=0)
