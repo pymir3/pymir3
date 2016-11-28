@@ -230,6 +230,7 @@ class BandwiseFeatures:
         feature = ""
         for i in range(20):
             feature = feature + "MFCC_"+ str(i) + " "
+        feature = feature.strip()
         t.metadata.feature = feature
         t.metadata.filename = self.spectrogram.metadata.input.name
 

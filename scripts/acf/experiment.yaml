@@ -1,9 +1,10 @@
 general:
   scratch_directory: "./scratch"
-  feature_extraction_filelist: "./dt1_meta.txt"
-  train_filelist: "./file_lists/dt1_2016/dt1_f1_train.txt"
-  test_filelist: "./file_lists/dt1_2016/dt1_f1_test.txt"
-  predict_file: "predict"
+  feature_extraction_filelist: "./file_lists/jgtzan_folds/jamendo_gtzan_meta.txt"
+  train_filelist: "./file_lists/jgtzan_folds/jgtzan_f1_train.txt"
+  test_filelist: "./file_lists/jgtzan_folds/jgtzan_f1_test.txt"
+  predict_file: "./scratch/predict"
+  label_file: "./file_lists/jgtzan_folds/jgtzan_f1_evaluate.txt"
   extract_accum_tag: ""
   train_test_tag: ""
   dft:
@@ -29,8 +30,8 @@ feature_extraction:
 
 bandwise_extraction:
   scale: 'mel'
-  number_of_bands: 20
-  also_one_band: False
+  number_of_bands: 30
+  also_one_band: True
   discard_bin_zero: True
 
 #Feature aggregation parameters
@@ -39,6 +40,10 @@ feature_aggregation:
   aggregated_output: "feature_matrix"
 
 simple_aggregation:
+  texture_windows: True
+  texture_window_length: 80
+  tw_buffer_size: 100
+  tw_workers: 4
   mean: True
   variance: True
   acceleration: False
@@ -51,15 +56,27 @@ simple_aggregation:
 #Model training parameters
 model_training:
   model_trainer: "svm_reg"
-  output_model: "svm_reg.model"
+  output_model: "svm.model"
 
 svm_reg:
+  balanced_class_weights: True
   num_workers: 4
-  Cs: [0.1, 1, 10, 100, 1000, 10000, 100000]
+  Cs: [1, 10, 100, 1000, 10000]
   gammas: [0.001, 0.0001, 0.00001, 0.000001]
   probability: False
+
+gmm:
+  num_workers: 4
+  n_components: -1
+  n_init: 5
+  covariance_type: 'diag'
+  min_covar: 0.01
 
 #Model testing parameters
 model_testing:
   model_tester: "simple"
-  predict_proba_file: "predict.proba"
+  predict_proba_file: ""
+
+#Evaluation parameters
+evaluation:
+  evaluator: "simple"

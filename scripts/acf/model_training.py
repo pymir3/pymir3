@@ -19,9 +19,6 @@ class ModelTrainerInput:
         self.features = features
         self.labels = labels
 
-    # def __str__(self):
-    #     return str(self.features) + str(self.features.shape) + str(self.labels)
-
 class ModelTrainer:
 
     def __init__(self):

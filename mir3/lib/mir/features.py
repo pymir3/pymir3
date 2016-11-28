@@ -18,6 +18,10 @@ def energy(A):
     """Energy of each frame"""
     return numpy.sum(A**2 , 0)
 
+def RMSEnergy(A):
+    """RMS Energy of each Frame"""
+    return  numpy.sqrt( (1.0 / A.shape[0]) * numpy.sum(A**2, axis=0))
+
 def flux(A):
     """Spectral flux of each frame"""
     a = numpy.diff(A, axis = 1)
@@ -43,23 +47,53 @@ def rolloff(A, alpha=0.95):
 
 def low_energy(A, texture_length):
     """Low energy feature for each texture window"""
-    energy_ = energy(A)
+    energy_ = numpy.concatenate( (numpy.arange(1),  RMSEnergy(A) ))
+
     step = texture_length
     total_aw = len(energy_)
-    begin = 0
+    begin = 1
     end = begin + step - 1
-    ret = numpy.array(())
+    
+    ret = numpy.zeros( total_aw - step + 1)
+
+    running_sum = numpy.sum( energy_[:end] )
 
     while end < total_aw:
-        avg_energy = numpy.mean(energy_[begin:end+1])
-        above_average = 0
-        for i in range(begin, end+1):
-            if energy_[i] > avg_energy:
-                above_average += 1
+        running_sum = running_sum - energy_[begin-1] + energy_[end]
+        avg_energy = running_sum / step
+
+        above_average = len ( numpy.where(energy_[begin:end] > avg_energy )[0] )
+
         pct = above_average / float(step)
-        ret = numpy.hstack((ret, pct))
+        
+        ret[begin] = pct
+        
         begin+=1
         end+=1
 
+    ret = ret[1:]
+
     return ret
+
+# def low_energy(A, texture_length):
+#     """Low energy feature for each texture window"""
+#     energy_ = energy(A)
+#     step = texture_length
+#     total_aw = len(energy_)
+#     begin = 0
+#     end = begin + step - 1
+#     ret = numpy.array(())
+
+#     while end < total_aw:
+#         avg_energy = numpy.mean(energy_[begin:end+1])
+#         above_average = 0
+#         for i in range(begin, end+1):
+#             if energy_[i] > avg_energy:
+#                 above_average += 1
+#         pct = above_average / float(step)
+#         ret = numpy.hstack((ret, pct))
+#         begin+=1
+#         end+=1
+
+#     return ret
 

@@ -4,8 +4,6 @@ import time
 import numpy
 import dill
 
-from sklearn.metrics import confusion_matrix
-
 class SimpleModelTester(ModelTester):
 
     def __init__(self):
@@ -18,7 +16,13 @@ class SimpleModelTester(ModelTester):
         model = dill.load(model_file)
         model_file.close()
 
-        predicted = model.predict(test_data.features)
+        scaler_file = open( ('%s.scaler' % model_filename))
+        scaler = dill.load(scaler_file)
+        scaler_file.close()
+
+        features = scaler.transform(test_data.features)
+
+        predicted = model.predict(features)
 
         #output predict file
         predict_filename = self.params['general']['predict_file']
@@ -30,8 +34,13 @@ class SimpleModelTester(ModelTester):
         predict_file.close()
 
         if hasattr(model, "predict_proba"):
-            predicted_proba_filename = self.params['general']['scratch_directory'] + "/" +\
-                                       self.params['model_testing']['predict_proba_file'];
+
+            if self.params['model_testing']['predict_proba_file'] != "":
+                predicted_proba_filename = self.params['general']['scratch_directory'] + "/" +\
+                                           self.params['model_testing']['predict_proba_file']
+            else:
+                predicted_proba_filename = predict_filename + ".proba"
+
             print "outputting predicted probability to file %s" % (predicted_proba_filename)
             prob = model.predict_proba(test_data.features)
             predicted_from_prob = numpy.argmax(prob, axis=1) + 1
