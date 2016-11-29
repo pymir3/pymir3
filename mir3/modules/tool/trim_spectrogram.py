@@ -3,6 +3,7 @@ import argparse
 import mir3.data.metadata as md
 import mir3.data.spectrogram as spectrogram
 import mir3.module
+import copy
 
 class TrimSpectrogram(mir3.module.Module):
     def get_help(self):
@@ -77,6 +78,8 @@ class TrimSpectrogram(mir3.module.Module):
         new_s.metadata.max_time = s.time_range(maxT)[0]
         new_s.metadata.sampling_configuration = \
             s.metadata.sampling_configuration
+        new_s.metadata.input_metadata = copy.deepcopy(s.metadata)
+
         new_s.metadata.method = md.Metadata(original_input=s.metadata.input,
                                             original_method=s.metadata.method,
                                             name='trim',

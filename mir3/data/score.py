@@ -26,7 +26,8 @@ class Score(do.DataObject):
         super(Score, self).__init__(
                 md.Metadata(instrument=None,
                             method_metadata=None,
-                            input=None))
+                            input=None,
+                            input_metadata=None))
         self.data = []
 
     def append(self, sequence):

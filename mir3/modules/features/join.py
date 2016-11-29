@@ -19,6 +19,7 @@ class Join(mir3.module.Module):
         data = []
         features = []
 
+
         for t in feature_tracks:
             if t is None:
                 continue
