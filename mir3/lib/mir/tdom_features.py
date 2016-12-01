@@ -17,8 +17,12 @@ def zero_crossings(wav_data, frame_length, window_size):
     wav_data[wav_data == 0] = 1
     wav_data[wav_data == -1] = 0
 
-    size = int(numpy.ceil((len(wav_data) -\
-        (frame_length-window_size))/float(window_size))) - 1
+
+
+    size = 1 + int((len(wav_data) - frame_length) / float(window_size))
+
+    #size = int(((len(wav_data) -\
+    #    (frame_length-window_size))/float(window_size))) - 1
     ret = numpy.zeros(size + 2)
 
     for k in xrange (size):
