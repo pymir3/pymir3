@@ -1,4 +1,5 @@
 import argparse
+import copy
 import numpy
 
 import mir3.data.feature_track as track
@@ -30,6 +31,7 @@ class Flux(mir3.module.Module):
         t.metadata.feature = "Flux_" + str(min_freq_bin) + "_" +\
             str(max_freq_bin)
         t.metadata.filename = spectrum.metadata.input.name
+        t.metadata.input_metadata = copy.deepcopy(spectrum.metadata)
 
         return t
 

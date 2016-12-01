@@ -1,5 +1,6 @@
 import argparse
 import numpy
+import copy
 
 import mir3.data.feature_track as track
 import mir3.data.spectrogram as spectrogram
@@ -32,6 +33,8 @@ class Mfcc(mir3.module.Module):
             feature = feature + "MFCC_"+ str(i) + " "
         t.metadata.feature = feature
         t.metadata.filename = s.metadata.input.name
+        t.metadata.input_metadata = copy.deepcopy(s.metadata)
+
         return t
 
     def run(self, args):

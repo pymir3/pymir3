@@ -1,5 +1,6 @@
 import argparse
 import numpy
+import copy
 
 import mir3.data.feature_track as track
 import mir3.module
@@ -15,21 +16,25 @@ class Diff(mir3.module.Module):
                             help="""output file""")
 
     def run(self, args):
-        o = track.FeatureTrack().load(args.infile)
-        o = self.calc_track(o)
+        t = track.FeatureTrack().load(args.infile)
+        o = self.calc_track(t)
         o.save(args.outfile)
 
-    def calc_track(self, o):
-        if o.data.ndim == 1:
-            o.data.shape = (o.data.size, 1)
+    def calc_track(self, t):
+        o = track.FeatureTrack()
 
-        pad = numpy.zeros( (1, o.data.shape[1]) )
+        if t.data.ndim == 1:
+            t.data.shape = (t.data.size, 1)
+
+        pad = numpy.zeros( (1, t.data.shape[1]) )
 
         o.data = numpy.vstack( ( pad,
-                                 numpy.diff(o.data, axis=0) ) )
+                                 numpy.diff(t.data, axis=0) ) )
 
         # Dealing with feature metadata:
-        my_features = o.metadata.feature.split()
+        o.metadata = copy.deepcopy(t.metadata)
+        o.metadata.input_metadata = copy.deepcopy(t.metadata)
+        my_features = t.metadata.feature.split()
         new_features = ""
         for feat in my_features:
             if (len(new_features) > 2) and (new_features[-1] != " "):
