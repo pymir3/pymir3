@@ -1,5 +1,6 @@
 import argparse
 import numpy
+import copy
 
 import mir3.data.feature_track as track
 import mir3.module
@@ -19,6 +20,9 @@ class Join(mir3.module.Module):
         data = []
         features = []
 
+        o = track.FeatureTrack()
+        o.metadata.input_metadata = []
+
         for t in feature_tracks:
             if t is None:
                 continue
@@ -27,14 +31,14 @@ class Join(mir3.module.Module):
                 t.data.shape = (t.data.size,1)
             data.append(t.data)
             features.append(t.metadata.feature)
+            o.metadata.input_metadata.append(copy.deepcopy(t.metadata))
             #print a.name, t.metadata.feature, t.data.shape
-
-        o = track.FeatureTrack()
 
         o.data = numpy.hstack(data)
         o.metadata.feature = ' '.join(features)
         o.metadata.filename = t.metadata.filename
         o.metadata.sampling_configuration = t.metadata.sampling_configuration
+
 
         return o
 

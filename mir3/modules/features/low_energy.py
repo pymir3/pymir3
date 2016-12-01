@@ -6,6 +6,7 @@ import mir3.data.spectrogram as spectrogram
 import mir3.lib.mir.features as feats
 import mir3.lib.mir.tdom_features as td_feats
 import mir3.module
+import copy
 
 class LowEnergy(mir3.module.Module):
     """Calculate the Low Energy feature"""
@@ -34,6 +35,7 @@ class LowEnergy(mir3.module.Module):
             str(max_freq_bin)
 
         t.metadata.filename = spectrum.metadata.input.name
+        t.metadata.input_metadata = copy.deepcopy(spectrum.metadata)
 
         return t
 

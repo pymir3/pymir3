@@ -1,4 +1,5 @@
 import argparse
+import copy
 import numpy
 import mir3.data.metadata as metadata
 import mir3.data.feature_track as ft
@@ -55,6 +56,8 @@ class ToTextureWindow(mir3.module.Module):
         #print ts, len(ts.split(" "))
 
         window_track.metadata.feature = ts
+        window_track.metadata.input_metadata =\
+                copy.deepcopy(analysis_track.metadata)
 
         #print feats
         #print ts

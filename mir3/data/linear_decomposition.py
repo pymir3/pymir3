@@ -23,7 +23,8 @@ class LinearDecomposition(do.DataObject):
 
     def __init__(self):
         super(LinearDecomposition, self).__init__(
-                md.Metadata(left={},
+                md.Metadata(input_metadata=None,
+                            left={},
                             right={}))
 
         self.data = blank.Blank(left={},

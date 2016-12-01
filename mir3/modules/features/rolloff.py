@@ -1,5 +1,6 @@
 import argparse
 import numpy
+import copy
 
 import mir3.data.feature_track as track
 import mir3.data.spectrogram as spectrogram
@@ -31,6 +32,7 @@ class Rolloff(mir3.module.Module):
             str(max_freq_bin)
 
         t.metadata.filename = spectrum.metadata.input.name
+        t.metadata.input_metadata = copy.deepcopy(spectrum.metadata)
 
         return t
 

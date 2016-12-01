@@ -8,6 +8,7 @@ class FeatureMatrix(do.DataObject):
     def __init__(self):
         super(FeatureMatrix, self).__init__(md.Metadata(feature=[],
                         filename=[],
+                        input_metadata=None,
                         sampling_configuration=md.Metadata(
                             dft_length=1024, fs=None, ofs=None,
                             spectrum_type='magnitude', window_length=1024,

@@ -32,6 +32,7 @@ class Spectrogram(do.DataObject):
     def __init__(self):
         super(Spectrogram, self).__init__(
             md.Metadata(input=None,
+                        input_metadata=None,
                         method=None,
                         min_freq=0.,
                         min_time=0.,

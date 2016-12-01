@@ -15,22 +15,23 @@ class TDZeroCrossings(mir3.module.Module):
 
     def build_arguments(self, parser):
         parser.add_argument('-F','--frame-length', type=int, default=1024, help="""size of frames, in samples (default: %(default)s)""")
-        parser.add_argument('-W','--window-size', type=int, default=512, help="""sliding window size, in samples (default: %(default)s)""")     
+        parser.add_argument('-W','--window-size', type=int, default=512, help="""sliding window size, in samples (default: %(default)s)""")
         parser.add_argument('infile', type=argparse.FileType('rb'),
                             help="""wav audio file""")
         parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""output track file""")
 
-    def run(self, args):
-        
-        rate, data = scipy.io.wavfile.read(args.infile)
+    def calc_track(self, data, frame_length, window_size, rate=44100):
         t = track.FeatureTrack()
-        t.data = td_feats.zero_crossings(data, args.frame_length, args.window_size)
-
+        t.data = td_feats.zero_crossings(data, frame_length, window_size)
         t.metadata.sampling_configuration.fs = rate
-        t.metadata.sampling_configuration.ofs = rate / args.window_size
-        t.metadata.sampling_configuration.window_length = args.window_size
+        t.metadata.sampling_configuration.ofs = rate / window_size
+        t.metadata.sampling_configuration.window_length = frame_length
         t.metadata.feature = "TDZeroCrossings"
-        t.metadata.filename = args.infile.name
+        return t
+
+    def run(self, args):
+        t = self.calc_track(args.infile, args.frame_length, args.window_size)
+        t.metadata.filename = infile
         t.save(args.outfile)
 
