@@ -7,6 +7,7 @@ from feature_aggregation import FeatureAggregator
 from model_training import ModelTrainer
 from model_testing import ModelTester
 from evaluation import Evaluator
+from pprint import pprint
 
 #ETC stands for Feature Extraction, Train and Classify
 #The idea is to make this the frontend for all ETC activities :)
@@ -217,6 +218,11 @@ def run_fetc():
     overwrite_params(exp, ovw)
 
     update_parameters(exp)
+
+    if exp['general']['output_parameters']:
+        print("===Experiment PARAMETERS===")
+        pprint(exp)
+        print("===End of Experiment PARAMETERS===")
 
     #print exp
 
