@@ -66,7 +66,7 @@ if __name__ == "__main__":
             print "\n", l
             current_exp = l.replace("###", "").replace(",", " ")
 
-        if "testing" in l:
+        if "testing model" in l:
             update_folds(fold_results, content, lineno)
 
         if "!!!" in l:
