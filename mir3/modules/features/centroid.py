@@ -1,6 +1,5 @@
 import argparse
 import copy
-import numpy
 
 import mir3.data.feature_track as track
 import mir3.data.spectrogram as spectrogram

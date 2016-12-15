@@ -1,5 +1,4 @@
 import argparse
-import mir3.data.note as note
 import mir3.data.score as score
 import mir3.lib.midi.MidiOutFile as MidiOutFile
 import mir3.module

@@ -1,8 +1,5 @@
 import numpy as np
 
-from scipy.io import loadmat
-from scipy.signal import lfilter, hamming
-from scipy.fftpack import fft
 from scipy.fftpack.realtransforms import dct
 
 def hz2mel(f):
@@ -98,7 +95,7 @@ def mfcc(input, nceps=13):
 
     nlinfil = 13
     nlogfil = 27
-    nfil = nlinfil + nlogfil
+    nlinfil + nlogfil
 
     fbank = trfbank(fs, nfft, lowfreq, linsc, logsc, nlinfil, nlogfil)[0]
     fbank = fbank.T[0:input.data.shape[0], :]

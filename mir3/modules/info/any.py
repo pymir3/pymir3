@@ -2,7 +2,6 @@ import argparse
 import numpy
 import pickle
 import sys
-import zlib
 
 import mir3.data.blank as blank
 import mir3.module

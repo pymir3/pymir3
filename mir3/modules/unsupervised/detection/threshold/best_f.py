@@ -1,12 +1,8 @@
 import argparse
-import numpy
 
 import sys
 
-import mir3.data.evaluation as evaluation
 import mir3.data.score as score
-import mir3.data.metadata as md
-import mir3.lib.mir.midifeatures as feats
 import mir3.module
 
 

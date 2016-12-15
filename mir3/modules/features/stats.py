@@ -1,5 +1,4 @@
 import argparse
-import copy
 import numpy
 import scipy.stats
 import scipy.signal

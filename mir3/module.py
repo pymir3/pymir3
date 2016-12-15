@@ -36,7 +36,6 @@ class Module(object):
         Args:
             parser: an argparse parser.
         """
-        pass
 
     def run(self, args):
         """Runs the module from command line.

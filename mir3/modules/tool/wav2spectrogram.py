@@ -12,7 +12,6 @@ import mir3.data.spectrogram as spectrogram
 import mir3.module
 import tempfile
 import subprocess
-import gc
 
 MAX_MEM_BLOCK = 2**8 * 2**10
 

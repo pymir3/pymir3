@@ -1,5 +1,4 @@
 import argparse
-import numpy
 
 import mir3.data.score as score
 import mir3.lib.mir.midifeatures as feats

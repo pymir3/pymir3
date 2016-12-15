@@ -90,7 +90,6 @@ class MidiOutStream:
 
     def channel_message(self, message_type, channel, data):
         """The default event handler for channel messages"""
-        pass
 
 
     def note_on(self, channel=0, note=0x40, velocity=0x40):
@@ -99,7 +98,6 @@ class MidiOutStream:
         channel: 0-15
         note, velocity: 0-127
         """
-        pass
 
 
     def note_off(self, channel=0, note=0x40, velocity=0x40):
@@ -108,7 +106,6 @@ class MidiOutStream:
         channel: 0-15
         note, velocity: 0-127
         """
-        pass
 
 
     def aftertouch(self, channel=0, note=0x40, velocity=0x40):
@@ -117,7 +114,6 @@ class MidiOutStream:
         channel: 0-15
         note, velocity: 0-127
         """
-        pass
 
 
     def continuous_controller(self, channel, controller, value):
@@ -126,7 +122,6 @@ class MidiOutStream:
         channel: 0-15
         controller, value: 0-127
         """
-        pass
 
 
     def patch_change(self, channel, patch):
@@ -135,7 +130,6 @@ class MidiOutStream:
         channel: 0-15
         patch: 0-127
         """
-        pass
 
 
     def channel_pressure(self, channel, pressure):
@@ -144,7 +138,6 @@ class MidiOutStream:
         channel: 0-15
         pressure: 0-127
         """
-        pass
 
 
     def pitch_bend(self, channel, value):
@@ -154,7 +147,6 @@ class MidiOutStream:
         value: 0-16383
 
         """
-        pass
 
 
 
@@ -167,7 +159,6 @@ class MidiOutStream:
         """
         data: list of values in range(128)
         """
-        pass
 
 
     #####################
@@ -178,7 +169,6 @@ class MidiOutStream:
         """
         value: 0-16383
         """
-        pass
 
 
     def song_select(self, songNumber):
@@ -186,7 +176,6 @@ class MidiOutStream:
         """
         songNumber: 0-127
         """
-        pass
 
 
     def tuning_request(self):
@@ -194,7 +183,6 @@ class MidiOutStream:
         """
         No values passed
         """
-        pass
 
             
     def midi_time_code(self, msg_type, values):
@@ -202,7 +190,6 @@ class MidiOutStream:
         msg_type: 0-7
         values: 0-15
         """
-        pass
 
 
     #########################
@@ -215,7 +202,6 @@ class MidiOutStream:
         nTracks: number of tracks
         division: timing division
         """
-        pass
 
 
     def eof(self):
@@ -223,7 +209,6 @@ class MidiOutStream:
         """
         End of file. No more events to be processed.
         """
-        pass
 
 
     #####################
@@ -235,7 +220,6 @@ class MidiOutStream:
         """
         Handles any undefined meta events
         """
-        pass
 
 
     def start_of_track(self, n_track=0):
@@ -243,7 +227,6 @@ class MidiOutStream:
         """
         n_track: number of track
         """
-        pass
 
 
     def end_of_track(self):
@@ -251,7 +234,6 @@ class MidiOutStream:
         """
         n_track: number of track
         """
-        pass
 
 
     def sequence_number(self, value):
@@ -259,7 +241,6 @@ class MidiOutStream:
         """
         value: 0-16383
         """
-        pass
 
 
     def text(self, text):
@@ -268,7 +249,6 @@ class MidiOutStream:
         Text event
         text: string
         """
-        pass
 
 
     def copyright(self, text):
@@ -277,7 +257,6 @@ class MidiOutStream:
         Copyright notice
         text: string
         """
-        pass
 
 
     def sequence_name(self, text):
@@ -286,7 +265,6 @@ class MidiOutStream:
         Sequence/track name
         text: string
         """
-        pass
 
 
     def instrument_name(self, text):
@@ -294,7 +272,6 @@ class MidiOutStream:
         """
         text: string
         """
-        pass
 
 
     def lyric(self, text):
@@ -302,7 +279,6 @@ class MidiOutStream:
         """
         text: string
         """
-        pass
 
 
     def marker(self, text):
@@ -310,7 +286,6 @@ class MidiOutStream:
         """
         text: string
         """
-        pass
 
 
     def cuepoint(self, text):
@@ -318,7 +293,6 @@ class MidiOutStream:
         """
         text: string
         """
-        pass
 
 
     def midi_ch_prefix(self, channel):
@@ -326,7 +300,6 @@ class MidiOutStream:
         """
         channel: midi channel for subsequent data (deprecated in the spec)
         """
-        pass
 
 
     def midi_port(self, value):
@@ -334,7 +307,6 @@ class MidiOutStream:
         """
         value: Midi port (deprecated in the spec)
         """
-        pass
 
 
     def tempo(self, value):
@@ -344,7 +316,6 @@ class MidiOutStream:
         tempo in us/quarternote
         (to calculate value from bpm: int(60,000,000.00 / BPM))
         """
-        pass
 
 
     def smtp_offset(self, hour, minute, second, frame, framePart):
@@ -363,7 +334,6 @@ class MidiOutStream:
                    using a different frame subdivision, defined in the 
                    MThd chunk).
         """
-        pass
 
 
 
@@ -378,7 +348,6 @@ class MidiOutStream:
         bb: The number of notated 32nd notes in a MIDI quarter note 
             (24 MIDI clocks)        
         """
-        pass
 
 
 
@@ -390,7 +359,6 @@ class MidiOutStream:
             = 1 flat, 0 = key of C, 1 = 1 sharp, etc).
         mi: is a byte specifying a major (0) or minor (1) key.
         """
-        pass
 
 
 
@@ -399,7 +367,6 @@ class MidiOutStream:
         """
         data: The data as byte values
         """
-        pass
 
 
 
@@ -412,7 +379,6 @@ class MidiOutStream:
         """
         No values passed
         """
-        pass
 
 
 
@@ -421,7 +387,6 @@ class MidiOutStream:
         """
         No values passed
         """
-        pass
 
 
 
@@ -430,7 +395,6 @@ class MidiOutStream:
         """
         No values passed
         """
-        pass
 
 
 
@@ -439,7 +403,6 @@ class MidiOutStream:
         """
         No values passed
         """
-        pass
 
 
 
@@ -448,7 +411,6 @@ class MidiOutStream:
         """
         No values passed
         """
-        pass
 
 
 
@@ -457,7 +419,6 @@ class MidiOutStream:
         """
         No values passed
         """
-        pass
 
 
 

@@ -1,6 +1,5 @@
 import numpy
 import numpy.linalg
-import scipy.stats
 
 # Self Similarity Calculations
 # Inputs:

@@ -1,7 +1,6 @@
 # -*- coding: ISO-8859-1 -*-
 
 # std library
-from struct import unpack
 
 # uhh I don't really like this, but there are so many constants to 
 # import otherwise
@@ -127,7 +126,7 @@ class MidiFileParser:
                 # only read last data byte if it is a sysex terminator
                 # It should allways be there, but better safe than sorry
                 if raw_in.readBew(move_cursor=0) == END_OFF_EXCLUSIVE:
-                    eo_sysex = raw_in.readBew()
+                    raw_in.readBew()
                 dispatch.sysex_event(sysex_data)
                 # the sysex code has not been properly tested, and might be fishy!
 

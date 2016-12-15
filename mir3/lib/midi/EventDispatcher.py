@@ -1,10 +1,10 @@
 # -*- coding: ISO-8859-1 -*-
 
 # std library
-from struct import unpack
 
 # custom
-from DataTypeConverters import readBew, readVar, varLen, toBytes
+from DataTypeConverters import readBew
+from DataTypeConverters import toBytes
 
 # uhh I don't really like this, but there are so many constants to 
 # import otherwise

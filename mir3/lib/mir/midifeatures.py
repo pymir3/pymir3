@@ -119,7 +119,7 @@ def note_density(eventList, time_resolution=0.005, duration=False):
 
     # Estimate statistics:
     d = numpy.array(densities)
-    t = numpy.array(time_array)
+    numpy.array(time_array)
 
     dMean = numpy.mean(d)
     dDev = numpy.std(d)

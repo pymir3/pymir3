@@ -66,7 +66,6 @@ class MidiOutStreamBase:
 
     def channel_message(self, message_type, channel, data):
         """The default event handler for channel messages"""
-        pass
 
 
     #####################
@@ -75,13 +74,11 @@ class MidiOutStreamBase:
     def system_exclusive(self, data):
 
         """The default event handler for system_exclusive messages"""
-        pass
 
 
     def system_common(self, common_type, common_data):
 
         """The default event handler for system common messages"""
-        pass
 
 
     #########################
@@ -94,7 +91,6 @@ class MidiOutStreamBase:
         nTracks: number of tracks
         division: timing division
         """
-        pass
 
 
     def start_of_track(self, n_track=0):
@@ -102,7 +98,6 @@ class MidiOutStreamBase:
         """
         n_track: number of track
         """
-        pass
 
 
     def eof(self):
@@ -110,7 +105,6 @@ class MidiOutStreamBase:
         """
         End of file. No more events to be processed.
         """
-        pass
 
 
     #####################
@@ -120,7 +114,6 @@ class MidiOutStreamBase:
     def meta_event(self, meta_type, data, time):
         
         """The default event handler for meta_events"""
-        pass
 
 
 

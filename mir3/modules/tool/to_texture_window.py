@@ -1,7 +1,6 @@
 import argparse
 import copy
 import numpy
-import mir3.data.metadata as metadata
 import mir3.data.feature_track as ft
 import mir3.module
 
@@ -37,7 +36,7 @@ class ToTextureWindow(mir3.module.Module):
         N = len(analysis_track.data)
 
         begin = 0
-        end = begin + w
+        begin + w
 
         ret = numpy.array(())
         ret.shape = (0,0)

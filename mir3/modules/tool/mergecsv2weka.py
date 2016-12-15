@@ -1,10 +1,7 @@
 import argparse
 import csv
-import numpy
-import numpy.random
 
 import mir3.data.feature_matrix as feature_matrix
-import mir3.data.feature_track as track
 import mir3.module
 
 class MergeCSV2Weka(mir3.module.Module):

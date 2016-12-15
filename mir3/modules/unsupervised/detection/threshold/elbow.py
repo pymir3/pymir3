@@ -1,8 +1,6 @@
-import argparse
 import numpy
 
 import mir3.data.linear_decomposition as ld
-import mir3.data.metadata as md
 import mir3.module
 
 

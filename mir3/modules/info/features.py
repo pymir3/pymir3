@@ -1,7 +1,6 @@
 import argparse
 import mir3.data.feature_matrix as feature_matrix
 import mir3.module
-import numpy
 import sys
 
 class Features(mir3.module.Module):

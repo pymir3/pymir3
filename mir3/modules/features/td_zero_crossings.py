@@ -1,9 +1,5 @@
 import argparse
-import numpy
-import scipy.io.wavfile
 import mir3.data.feature_track as track
-import mir3.data.spectrogram as spectrogram
-import mir3.lib.mir.features as feats
 import mir3.lib.mir.tdom_features as td_feats
 import mir3.module
 

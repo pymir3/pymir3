@@ -1,8 +1,5 @@
 import argparse
-import copy
 import numpy
-import scipy.stats
-import sys
 
 import mir3.data.self_similarity_matrix as self_similarity_matrix
 import mir3.data.feature_track as track
@@ -26,8 +23,6 @@ class SelfSimilarity(mir3.module.Module):
     def run(self, args):
         o = track.FeatureTrack()
 
-        final_output = None
-        final_filenames = []
 
         o = o.load(args.infile)
 

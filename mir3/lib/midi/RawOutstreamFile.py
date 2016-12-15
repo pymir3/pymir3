@@ -3,11 +3,11 @@
 # standard library imports
 import sys
 from types import StringType
-from struct import unpack
 from cStringIO import StringIO
 
 # custom import
-from DataTypeConverters import writeBew, writeVar, fromBytes
+from DataTypeConverters import writeBew
+from DataTypeConverters import writeVar
 
 class RawOutstreamFile:
     
@@ -37,7 +37,7 @@ class RawOutstreamFile:
 
     def writeVarLen(self, value):
         "Writes a variable length word to the file"
-        var = self.writeSlice(writeVar(value))
+        self.writeSlice(writeVar(value))
 
 
     def write(self):

@@ -1,5 +1,4 @@
 import argparse
-import numpy
 import copy
 
 import mir3.data.feature_track as track
