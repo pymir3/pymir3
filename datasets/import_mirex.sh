@@ -2,5 +2,5 @@
 
 echo "Downloading MIREX-based database"
 # TODO: remove from dropbox
-wget https://dl.dropboxusercontent.com/u/64294901/TrollData/mirex.zip --no-check-certificate
-unzip mirex.zip
+wget http://timba.nics.unicamp.br/mir_datasets/transcription/Mirex.zip --no-check-certificate
+unzip Mirex.zip
