@@ -468,7 +468,7 @@ class Wav2Spectrogram(mir3.module.Module):
 
         # Calculates data
         if not from_data:
-            rate, data = self.load_audio(wav_file)
+            rate, data = self.load_audio(wav_file, fs=wav_rate)
         else:
             rate = wav_rate
             data = wav_data
