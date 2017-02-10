@@ -16,17 +16,21 @@ class Identity(mir3.module.Module):
         parser.add_argument('outfile', type=argparse.FileType('wb'),
                             help="""output track file""")
 
+    def calc_track(self, spectrum):
+        t = track.FeatureTrack()
+        t.data = spectrum.data.T
+
+        t.metadata.sampling_configuration = spectrum.metadata.sampling_configuration
+        t.metadata.feature = ""
+        for f in xrange(spectrum.data.shape[0]):
+            t.metadata.feature += "DFT_" + str(spectrum.freq_bin(f)) + "Hz "
+
+        t.metadata.filename = spectrum.metadata.input.name
+        return t
+
     def run(self, args):
         s = spectrogram.Spectrogram().load(args.infile)
+        t = self.calc_track(s)
 
-        t = track.FeatureTrack()
-        t.data = s.data.T
-
-        t.metadata.sampling_configuration = s.metadata.sampling_configuration
-        t.metadata.feature = ""
-        for f in xrange(s.data.shape[0]):
-            t.metadata.feature += "DFT_" + str(s.freq_bin(f)) + "Hz "
-
-        t.metadata.filename = s.metadata.input.name
         t.save(args.outfile)
 

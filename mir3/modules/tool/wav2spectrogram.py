@@ -359,6 +359,7 @@ class Wav2Spectrogram(mir3.module.Module):
         from: https://github.com/TUT-ARG/DCASE2016-baseline-system-python/blob/master/src/files.py
         """
 
+
         if isinstance(audiofile, basestring):
             audiofile = open(audiofile, "rb")
 
@@ -432,7 +433,7 @@ class Wav2Spectrogram(mir3.module.Module):
 
     def convert(self, wav_file, window_length=2048, dft_length=2048,
                 window_step=1024,
-                spectrum_type='magnitude', save_metadata=True, wav_rate=None, wav_data=None):
+                spectrum_type='magnitude', save_metadata=True, wav_rate=44100, wav_data=None):
 
         """Converts a WAV file to a spectrogram.
 
