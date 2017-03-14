@@ -72,19 +72,14 @@ class ModelTester:
                     ffiles = f.readlines()
 
                 filenames = []
-                labels_f = []
 
                 for l in ffiles:
                     d = l.split('\t')
-                    if len(d) < 2:
-                        break
                     filenames.append(d[0].strip())
-                    labels_f.append(d[1].strip())
                 
-                filenames_features = map(lambda x: self.params['general']['scratch_directory'] + "/" + os.path.basename(x) + '.features', filenames)
+                filenames_features = map(lambda x: self.params['general']['scratch_directory'] + "/" + acf_utils.extract_filename(x, "wav") + ".features", filenames)
 
                 features = []
-                labels = []
 
                 for f in xrange(len(filenames_features)):
                     track = feature_track.FeatureTrack()
@@ -96,7 +91,6 @@ class ModelTester:
 
                     if not numpy.any(numpy.isnan(ft)):
                         features.append(ft)
-                        labels.append(labels_f[f])
                 
                 filenames_features = None
                 ft = None

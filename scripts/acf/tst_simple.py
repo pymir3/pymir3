@@ -44,9 +44,6 @@ class SimpleModelTester(ModelTester):
         if model.n_dic != None:
             predicted = model.numbers_to_labels(predicted)
 
-        print predicted
-
-
         #output predict file
         predict_filename = self.params['general']['predict_file']
         print "outputting predicted classes to file %s" % (predict_filename)
