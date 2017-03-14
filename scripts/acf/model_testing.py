@@ -76,6 +76,8 @@ class ModelTester:
 
                 for l in ffiles:
                     d = l.split('\t')
+                    if len(d) < 2:
+                        break
                     filenames.append(d[0].strip())
                     labels_f.append(d[1].strip())
                 
