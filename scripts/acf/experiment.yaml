@@ -78,6 +78,7 @@ hmm:
   n_components: 6
   covariance_type: 'diag'
   n_iter: 10
+  n_workers: 1
 
 #Model testing parameters
 model_testing:

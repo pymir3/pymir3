@@ -136,7 +136,7 @@ class HmmModelTrainer(ModelTrainer):
 
         X_train = [scaler.transform(features[i]) for i in xrange(len(features))]
 
-        cl.fit(X_train, labels, train_lengths)
+        cl.fit(X_train, labels, train_lengths, workers=self.params['hmm']['n_workers'])
 
         out_filename = self.params['general']['scratch_directory'] + "/" + self.params['model_training']['output_model']
         outfile = open(out_filename, "w")
