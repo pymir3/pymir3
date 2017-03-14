@@ -86,7 +86,9 @@ class ModelTrainer:
                     filenames.append(d[0].strip())
                     labels_f.append(d[1].strip())
                 
-                filenames_features = map(lambda x: self.params['general']['scratch_directory'] + "/" + os.path.basename(x) + '.features', filenames)
+                acf_utils.extract_filename(track.metadata.filename, "wav") + ".features"
+
+                filenames_features = map(lambda x: self.params['general']['scratch_directory'] + "/" acf_utils.extract_filename(x, "wav") + ".features" + '.features', filenames)
 
                 features = []
                 labels = []
