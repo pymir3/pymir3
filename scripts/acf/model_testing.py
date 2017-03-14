@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import gc
-
+import os
 import acf_utils
 import sys
 import numpy
@@ -8,12 +8,13 @@ import numpy
 sys.path.append("../../")
 
 import mir3.data.feature_matrix as feature_matrix
+import mir3.data.feature_track as feature_track
 
 class ModelTesterInput:
-    def __init__(self, features, filenames):
+    def __init__(self, features, filenames, itype):
         self.features = features
         self.filenames = filenames
-
+        self.type = itype
 
 class ModelTester:
 
@@ -26,40 +27,85 @@ class ModelTester:
 
     def run(self):
 
-        print "testing model from train filelist: %s" % (self.params['general']['test_filelist'])
+        if self.params['model_testing']['test_input_type'] == 'feature_matrix':
 
-        m = feature_matrix.FeatureMatrix()
-        mf = open(self.params['general']['scratch_directory'] + "/" + self.params['feature_aggregation']['aggregated_output'])
-        m = m.load(mf)
-        mf.close()
+            print "testing model from train filelist: %s" % (self.params['general']['test_filelist'])
 
-        with open(self.params['general']['test_filelist']) as f:
-            linhas = f.readlines()
+            m = feature_matrix.FeatureMatrix()
+            mf = open(self.params['general']['scratch_directory'] + "/" + self.params['feature_aggregation']['aggregated_output'])
+            m = m.load(mf)
+            mf.close()
 
-        files = dict()
+            with open(self.params['general']['test_filelist']) as f:
+                linhas = f.readlines()
 
-        for i in xrange(len(m.metadata.filename)):
-            files[m.metadata.filename[i]] = i
+            files = dict()
 
-        features = []
-        test_filenames = []
+            for i in xrange(len(m.metadata.filename)):
+                files[m.metadata.filename[i]] = i
 
-        for i in xrange(len(linhas)):
-            filename = linhas[i].split("\t")[0].strip()
-            test_filenames.append(filename)
+            features = []
+            test_filenames = []
 
-            feat = m.data[files[filename]]
-            features.append(feat)
+            for i in xrange(len(linhas)):
+                filename = linhas[i].split("\t")[0].strip()
+                test_filenames.append(filename)
 
-        features = numpy.array(features)
+                feat = m.data[files[filename]]
+                features.append(feat)
 
-        files = None
+            features = numpy.array(features)
 
-        input = ModelTesterInput(features, test_filenames)
+            files = None
 
-        gc.collect()
+            input = ModelTesterInput(features, test_filenames, 'matrix')
 
-        self.test(input)
+            gc.collect()
+
+            self.test(input)
+
+        else:
+
+            if self.params['model_testing']['test_input_type'] == 'feature_tracks':
+
+                with open(self.params['general']['test_filelist']) as f:
+                    ffiles = f.readlines()
+
+                filenames = []
+                labels_f = []
+
+                for l in ffiles:
+                    d = l.split('\t')
+                    filenames.append(d[0].strip())
+                    labels_f.append(d[1].strip())
+                
+                filenames_features = map(lambda x: self.params['general']['scratch_directory'] + "/" + os.path.basename(x) + '.features', filenames)
+
+                features = []
+                labels = []
+
+                for f in xrange(len(filenames_features)):
+                    track = feature_track.FeatureTrack()
+                    trackfile = open(filenames_features[f], mode='r')
+                    track = track.load(trackfile)
+                    trackfile.close()
+                    
+                    ft = track.data
+
+                    if not numpy.any(numpy.isnan(ft)):
+                        features.append(ft)
+                        labels.append(labels_f[f])
+                
+                filenames_features = None
+                ft = None
+
+                features = numpy.array(features)
+
+                input = ModelTesterInput(features, filenames, 'tracks')
+                    
+                gc.collect()
+
+                self.test(input)                
 
     def test(self, test_data):
         raise NotImplementedError

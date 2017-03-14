@@ -20,9 +20,32 @@ class SimpleModelTester(ModelTester):
         scaler = dill.load(scaler_file)
         scaler_file.close()
 
-        features = scaler.transform(test_data.features)
 
-        predicted = model.predict(features)
+        if test_data.type == 'matrix':
+
+            features = scaler.transform(test_data.features)
+
+            predicted = model.predict(features)
+
+        else:
+
+            if test_data.type == 'tracks':
+
+                all_tests = numpy.array(test_data.features[0])
+                train_lengths = [test_data.features[0].shape[0]]
+                for i in xrange(1, len(test_data.features)):
+                    all_tests = numpy.vstack( (all_tests, numpy.array(test_data.features[i])) )
+                    train_lengths.append(test_data.features[i].shape[0])
+
+                X_test = [ scaler.transform(test_data.features[i]) for i in xrange(len(test_data.features)) ]
+
+                predicted = [ model.predict(X_test[i]) for i in xrange(len(X_test)) ]
+
+        if model.n_dic != None:
+            predicted = model.numbers_to_labels(predicted)
+
+        print predicted
+
 
         #output predict file
         predict_filename = self.params['general']['predict_file']

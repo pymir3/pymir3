@@ -11,10 +11,10 @@ general:
     len: 2048
     window_size: 1024
     window_step: 512
-  sample_rate: 44100 #usar isso!!!!!!!! resampling é muito lento..
+  sample_rate: 22050 #usar isso!!!!!!!! resampling é muito lento..
   mono: True
   zero_pad_resampling: True
-  output_parameters: True
+  output_parameters: False
 
 steps:
   extract_features: False
@@ -27,10 +27,10 @@ steps:
 feature_extraction:
   output_buffer_size: 100
   extractor: 'bandwise'
-  worker_extractors: 4
+  worker_extractors: 1
 
 bandwise_extraction:
-  scale: 'mel'
+  scale: 'one'
   number_of_bands: 30
   also_one_band: True
   discard_bin_zero: True
@@ -44,7 +44,7 @@ simple_aggregation:
   texture_windows: True
   texture_window_length: 80
   tw_buffer_size: 100
-  tw_workers: 4
+  tw_workers: 1
   mean: True
   variance: True
   acceleration: False
@@ -56,12 +56,13 @@ simple_aggregation:
 
 #Model training parameters
 model_training:
-  model_trainer: "svm_reg"
-  output_model: "svm.model"
+  model_trainer: "hmm"
+  output_model: "hmm.model"
+  train_input_type: 'feature_tracks'
 
 svm_reg:
-  balanced_class_weights: True
-  num_workers: 4
+  balanced_class_weights: False
+  num_workers: 12
   Cs: [1, 10, 100, 1000, 10000]
   gammas: [0.001, 0.0001, 0.00001, 0.000001]
   probability: False
@@ -73,10 +74,16 @@ gmm:
   covariance_type: 'diag'
   min_covar: 0.01
 
+hmm:
+  n_components: 6
+  covariance_type: 'diag'
+  n_iter: 10
+
 #Model testing parameters
 model_testing:
   model_tester: "simple"
   predict_proba_file: ""
+  test_input_type: 'feature_tracks'
 
 #Evaluation parameters
 evaluation:
