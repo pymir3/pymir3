@@ -41,8 +41,9 @@ class SimpleModelTester(ModelTester):
 
                 predicted = [ model.predict(X_test[i]) for i in xrange(len(X_test)) ]
 
-        if model.n_dic != None:
-            predicted = model.numbers_to_labels(predicted)
+	if hasattr(model, "n_dic"):
+	    if model.n_dic != None:
+	        predicted = model.numbers_to_labels(predicted)
 
         #output predict file
         predict_filename = self.params['general']['predict_file']
