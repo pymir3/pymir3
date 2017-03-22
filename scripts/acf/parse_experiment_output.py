@@ -23,7 +23,22 @@ def update_folds(fl, content, lineno, last_tag):
 def update_train_folds(fl, content, lineno):
     
     i = lineno
-    while "testing model" not in content[i]:
+    c='N/A'
+    gamma='N/A'
+    best_model_score=0.0
+    anova_pct = 0
+    train_time = 0
+    user_time = 0
+    system_time = 0
+    total_time = 0
+    cpu = 0
+    maxresident = 0
+    inputs = 0
+    outputs = 0
+    major_pf = 0
+    minor_pf = 0
+    
+    while ("testing model" not in content[i]) and ("outputting predicted classes" not in content[i]):
 
         if "training took" in content[i]:
             d = content[i].split(" ")
@@ -38,6 +53,10 @@ def update_train_folds(fl, content, lineno):
             d = content[i].split(" ")
             c = d[7].strip()
             gamma = d[10].strip()
+
+        if "model score" in content[i]:
+            d = content[i].split(" ")
+            best_model_score = float(d[3].strip())
 
         if "maxresident" in content[i]:
             d = content[i].split(" ")
@@ -59,7 +78,7 @@ def update_train_folds(fl, content, lineno):
 
     total_time = float(elapsed_time.split(":")[0]) * 60 + float(elapsed_time.split(":")[1].split(".")[0]) + float(elapsed_time.split(":")[1].split(".")[1]) * .01
 
-    fl.append( [c, gamma, anova_pct,  train_time, user_time, system_time, total_time, cpu, maxresident, inputs, outputs, major_pf, minor_pf] )
+    fl.append( [c, gamma, anova_pct, best_model_score, train_time, user_time, system_time, total_time, cpu, maxresident, inputs, outputs, major_pf, minor_pf] )
 
 def print_results(folds):
 
@@ -122,7 +141,7 @@ if __name__ == "__main__":
             print "\n", l
             current_exp = l.replace("###", "").replace(",", " ")
 
-        if "testing model" in l:
+        if "testing model" in l or "predict file:" in l:
             update_folds(fold_results, content, lineno, sys.argv[3])
 
         if "*** FOLD" in l:
@@ -169,7 +188,7 @@ if __name__ == "__main__":
 
     output.write("\n\n\n")
 
-    output.write("exp;var;anova_pct;train_time;user_time;system_time;wall_time;cpu_usage;maxresident(k);inputs;outputs;majpf;minpf\n")
+    output.write("exp;var;anova_pct;best_model_score;train_time;user_time;system_time;wall_time;cpu_usage;maxresident(k);inputs;outputs;majpf;minpf\n")
 
     for i in final_train_results:
         output.write( "%s;%s;" %(i[0].strip(), i[1].strip()))
