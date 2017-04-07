@@ -476,8 +476,8 @@ class Wav2Spectrogram(mir3.module.Module):
 
         #data /= numpy.max(numpy.abs(data)) # Normalization to -1/+1 range
 
-        data -= numpy.mean(data)
-        data /= numpy.var(data)**(0.5)
+        #data -= numpy.mean(data)
+        #data /= numpy.var(data)**(0.5)
 
         if data.ndim > 1:
             data = numpy.sum(data, axis=1)

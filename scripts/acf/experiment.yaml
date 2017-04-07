@@ -28,6 +28,7 @@ feature_extraction:
   output_buffer_size: 100
   extractor: 'bandwise'
   worker_extractors: 1
+  threshold_cut: None
 
 bandwise_extraction:
   scale: 'one'
