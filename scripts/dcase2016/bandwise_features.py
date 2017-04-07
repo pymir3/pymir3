@@ -20,7 +20,7 @@ import mir3.lib.mir.tdom_features as tdomf
 
 import mir3.modules.features.join as feat_join
 import mir3.modules.features.stats as feat_stats
-
+import mir3.modules.tool.threshold_spectrogram as threshold
 
 class FrequencyBand:
     def bands(self):
@@ -119,7 +119,7 @@ class BandwiseFeatures:
     """
 
     def __init__(self, infile, dft_len=2048, window='hanning', window_len=2048, window_step=1024, db_spec = True,
-                                            fs = 44100, mono = True, zero_pad_resampling=False ):
+                                            fs = 44100, mono = True, zero_pad_resampling=False, threshold_cut=None ):
         self.infile = infile
         self.dft_len = dft_len
         self.window_len = window_len
@@ -127,7 +127,7 @@ class BandwiseFeatures:
         self.window_step = window_step
         self.db_spec = db_spec
         self.features_per_band = 0
-
+        self.threshold_cut = threshold_cut
 
         #load the auio file and compute its spectrum
         #audio_file = open(infile, 'rb')
@@ -149,7 +149,8 @@ class BandwiseFeatures:
                                                               wav_rate=rate,
                                                               wav_data=audio_data)
 
-
+        if self.threshold_cut is not None:
+            self.spectrogram = threshold.ThresholdSpectrogram.threshold(self.spectrogram, self.threshold_cut)
 
         # keeping the time-domain data for computing time-domain features
         self.audio_data = audio_data
