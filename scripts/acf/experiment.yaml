@@ -28,13 +28,13 @@ feature_extraction:
   output_buffer_size: 100
   extractor: 'bandwise'
   worker_extractors: 1
-  threshold_cut: None
 
 bandwise_extraction:
   scale: 'one'
   number_of_bands: 30
   also_one_band: True
   discard_bin_zero: True
+  threshold_cut: None
 
 #Feature aggregation parameters
 feature_aggregation:
