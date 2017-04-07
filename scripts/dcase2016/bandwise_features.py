@@ -150,7 +150,7 @@ class BandwiseFeatures:
                                                               wav_data=audio_data)
 
         if self.threshold_cut is not None:
-            self.spectrogram = threshold.ThresholdSpectrogram.threshold(self.spectrogram, self.threshold_cut)
+            self.spectrogram = threshold.ThresholdSpectrogram().threshold(self.spectrogram, self.threshold_cut)
 
         # keeping the time-domain data for computing time-domain features
         self.audio_data = audio_data

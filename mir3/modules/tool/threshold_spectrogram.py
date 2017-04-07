@@ -1,6 +1,6 @@
 import argparse
 import csv
-import numpy
+import numpy as np
 import copy
 
 import mir3.data.feature_matrix as feature_matrix
@@ -27,7 +27,7 @@ class ThresholdSpectrogram(mir3.module.Module):
         data = out.data
         M = np.max(data)
         F = data / M
-        k = 20 * np.log10(F)
+        k = 20 * np.log10(F + + np.finfo(np.float).eps)
         k[k >= threshold] = 1
         k[k <  threshold] = 0
         data = data * k
