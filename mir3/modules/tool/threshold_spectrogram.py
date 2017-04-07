@@ -21,7 +21,7 @@ class ThresholdSpectrogram(mir3.module.Module):
 
         if overwrite_spec:
             out = input_spec
-        else
+        else:
             out = copy.deepcopy(input_spec)
 
         data = out.data
