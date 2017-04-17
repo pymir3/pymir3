@@ -50,7 +50,7 @@ class ModelTrainer:
 
             for i in xrange(len(m.metadata.filename)):
                 files[m.metadata.filename[i]] = i
-
+          
             labels = []
             features = []
 

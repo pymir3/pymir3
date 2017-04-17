@@ -57,9 +57,9 @@ simple_aggregation:
 
 #Model training parameters
 model_training:
-  model_trainer: "hmm"
-  output_model: "hmm.model"
-  train_input_type: 'feature_tracks'
+  model_trainer: "sigtia_net"
+  output_model: "sigtia_net.params"
+  train_input_type: 'feature_matrix'
 
 svm_reg:
   balanced_class_weights: False
@@ -67,6 +67,11 @@ svm_reg:
   Cs: [1, 10, 100, 1000, 10000]
   gammas: [0.001, 0.0001, 0.00001, 0.000001]
   probability: False
+
+sigtia_net:
+  hidden_neurons: 50
+  hidden_layers: 3
+  dropout_rate: 0.0
 
 gmm:
   num_workers: 4
@@ -85,7 +90,8 @@ hmm:
 model_testing:
   model_tester: "simple"
   predict_proba_file: ""
-  test_input_type: 'feature_tracks'
+  test_input_type: 'feature_matrix'
+  label_dict: 'gtzan_label.dict'
 
 #Evaluation parameters
 evaluation:

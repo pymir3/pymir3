@@ -3,6 +3,7 @@ from sklearn.svm import SVC
 import time
 import numpy
 import dill
+from dft_net import sigtia_net
 
 class SimpleModelTester(ModelTester):
 
@@ -11,6 +12,7 @@ class SimpleModelTester(ModelTester):
 
     def test(self, test_data):
         model_filename = self.params['general']['scratch_directory'] + "/" + self.params['model_training']['output_model']
+        label_dict = self.params['general']['scratch_directory'] + "/" + self.params['model_testing']['label_dict']
 
         model_file = open(model_filename)
         model = dill.load(model_file)
@@ -23,9 +25,35 @@ class SimpleModelTester(ModelTester):
 
         if test_data.type == 'matrix':
 
+            if self.params['model_training']['model_trainer'] == "sigtia_net":
+                params = model
+                ld_file = open(label_dict)
+                l_dict = dill.load(ld_file)
+                ld_file.close()
+                hidden_neurons = self.params['sigtia_net']['hidden_neurons']
+                hidden_layers = self.params['sigtia_net']['hidden_layers']
+                dropout_rate = self.params['sigtia_net']['dropout_rate']
+                model = sigtia_net.SigtiaNET((None, test_data.features.shape[1]), len(l_dict.keys()),
+                     hidden_neurons=hidden_neurons, hidden_layers=hidden_layers, dropout_rate=dropout_rate)
+                model.set_params(params)
+                
             features = scaler.transform(test_data.features)
 
-            predicted = model.predict(features)
+            predicted = model.predict((features.astype('float32'), None))
+            print predicted.shape
+            if self.params['model_training']['model_trainer'] == "sigtia_net":
+                predicted = predicted.argmax(axis=1)
+
+
+            #TODO: na verdade esse esquema de voltar as labels deve ser feito de forma independente se o tipo eh matrix ou tracks
+            #na HMM eu fiz diferente (ver abaixo....)
+            #acho que o esquema do arquivo eh melhor...
+            if label_dict is not None:
+                l_dict = dill.load(open(label_dict))
+                inv_ldict = dict()
+                for i, l in enumerate(l_dict.keys()):
+                    inv_ldict[i] = l
+                predicted = [inv_ldict[i] for i in predicted]
 
         else:
 
