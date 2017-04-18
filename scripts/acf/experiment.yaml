@@ -35,6 +35,7 @@ bandwise_extraction:
   also_one_band: True
   discard_bin_zero: True
   threshold_cut: None
+  feature_set: 'gtzan' #can be gtzan, gtzan+mfcc or mfcc (although MFCC is part of the original GTZAN featureset)
 
 #Feature aggregation parameters
 feature_aggregation:

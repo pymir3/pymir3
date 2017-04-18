@@ -119,7 +119,8 @@ class BandwiseFeatures:
     """
 
     def __init__(self, infile, dft_len=2048, window='hanning', window_len=2048, window_step=1024, db_spec = True,
-                                            fs = 44100, mono = True, zero_pad_resampling=False, threshold_cut=None ):
+                                            fs = 44100, mono = True, zero_pad_resampling=False, threshold_cut=None,
+					    feature_set = 'gtzan+mfcc'):
         self.infile = infile
         self.dft_len = dft_len
         self.window_len = window_len
@@ -128,6 +129,7 @@ class BandwiseFeatures:
         self.db_spec = db_spec
         self.features_per_band = 0
         self.threshold_cut = threshold_cut
+	self.feature_set = feature_set
 
         #load the auio file and compute its spectrum
         #audio_file = open(infile, 'rb')
@@ -149,7 +151,7 @@ class BandwiseFeatures:
                                                               wav_rate=rate,
                                                               wav_data=audio_data)
 
-        if self.threshold_cut is not None:
+        if self.threshold_cut not in ['None', None]:
             self.spectrogram = threshold.ThresholdSpectrogram().threshold(self.spectrogram, self.threshold_cut, overwrite_spec=True)
 
         # keeping the time-domain data for computing time-domain features
@@ -196,57 +198,63 @@ class BandwiseFeatures:
 
             features = []
 
-            flatness_feature = flatness.calc_track_band(self.spectrogram, lowbin, highbin)
-            flatness_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
-            features.append(flatness_feature)
+            if 'gtzan' in self.feature_set.split("+"):
 
-            energy_feature = energy.calc_track_band(self.spectrogram, lowbin, highbin)
-            energy_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
-            features.append(energy_feature)
+                flatness_feature = flatness.calc_track_band(self.spectrogram, lowbin, highbin)
+                flatness_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
+                features.append(flatness_feature)
 
-            flux_feature = flux.calc_track_band(self.spectrogram, lowbin, highbin)
-            flux_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
-            features.append(flux_feature)
+                energy_feature = energy.calc_track_band(self.spectrogram, lowbin, highbin)
+                energy_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
+                features.append(energy_feature)
 
-            centroid_feature = centroid.calc_track_band(self.spectrogram, lowbin, highbin)
-            centroid_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
-            features.append(centroid_feature)
+                flux_feature = flux.calc_track_band(self.spectrogram, lowbin, highbin)
+                flux_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
+                features.append(flux_feature)
 
-            rolloff_feature = rolloff.calc_track_band(self.spectrogram, lowbin, highbin)
-            rolloff_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
-            features.append(rolloff_feature)
+                centroid_feature = centroid.calc_track_band(self.spectrogram, lowbin, highbin)
+                centroid_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
+                features.append(centroid_feature)
 
-            lowenergy_feature = lowenergy.calc_track_band(self.spectrogram, 10, lowbin, highbin)
-            lowenergy_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
-            features.append(lowenergy_feature)
+                rolloff_feature = rolloff.calc_track_band(self.spectrogram, lowbin, highbin)
+                rolloff_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
+                features.append(rolloff_feature)
+
+                lowenergy_feature = lowenergy.calc_track_band(self.spectrogram, 10, lowbin, highbin)
+                lowenergy_feature.metadata.feature += ("_" + str(b[0])) + ("_" + str(b[1]))
+                features.append(lowenergy_feature)
 
             self.features_per_band = len(features)
 
             self.band_features = np.hstack((self.band_features, features))
 
-        #MFCC hack
-        t = track.FeatureTrack()
-        t.data = mfcc.mfcc(self.spectrogram,20)
-        t.metadata.sampling_configuration = self.spectrogram.metadata.sampling_configuration
-        feature = ""
-        for i in range(20):
-            feature = feature + "MFCC_"+ str(i) + " "
-        feature = feature.strip()
-        t.metadata.feature = feature
-        t.metadata.filename = self.spectrogram.metadata.input.name
+        if 'mfcc' in self.feature_set.split("+"):
 
-        self.band_features = np.hstack((self.band_features, t))
+            #MFCC hack
+            t = track.FeatureTrack()
+            t.data = mfcc.mfcc(self.spectrogram,20)
+            t.metadata.sampling_configuration = self.spectrogram.metadata.sampling_configuration
+            feature = ""
+            for i in range(20):
+                feature = feature + "MFCC_"+ str(i) + " "
+            feature = feature.strip()
+            t.metadata.feature = feature
+            t.metadata.filename = self.spectrogram.metadata.input.name
 
-        #Zero crossings
-        t = track.FeatureTrack()
-        t.data = tdomf.zero_crossings(self.audio_data, 1024, 512)
-        t.metadata.sampling_configuration.fs = self.samplingrate
-        t.metadata.sampling_configuration.ofs = self.samplingrate / 1024
-        t.metadata.sampling_configuration.window_length = 512
-        t.metadata.feature = "TDZeroCrossings"
-        t.metadata.filename = self.spectrogram.metadata.input.name
+            self.band_features = np.hstack((self.band_features, t))
 
-        self.band_features = np.hstack((self.band_features, t))
+        if 'gtzan' in self.feature_set.split("+"):
+
+            #Zero crossings
+            t = track.FeatureTrack()
+            t.data = tdomf.zero_crossings(self.audio_data, 1024, 512)
+            t.metadata.sampling_configuration.fs = self.samplingrate
+            t.metadata.sampling_configuration.ofs = self.samplingrate / 1024
+            t.metadata.sampling_configuration.window_length = 512
+            t.metadata.feature = "TDZeroCrossings"
+            t.metadata.filename = self.spectrogram.metadata.input.name
+
+            self.band_features = np.hstack((self.band_features, t))
 
         gc.collect()
 
