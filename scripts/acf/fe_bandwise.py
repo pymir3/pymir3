@@ -64,6 +64,7 @@ class BandwiseExtractor(FeatureExtractor):
             to_mono = self.params['general']['mono']
             zero_pad_resampling = self.params['general']['zero_pad_resampling']
             threshold_cut = self.params['bandwise_extraction']['threshold_cut']
+            feature_set = self.params['bandwise_extraction']['feature_set']
 
             T0 = time.time()
             logger.debug("Extracting features for %s", filename)
@@ -77,7 +78,8 @@ class BandwiseExtractor(FeatureExtractor):
                                         fs=desired_sample_rate,
                                         mono=to_mono,
                                         zero_pad_resampling=zero_pad_resampling,
-                                        threshold_cut=threshold_cut)
+                                        threshold_cut=threshold_cut,
+                                        feature_set=feature_set)
 
             if scale == 'one':
                 a = BF.OneBand(low=int(feats.spectrogram.metadata.min_freq),
