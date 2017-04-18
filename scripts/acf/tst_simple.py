@@ -3,7 +3,6 @@ from sklearn.svm import SVC
 import time
 import numpy
 import dill
-from dft_net import sigtia_net
 
 class SimpleModelTester(ModelTester):
 
@@ -26,6 +25,7 @@ class SimpleModelTester(ModelTester):
         if test_data.type == 'matrix':
 
             if self.params['model_training']['model_trainer'] == "sigtia_net":
+		from dft_net import sigtia_net
                 params = model
                 ld_file = open(label_dict)
                 l_dict = dill.load(ld_file)
@@ -39,11 +39,11 @@ class SimpleModelTester(ModelTester):
                 
             features = scaler.transform(test_data.features)
 
-            predicted = model.predict((features.astype('float32'), None))
-            print predicted.shape
             if self.params['model_training']['model_trainer'] == "sigtia_net":
+                predicted = model.predict((features.astype('float32'), None))
                 predicted = predicted.argmax(axis=1)
-
+            else:
+                predicted = model.predict(features)
 
             #TODO: na verdade esse esquema de voltar as labels deve ser feito de forma independente se o tipo eh matrix ou tracks
             #na HMM eu fiz diferente (ver abaixo....)

@@ -75,6 +75,10 @@ class ModelTrainer:
         else:
             if self.params['model_training']['train_input_type'] == 'feature_tracks':
 
+                ft_filter = self.params['model_training']['ft_filter']
+                ft_nframes = self.params['model_training']['ft_nframes']
+                ft_stack = self.params['model_training']['ft_stack']
+
                 with open(self.params['general']['train_filelist']) as f:
                     ffiles = f.readlines()
 
@@ -93,6 +97,8 @@ class ModelTrainer:
                 features = []
                 labels = []
 
+                total_frames = 0
+
                 for f in xrange(len(filenames_features)):
                     track = feature_track.FeatureTrack()
                     trackfile = open(filenames_features[f], mode='r')
@@ -100,15 +106,33 @@ class ModelTrainer:
                     trackfile.close()
                     
                     ft = track.data
+                    
+                    if ft_filter == 'linear':
+                        mask = numpy.linspace(start=0, stop=ft.shape[0]-1, num=ft_nframes, dtype='int32')
+                        ft = ft[mask]
+
+                    if ft_filter == 'random':
+                        mask = numpy.random.randint(low=0, high=ft.shape[0], size=ft_nframes)
+                        ft = ft[mask]
 
                     if not numpy.any(numpy.isnan(ft)):
+                        total_frames += ft.shape[0]
                         features.append(ft)
                         labels.append(labels_f[f])
                 
                 filenames_features = None
                 ft = None
 
+                #Filters break HMM. It used to return (feature_tracks,), now returns (feature_tracks,ft_nframes,nfeatures)
                 features = numpy.array(features)
+
+                if ft_stack:
+                    features = features.reshape(total_frames, -1)
+                    yr = numpy.ones(len(labels), dtype='int64') * ft_nframes
+                    labels = numpy.repeat(labels, yr)
+    
+                #print features.shape, labels.shape, labels
+                #exit(0)
 
                 input = ModelTrainerInput(features, labels, 'tracks')
                     

@@ -60,6 +60,9 @@ model_training:
   model_trainer: "sigtia_net"
   output_model: "sigtia_net.params"
   train_input_type: 'feature_matrix'
+  ft_filter: 'linear'
+  ft_nframes: 5
+  ft_stack: True
 
 svm_reg:
   balanced_class_weights: False
@@ -72,6 +75,9 @@ sigtia_net:
   hidden_neurons: 50
   hidden_layers: 3
   dropout_rate: 0.0
+  batch_size: 500
+  max_epochs: 10000
+  early_stopping: 500
 
 gmm:
   num_workers: 4
@@ -92,6 +98,10 @@ model_testing:
   predict_proba_file: ""
   test_input_type: 'feature_matrix'
   label_dict: 'gtzan_label.dict'
+
+voting:
+  aggregation_type: 'max'
+  votes: 5
 
 #Evaluation parameters
 evaluation:
