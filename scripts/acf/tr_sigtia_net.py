@@ -63,7 +63,7 @@ class SigtiaNetModelTrainer(ModelTrainer):
 	Y_M[k, labels] = 1
 	labels = Y_M.astype('float32')
 
-        X_train, X_val, Y_train, Y_val = train_test_split(features, labels, test_size=0.3)
+        X_train, X_val, Y_train, Y_val = train_test_split(features, labels, test_size=0.2)
 
         estimator.fit((X_train, Y_train), (X_val, Y_val), max_epochs=max_epochs, early_stopping=early_stopping, batch_size=batch_size)
         T1 = time.time()

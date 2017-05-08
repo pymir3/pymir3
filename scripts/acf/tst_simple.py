@@ -6,6 +6,17 @@ import dill
 
 class SimpleModelTester(ModelTester):
 
+    def load_sigtia_net(self, params, num_feats, num_classes):
+	from dft_net import sigtia_net
+        hidden_neurons = self.params['sigtia_net']['hidden_neurons']
+        hidden_layers = self.params['sigtia_net']['hidden_layers']
+        dropout_rate = self.params['sigtia_net']['dropout_rate']
+        model = sigtia_net.SigtiaNET((None, num_feats), num_classes,
+             hidden_neurons=hidden_neurons, hidden_layers=hidden_layers, dropout_rate=dropout_rate)
+        model.set_params(params)
+
+        return model
+
     def __init__(self):
         pass
 
@@ -22,20 +33,13 @@ class SimpleModelTester(ModelTester):
         scaler_file.close()
 
 
-        if test_data.type == 'matrix':
+        #I SHOULD REALLY FIX THIS 'OR' statement. I'll let it go for now.
+        if test_data.type == 'matrix' or self.params['model_training']['model_trainer'] == "sigtia_net":
 
             if self.params['model_training']['model_trainer'] == "sigtia_net":
-		from dft_net import sigtia_net
-                params = model
-                ld_file = open(label_dict)
-                l_dict = dill.load(ld_file)
-                ld_file.close()
-                hidden_neurons = self.params['sigtia_net']['hidden_neurons']
-                hidden_layers = self.params['sigtia_net']['hidden_layers']
-                dropout_rate = self.params['sigtia_net']['dropout_rate']
-                model = sigtia_net.SigtiaNET((None, test_data.features.shape[1]), len(l_dict.keys()),
-                     hidden_neurons=hidden_neurons, hidden_layers=hidden_layers, dropout_rate=dropout_rate)
-                model.set_params(params)
+                params=model
+                l_dict = dill.load(open(label_dict))
+		model = self.load_sigtia_net(params, test_data.features.shape[1], len(l_dict.keys()))
                 
             features = scaler.transform(test_data.features)
 
@@ -45,33 +49,34 @@ class SimpleModelTester(ModelTester):
             else:
                 predicted = model.predict(features)
 
-            #TODO: na verdade esse esquema de voltar as labels deve ser feito de forma independente se o tipo eh matrix ou tracks
-            #na HMM eu fiz diferente (ver abaixo....)
-            #acho que o esquema do arquivo eh melhor...
-            if label_dict is not None:
-                l_dict = dill.load(open(label_dict))
-                inv_ldict = dict()
-                for i, l in enumerate(l_dict.keys()):
-                    inv_ldict[i] = l
-                predicted = [inv_ldict[i] for i in predicted]
-
         else:
 
             if test_data.type == 'tracks':
+                if self.params['model_training']['model_trainer'] == "hmm": 
+                    all_tests = numpy.array(test_data.features[0])
+                    train_lengths = [test_data.features[0].shape[0]]
+                    for i in xrange(1, len(test_data.features)):
+                        all_tests = numpy.vstack( (all_tests, numpy.array(test_data.features[i])) )
+                        train_lengths.append(test_data.features[i].shape[0])
 
-                all_tests = numpy.array(test_data.features[0])
-                train_lengths = [test_data.features[0].shape[0]]
-                for i in xrange(1, len(test_data.features)):
-                    all_tests = numpy.vstack( (all_tests, numpy.array(test_data.features[i])) )
-                    train_lengths.append(test_data.features[i].shape[0])
+                    X_test = [ scaler.transform(test_data.features[i]) for i in xrange(len(test_data.features)) ]
 
-                X_test = [ scaler.transform(test_data.features[i]) for i in xrange(len(test_data.features)) ]
+                    predicted = [ model.predict(X_test[i]) for i in xrange(len(X_test)) ]
 
-                predicted = [ model.predict(X_test[i]) for i in xrange(len(X_test)) ]
+        #TODO: na verdade esse esquema de voltar as labels deve ser feito de forma independente se o tipo eh matrix ou tracks
+        #na HMM eu fiz diferente (ver abaixo....)
+        #acho que o esquema do arquivo eh melhor...
+        if label_dict is not None:
+            l_dict = dill.load(open(label_dict))
+            #print l_dict
+            inv_ldict = dict()
+            for i, l in enumerate(sorted(l_dict.keys())):
+                inv_ldict[i] = l
+            predicted = [inv_ldict[i] for i in predicted]
 
-	if hasattr(model, "n_dic"):
-	    if model.n_dic != None:
-	        predicted = model.numbers_to_labels(predicted)
+        if hasattr(model, "n_dic"):
+            if model.n_dic != None:
+                predicted = model.numbers_to_labels(predicted)
 
         #output predict file
         predict_filename = self.params['general']['predict_file']

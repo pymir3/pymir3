@@ -18,10 +18,10 @@ general:
 
 steps:
   extract_features: False
-  aggregate_features: True
-  train: False
-  test: False
-  evaluate: False
+  aggregate_features: False
+  train: True
+  test: True
+  evaluate: True
 
 #Feature extraction parameters
 feature_extraction:
@@ -61,9 +61,9 @@ model_training:
   model_trainer: "sigtia_net"
   output_model: "sigtia_net.params"
   train_input_type: 'feature_matrix'
-  ft_filter: 'linear'
-  ft_nframes: 5
-  ft_stack: True
+  ft_filter: 'linear'   #can be linear, random or all.
+  ft_nframes: 5         #the number of frames to keep
+  ft_stack: True        #Whether to stack output into a (total_frames,num_features) matrix.
 
 svm_reg:
   balanced_class_weights: False
@@ -73,12 +73,12 @@ svm_reg:
   probability: False
 
 sigtia_net:
-  hidden_neurons: 50
-  hidden_layers: 3
+  hidden_neurons: 20
+  hidden_layers: 1
   dropout_rate: 0.0
-  batch_size: 500
+  batch_size: 400
   max_epochs: 10000
-  early_stopping: 500
+  early_stopping: 1000
 
 gmm:
   num_workers: 4
@@ -100,10 +100,14 @@ model_testing:
   test_input_type: 'feature_matrix'
   label_dict: 'gtzan_label.dict'
 
-voting:
-  aggregation_type: 'max'
-  votes: 5
 
 #Evaluation parameters
 evaluation:
   evaluator: "simple"
+
+voting:
+  aggregation_type: 'max'
+  votes: 5              #this should match model_training.ft_nframes (ideally)
+
+
+
