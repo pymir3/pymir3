@@ -200,3 +200,49 @@ class ToTextureWindow(mir3.module.Module):
 
         window_track.data = ret
         return window_track
+
+    def to_texture_from_nparray(self, analysis_array, texture_size):
+
+        w = texture_size
+        N = len(analysis_array)
+
+        begin = 0
+        end = begin + w
+
+        ret = numpy.array(())
+        ret.shape = (0,0)
+        dT = analysis_array.T
+        it = 1 if dT.ndim == 1 else dT.shape[0]
+
+        n = 0
+        S = numpy.array([0.0] * it) 
+        m = numpy.array([0.0] * it)
+
+        saida = numpy.zeros((analysis_array.shape[0], analysis_array.shape[1]*2))
+
+        for x in dT[:,:w].T:
+            n = n + 1
+
+            n_m = m + (x - m)/n
+            n_s = S + (x - m)*(x - n_m)
+
+            m = n_m
+            S = n_s
+
+        y = numpy.concatenate((m, S/n), axis=0)
+        saida[n] = y
+
+        for i in range(w, N):
+            m = n_m
+
+            n_m = m + (dT[:,i]-m)/n - (dT[:,i-w]-m)/n
+
+            S = S + ( (dT[:,i] - n_m) * (dT[:,i] - m) ) - ( ( dT[:,i-w] - m )*( dT[:,i-w] - n_m ) )
+
+            y = numpy.concatenate((m, S/n), axis=0)
+            saida[i] = y
+
+        ret = saida[w:,:]
+
+        return ret
+
