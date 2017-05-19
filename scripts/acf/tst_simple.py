@@ -28,9 +28,9 @@ class SimpleModelTester(ModelTester):
         model = dill.load(model_file)
         model_file.close()
 
-        scaler_file = open( ('%s.scaler' % model_filename))
-        scaler = dill.load(scaler_file)
-        scaler_file.close()
+        #scaler_file = open( ('%s.scaler' % model_filename))
+        #scaler = dill.load(scaler_file)
+        #scaler_file.close()
 
 
         #I SHOULD REALLY FIX THIS 'OR' statement. I'll let it go for now.
@@ -41,7 +41,7 @@ class SimpleModelTester(ModelTester):
                 l_dict = dill.load(open(label_dict))
 		model = self.load_sigtia_net(params, test_data.features.shape[1], len(l_dict.keys()))
                 
-            features = scaler.transform(test_data.features)
+            #features = scaler.transform(test_data.features)
 
             if self.params['model_training']['model_trainer'] == "sigtia_net":
                 predicted = model.predict((features.astype('float32'), None))
@@ -59,7 +59,7 @@ class SimpleModelTester(ModelTester):
                         all_tests = numpy.vstack( (all_tests, numpy.array(test_data.features[i])) )
                         train_lengths.append(test_data.features[i].shape[0])
 
-                    X_test = [ scaler.transform(test_data.features[i]) for i in xrange(len(test_data.features)) ]
+                    #X_test = [ scaler.transform(test_data.features[i]) for i in xrange(len(test_data.features)) ]
 
                     predicted = [ model.predict(X_test[i]) for i in xrange(len(X_test)) ]
 
