@@ -42,7 +42,7 @@ class SimpleModelTester(ModelTester):
 		model = self.load_sigtia_net(params, test_data.features.shape[1], len(l_dict.keys()))
                 
             #features = scaler.transform(test_data.features)
-
+            features = test_data.features
             if self.params['model_training']['model_trainer'] == "sigtia_net":
                 predicted = model.predict((features.astype('float32'), None))
                 predicted = predicted.argmax(axis=1)
@@ -66,7 +66,7 @@ class SimpleModelTester(ModelTester):
         #TODO: na verdade esse esquema de voltar as labels deve ser feito de forma independente se o tipo eh matrix ou tracks
         #na HMM eu fiz diferente (ver abaixo....)
         #acho que o esquema do arquivo eh melhor...
-        if label_dict is not None:
+        if self.params['model_testing']['label_dict'] not in [None, 'None']:
             l_dict = dill.load(open(label_dict))
             #print l_dict
             inv_ldict = dict()
