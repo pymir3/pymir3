@@ -336,7 +336,7 @@ class Wav2Spectrogram(mir3.module.Module):
         return open(wav_filename, "rb")
 
 
-    def load_audio(self, audiofile, mono=True, fs=44100, zero_pad_resampling=False):
+    def load_audio(self, audiofile, mono=True, fs=None, zero_pad_resampling=False):
         """Load audio file into numpy array
         Supports 24-bit wav-format, and flac audio through librosa.
         Parameters
@@ -410,16 +410,19 @@ class Wav2Spectrogram(mir3.module.Module):
         audio_data = audio_data / float(2 ** (sample_width * 8 - 1) + 1)
 
         # Resample
-        if fs != sample_rate:
-            #zero pad to nearest power of two to improve resampling performance
-            if zero_pad_resampling:
-                n = len(audio_data)
-                y = int(numpy.floor(numpy.log2(n)))
-                nextpow2 = numpy.power(2, y + 1)
-                audio_data = numpy.pad(audio_data, ((nextpow2 - n), (0)), mode='constant')
+        if fs is not None:
+            if fs != sample_rate:
+                #zero pad to nearest power of two to improve resampling performance
+                if zero_pad_resampling:
+                    n = len(audio_data)
+                    y = int(numpy.floor(numpy.log2(n)))
+                    nextpow2 = numpy.power(2, y + 1)
+                    audio_data = numpy.pad(audio_data, ((nextpow2 - n), (0)), mode='constant')
 
-            audio_data = scipy.signal.resample(audio_data, len(audio_data) * (float(fs) / sample_rate) )
-            sample_rate = fs
+                audio_data = scipy.signal.resample(audio_data, len(audio_data) * (float(fs) / sample_rate) )
+                sample_rate = fs
+        else:
+            fs = sample_rate
 
         audiofile.close()
         audio_file.close()
@@ -433,7 +436,7 @@ class Wav2Spectrogram(mir3.module.Module):
 
     def convert(self, wav_file, window_length=2048, dft_length=2048,
                 window_step=1024,
-                spectrum_type='magnitude', save_metadata=True, wav_rate=44100, wav_data=None):
+                spectrum_type='magnitude', save_metadata=True, wav_rate=None, wav_data=None):
 
         """Converts a WAV file to a spectrogram.
 
